@@ -13036,11 +13036,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/paulscollay/development/projects/azure/vegaplanner/vega.csproj",
+      "projectUniqueName": "/Users/paulscollay/development/projects/azure/vegaplannerserver/vega.csproj",
       "projectName": "vega",
-      "projectPath": "/Users/paulscollay/development/projects/azure/vegaplanner/vega.csproj",
+      "projectPath": "/Users/paulscollay/development/projects/azure/vegaplannerserver/vega.csproj",
       "packagesPath": "/Users/paulscollay/.nuget/packages/",
-      "outputPath": "/Users/paulscollay/development/projects/azure/vegaplanner/obj/",
+      "outputPath": "/Users/paulscollay/development/projects/azure/vegaplannerserver/obj/",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
