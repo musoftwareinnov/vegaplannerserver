@@ -1,0 +1,277 @@
+//Login Details
+
+1. Azure Login
+2. Deployment Login  -> 
+3. DB admin password login
+
+
+
+
+
+
+// Create resource group
+az group create --name myResourceGroup --location "West Europe"
+
+//Create a server
+az sql server create --name vegaplserver --resource-group myResourceGroup --location "West Europe" --admin-user vegapladmin --admin-password VPAmudpud11970
+
+//Create a firewall
+az sql server firewall-rule create --resource-group myResourceGroup --server vegaplserver --name AllowYourIp --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+
+//Create a database
+az sql db create --resource-group myResourceGroup --server vegaplserver --name vegaplDbDev --service-objective S0
+
+//Create a Connection String
+Server=tcp:vegaplserver.database.windows.net,1433;Database=vegaplDbDev;User ID=vegapladmin;Password=VPAmudpud11970;Encrypt=true;Connection Timeout=30;
+
+//Setup a deployment password
+az webapp deployment user set --user-name musoftware --password admudpud1
+
+//Create a web app - todolist
+az webapp create --resource-group myResourceGroup --plan myAppServicePlan --name vpToDoList --deployment-local-git
+
+//Configure environment variable
+az webapp config connection-string set --resource-group myResourceGroup --name vpToDoList --settings MyDbConnection='Server=tcp:vegaplserver.database.windows.net,1433;Database=vegaplDbDev;User ID=vegapladmin;Password=VPAmudpud11970;Encrypt=true;Connection Timeout=30' --connection-string-type SQLServer
+
+//Set Environment 
+az webapp config appsettings set --name vpToDoList --resource-group myResourceGroup --settings ASPNETCORE_ENVIRONMENT="Production"
+
+
+
+#Create a server
+az sql server create --name vegaplserver --resource-group myResourceGroup --location "West Europe" --admin-user vegapladmin --admin-password VPAmudpud11970
+{
+  "administratorLogin": "vegapladmin",
+  "administratorLoginPassword": null,
+  "fullyQualifiedDomainName": "vegaplserver.database.windows.net",
+  "id": "/subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668/resourceGroups/myResourceGroup/providers/Microsoft.Sql/servers/vegaplserver",
+  "identity": null,
+  "kind": "v12.0",
+  "location": "westeurope",
+  "name": "vegaplserver",
+  "resourceGroup": "myResourceGroup",
+  "state": "Ready",
+  "tags": null,
+  "type": "Microsoft.Sql/servers",
+  "version": "12.0"
+}
+
+az sql server firewall-rule create --resource-group myResourceGroup --server vegaplserver --name AllowYourIp --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+{
+  "endIpAddress": "0.0.0.0",
+  "id": "/subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668/resourceGroups/myResourceGroup/providers/Microsoft.Sql/servers/vegaplserver/firewallRules/AllowYourIp",
+  "kind": "v12.0",
+  "location": "West Europe",
+  "name": "AllowYourIp",
+  "resourceGroup": "myResourceGroup",
+  "startIpAddress": "0.0.0.0",
+  "type": "Microsoft.Sql/servers/firewallRules"
+}
+
+//Create Database
+paul@Azure:~$ az sql db create --resource-group myResourceGroup --server vegaplserver --name vegaplDbDev --service-objective S0
+    {
+      "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+      "collation": "SQL_Latin1_General_CP1_CI_AS",
+      "createMode": null,
+      "creationDate": "2018-09-28T14:07:04.100000+00:00",
+      "currentServiceObjectiveName": "S0",
+      "currentSku": {
+        "capacity": 10,
+        "family": null,
+        "name": "Standard",
+        "size": null,
+        "tier": "Standard"
+      },
+      "databaseId": "a8623af2-3d4f-4ae1-98c9-130ce0eff02d",
+      "defaultSecondaryLocation": "northeurope",
+      "earliestRestoreDate": "2018-09-28T14:37:04.100000+00:00",
+      "edition": "Standard",
+      "elasticPoolId": null,
+      "elasticPoolName": null,
+      "failoverGroupId": null,
+      "id": "/subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668/resourceGroups/myResourceGroup/providers/Microsoft.Sql/servers/vegaplserver/databases/vegaplDbDev",
+      "kind": "v12.0,user",
+      "licenseType": null,
+      "location": "westeurope",
+      "longTermRetentionBackupResourceId": null,
+      "managedBy": null,
+      "maxLogSizeBytes": null,
+      "maxSizeBytes": 268435456000,
+      "name": "vegaplDbDev",
+      "readScale": "Disabled",
+      "recoverableDatabaseId": null,
+      "recoveryServicesRecoveryPointId": null,
+      "requestedServiceObjectiveName": "S0",
+      "resourceGroup": "myResourceGroup",
+      "restorableDroppedDatabaseId": null,
+      "restorePointInTime": null,
+      "sampleName": null,
+      "sku": {
+        "capacity": 10,
+        "family": null,
+        "name": "Standard",
+        "size": null,
+        "tier": "Standard"
+      },
+      "sourceDatabaseDeletionDate": null,
+      "sourceDatabaseId": null,
+      "status": "Online",
+      "tags": null,
+      "type": "Microsoft.Sql/servers/databases",
+      "zoneRedundant": false
+    }
+
+//DB Connection String
+Server=tcp:vegaplserver.database.windows.net,1433;Database=vegaplDbDev;User ID=vegapladmin;Password=VPAmudpud11970;Encrypt=true;Connection Timeout=30;
+
+    //Setup a deployment password
+    az webapp deployment user set --user-name musoftware --password admudpud1
+
+    //==>>>>>>
+    paul@Azure:~$ az appservice plan create --name myAppServicePlan --resource-group myResourceGroup
+    {
+      "adminSiteName": null,
+      "freeOfferExpirationTime": null,
+      "geoRegion": "West Europe",
+      "hostingEnvironmentProfile": null,
+      "hyperV": null,
+      "id": "/subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668/resourceGroups/myResourceGroup/providers/Microsoft.Web/serverfarms/myAppServicePlan",
+      "isSpot": false,
+      "isXenon": false,
+      "kind": "app",
+      "location": "West Europe",
+      "maximumNumberOfWorkers": 3,
+      "name": "myAppServicePlan",
+      "numberOfSites": 0,
+      "perSiteScaling": false,
+      "provisioningState": "Succeeded",
+      "reserved": false,
+      "resourceGroup": "myResourceGroup",
+      "sku": {
+        "capabilities": null,
+        "capacity": 1,
+        "family": "B",
+        "locations": null,
+        "name": "B1",
+        "size": "B1",
+        "skuCapacity": null,
+        "tier": "Basic"
+      },
+      "spotExpirationTime": null,
+      "status": "Ready",
+      "subscription": "e69f7c40-76f1-464d-babc-0c47f2963668",
+      "tags": null,
+      "targetWorkerCount": 0,
+      "targetWorkerSizeId": 0,
+      "type": "Microsoft.Web/serverfarms",
+      "workerTierName": null
+    }
+
+
+    //Create a web app - todolist
+    az webapp create --resource-group myResourceGroup --plan myAppServicePlan --name vpToDoList --deployment-local-git
+
+    "deploymentLocalGitUrl": "https://musoftware@vptodolist.scm.azurewebsites.net/vpToDoList.git",
+
+    Local git is configured with url of 'https://musoftware@vptodolist.scm.azurewebsites.net/vpToDoList.git'
+{
+  "availabilityState": "Normal",
+  "clientAffinityEnabled": true,
+  "clientCertEnabled": false,
+  "cloningInfo": null,
+  "containerSize": 0,
+  "dailyMemoryTimeQuota": 0,
+  "defaultHostName": "vptodolist.azurewebsites.net",
+  "deploymentLocalGitUrl": "https://musoftware@vptodolist.scm.azurewebsites.net/vpToDoList.git",
+  "enabled": true,
+  "enabledHostNames": [
+    "vptodolist.azurewebsites.net",
+    "vptodolist.scm.azurewebsites.net"
+  ],
+  "ftpPublishingUrl": "ftp://waws-prod-am2-129.ftp.azurewebsites.windows.net/site/wwwroot",
+  "hostNameSslStates": [
+    {
+      "hostType": "Standard",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "vptodolist.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    },
+    {
+      "hostType": "Repository",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "vptodolist.scm.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIp": null
+    }
+  ],
+  "hostNames": [
+    "vptodolist.azurewebsites.net"
+  ],
+  "hostNamesDisabled": false,
+  "hostingEnvironmentProfile": null,
+  "httpsOnly": false,
+  "hyperV": null,
+  "id": "/subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668/resourceGroups/myResourceGroup/providers/Microsoft.Web/sites/vpToDoList",
+  "identity": null,
+  "isDefaultContainer": null,
+  "isXenon": false,
+  "kind": "app",
+  "lastModifiedTimeUtc": "2018-09-30T15:00:09.520000",
+  "location": "West Europe",
+  "maxNumberOfWorkers": null,
+  "name": "vpToDoList",
+  "outboundIpAddresses": "52.166.78.97,52.166.76.57,52.166.72.50,52.166.72.42,52.166.73.59",
+  "possibleOutboundIpAddresses": "52.166.78.97,52.166.76.57,52.166.72.50,52.166.72.42,52.166.73.59,51.144.105.240,40.91.195.191",
+  "repositorySiteName": "vpToDoList",
+  "reserved": false,
+  "resourceGroup": "myResourceGroup",
+  "scmSiteAlsoStopped": false,
+  "serverFarmId": "/subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668/resourceGroups/myResourceGroup/providers/Microsoft.Web/serverfarms/myAppServicePlan",
+  "siteConfig": null,
+  "slotSwapStatus": null,
+  "state": "Running",
+  "suspendedTill": null,
+  "tags": null,
+  "targetSwapSlot": null,
+  "trafficManagerHostNames": null,
+  "type": "Microsoft.Web/sites",
+  "usageState": "Normal"
+}
+paul@Azure:~$
+
+//Configure environment variable
+az webapp config connection-string set --resource-group myResourceGroup --name vpToDoList --settings MyDbConnection='Server=tcp:vegaplserver.database.windows.net,1433;Database=vegaplDbDev;User ID=vegapladmin;Password=VPAmudpud11970;Encrypt=true;Connection Timeout=30' --connection-string-type SQLServer
+
+  {
+    "MyDbConnection": {
+      "type": "SQLServer",
+      "value": "Server=tcp:vegaplserver.database.windows.net,1433;Database=vegaplDbDev;User ID=vegapladmin;Password=VPAmudpud11970;Encrypt=true;Connection Timeout=30"
+    }
+  }
+
+
+//Set Environment 
+az webapp config appsettings set --name vpToDoList --resource-group myResourceGroup --settings ASPNETCORE_ENVIRONMENT="Production"
+
+    [
+      {
+        "name": "WEBSITE_NODE_DEFAULT_VERSION",
+        "slotSetting": false,
+        "value": "6.9.1"
+      },
+      {
+        "name": "ASPNETCORE_ENVIRONMENT",
+        "slotSetting": false,
+        "value": "Production"
+      }
+    ]

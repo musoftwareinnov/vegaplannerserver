@@ -1,0 +1,40 @@
+  dotnet new angular -o vega
+  cd vega
+  npm install
+  npx webpack --config webpack.config.vendor.js
+ angular.json #install insto root 
+  ng g component  vehicle-form  --skip-import 
+  npm install ng2-toasty --save      #add to vendor.js
+  npm install font-awsome --save 
+  npm install @types/underscore
+  npm install underscore --save-dev  #add to vendor.js
+
+  npm webpack   #check build is okay
+
+npm install @ngtools/webpack@1.10.2 --only=dev -- to build with node
+'If problems!!!
+ npm cache clean --force
+ npm install
+ npm install --save-dev @angular/cli@latest
+
+
+#change env to production
+export ASPNETCORE_ENVIRONMENT=Production
+webpack -- run to update changes  
+
+#database stuff
+  215  dotnet ef migrations add InitialModel
+  217  dotnet ef database update
+  219  dotnet ef migrations add AddAnnotations
+  220  dotnet ef migrations remove
+  222  dotnet ef migrations add ApplyContraints
+  223  dotnet ef database update
+  225  dotnet ef migrations add SeedDatabase
+  226  dotnet ef database update
+  230  dotnet ef migrations add ApplyContraints
+  231  dotnet ef database update
+  233  dotnet ef migrations update ApplyContraints
+  234  dotnet ef database update ApplyContraints
+
+#usefull to regenerate when upgrading angular or removing/install packages
+npx webpack --config webpack.config.vendor.js

@@ -1,0 +1,5 @@
+#sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=MyComplexPassword!1234' -p 1433:1433 -d microsoft/mssql-server-linux
+dotnet ef database update InitialSchema
+dotnet ef database update AddStaticData
+dotnet ef database update AddFeatures
+
