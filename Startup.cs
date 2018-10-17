@@ -41,6 +41,12 @@ namespace vega
         private const string SecretKey = "H14LwZOakkopDONR3tiEGqcsz6tgLjNl"; // gen from https://randomkeygen.com/
         private readonly SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
 
+        //setup CORS access (TODO : move to settings file)
+        private string[] allowCors = {
+            "http://localhost:4200",
+            "https://vegaplclient.azurewebsites.net"
+        };
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -92,8 +98,9 @@ namespace vega
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
             //Allow Cross Origin
-            services.AddCors(options => options.AddPolicy("AllowAll", p => 
-            p.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader()));
+            services.AddCors(options => options.AddPolicy("AllowAll", 
+                o => o.WithOrigins(allowCors).AllowAnyMethod().AllowAnyHeader()
+                ));
 
 
             //Unit Of Work Design Pattern
