@@ -44,7 +44,7 @@ namespace vega
         //setup CORS access (TODO : move to settings file)
         private string[] allowCors = {
             "http://localhost:4200",
-            "https://vegaplclient.azurewebsites.net"
+            "https://vegaplannerclient.azurewebsites.net"
         };
 
         public Startup(IHostingEnvironment env)
