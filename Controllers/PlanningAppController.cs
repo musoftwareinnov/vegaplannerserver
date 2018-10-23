@@ -141,7 +141,8 @@ namespace vega.Controllers
 
                 planningApp.DevelopmentAddress.CompanyName = planningResource.DevelopmentAddress.CompanyName;
                 planningApp.DevelopmentAddress.AddressLine1 = planningResource.DevelopmentAddress.AddressLine1;
-                planningApp.DevelopmentAddress.AddressLine2 = planningResource.DevelopmentAddress.AddressLine2;
+                planningApp.DevelopmentAddress.City = planningResource.DevelopmentAddress.City;
+                planningApp.DevelopmentAddress.County = planningResource.DevelopmentAddress.County;
                 planningApp.DevelopmentAddress.Postcode = planningResource.DevelopmentAddress.Postcode;
                 planningApp.DevelopmentAddress.GeoLocation = planningResource.DevelopmentAddress.GeoLocation;               
                 }    

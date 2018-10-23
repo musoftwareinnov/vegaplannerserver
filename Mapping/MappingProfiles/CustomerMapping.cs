@@ -27,8 +27,10 @@ namespace vega.Mapping.MappingProfiles
                     //Address Details
                     .ForMember(psr => psr.AddressLine1,                    
                         opt => opt.MapFrom(ps =>  ps.CustomerAddress.AddressLine1))
-                    .ForMember(psr => psr.AddressLine2,                    
-                        opt => opt.MapFrom(ps =>  ps.CustomerAddress.AddressLine2))
+                    .ForMember(psr => psr.City,                    
+                        opt => opt.MapFrom(ps =>  ps.CustomerAddress.City))
+                    .ForMember(psr => psr.County,                    
+                        opt => opt.MapFrom(ps =>  ps.CustomerAddress.County))
                     .ForMember(psr => psr.Postcode,                    
                         opt => opt.MapFrom(ps =>  ps.CustomerAddress.Postcode));
 
@@ -53,8 +55,10 @@ namespace vega.Mapping.MappingProfiles
                     //Address Details
                     .ForMember(psr => psr.AddressLine1,                    
                         opt => opt.MapFrom(ps =>  ps.CustomerAddress.AddressLine1))
-                    .ForMember(psr => psr.AddressLine2,                    
-                        opt => opt.MapFrom(ps =>  ps.CustomerAddress.AddressLine2))
+                    .ForMember(psr => psr.City,                    
+                        opt => opt.MapFrom(ps =>  ps.CustomerAddress.City))
+                    .ForMember(psr => psr.County,                    
+                        opt => opt.MapFrom(ps =>  ps.CustomerAddress.County))
                     .ForMember(psr => psr.Postcode,                    
                         opt => opt.MapFrom(ps =>  ps.CustomerAddress.Postcode))
 
@@ -66,12 +70,14 @@ namespace vega.Mapping.MappingProfiles
                     opt => opt.MapFrom(ps =>  ps.CustomerContact.FirstName  
                                             + ' ' + ps.CustomerContact.LastName
                                             + ", " + ps.CustomerAddress.AddressLine1
-                                            + ' ' + ps.CustomerAddress.AddressLine2
+                                            + ',' + ps.CustomerAddress.City
+                                            + ',' + ps.CustomerAddress.County
                                             + ", " + ps.CustomerAddress.Postcode ))
 
                     .ForMember(psr => psr.CustomerAddressSummary,
                     opt => opt.MapFrom(ps =>  ps.CustomerAddress.AddressLine1
-                                            + ' ' + ps.CustomerAddress.AddressLine2
+                                            + ',' + ps.CustomerAddress.City
+                                            + ',' + ps.CustomerAddress.County
                                             + ", " + ps.CustomerAddress.Postcode ));
                                             
             CreateMap<CustomerResource, Customer>()
@@ -95,8 +101,8 @@ namespace vega.Mapping.MappingProfiles
                         o => o.MapFrom(s => s.AddressLine1))
                 .ForPath(d => d.CustomerAddress.AddressLine1, 
                         o => o.MapFrom(s => s.AddressLine1))
-                .ForPath(d => d.CustomerAddress.AddressLine2, 
-                        o => o.MapFrom(s => s.AddressLine2))
+                .ForPath(d => d.CustomerAddress.City, 
+                        o => o.MapFrom(s => s.City))
                 .ForPath(d => d.CustomerAddress.Postcode, 
                         o => o.MapFrom(s => s.Postcode))
                 .ForPath(d => d.CustomerAddress.GeoLocation, 
@@ -105,7 +111,8 @@ namespace vega.Mapping.MappingProfiles
                     opt => opt.MapFrom(ps =>        ps.FirstName   
                                             + ' ' + ps.LastName 
                                             + ' ' + ps.AddressLine1
-                                            + ' ' + ps.AddressLine2
+                                            + ' ' + ps.City
+                                            + ' ' + ps.County
                                             + ' ' + ps.Postcode
                                             + ' ' + ps.EmailAddress
                                             + ' ' + ps.TelephoneHome
@@ -116,7 +123,8 @@ namespace vega.Mapping.MappingProfiles
                     opt => opt.MapFrom(ps => ps.CustomerContact.FirstName  
                                             + ' ' + ps.CustomerContact.LastName
                                             + ", " + ps.CustomerAddress.AddressLine1
-                                            + ' ' + ps.CustomerAddress.AddressLine2
+                                            + ' ' + ps.CustomerAddress.City
+                                            + ' ' + ps.CustomerAddress.County                                            
                                             + ", " + ps.CustomerAddress.Postcode ));
                                            
         }

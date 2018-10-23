@@ -275,3 +275,7 @@ az webapp config appsettings set --name vpToDoList --resource-group myResourceGr
         "value": "Production"
       }
     ]
+
+    170   git remote remove azure
+    171   git remote add azure https://musoftware@vegaplanner.scm.azurewebsites.net/vegaPlanner.git
+    172    git push azure master
