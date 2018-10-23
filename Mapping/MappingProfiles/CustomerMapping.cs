@@ -103,6 +103,8 @@ namespace vega.Mapping.MappingProfiles
                         o => o.MapFrom(s => s.AddressLine1))
                 .ForPath(d => d.CustomerAddress.City, 
                         o => o.MapFrom(s => s.City))
+                .ForPath(d => d.CustomerAddress.County, 
+                        o => o.MapFrom(s => s.County))
                 .ForPath(d => d.CustomerAddress.Postcode, 
                         o => o.MapFrom(s => s.Postcode))
                 .ForPath(d => d.CustomerAddress.GeoLocation, 
