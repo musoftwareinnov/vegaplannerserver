@@ -43,7 +43,7 @@ namespace vega.Controllers
                 return NotFound();
 
             var result = mapper.Map<Customer, CustomerResource>(customer);
- 
+
             return Ok(result);
         } 
 

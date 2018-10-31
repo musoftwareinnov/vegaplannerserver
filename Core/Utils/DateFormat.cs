@@ -2,6 +2,7 @@ using System;
 using Microsoft.Extensions.Options;
 using vega.Core.Models.Settings;
 using vega.Extensions.DateTime;
+using vegaplannerserver.Core;
 
 namespace vega.Core.Utils
 {
@@ -11,6 +12,15 @@ namespace vega.Core.Utils
         public DateFormatString(IOptionsSnapshot<DateFormatSetting> options)
         {
             this.options = options.Value;
+        }
+    }
+
+    public class DateTest
+    {
+        private readonly DateFormatSetting options;
+        public DateTest(IServiceProvider BusinessDateRepository)
+        {
+            
         }
     }
 

@@ -4,15 +4,20 @@ namespace vega.Core.Utils
 {
 
     public sealed class SystemDate
-{
-    public DateTime date;
-    private static readonly System.Lazy<SystemDate> lazy =
-        new Lazy<SystemDate>(() => new SystemDate());
-    
-    public static SystemDate Instance { get { return lazy.Value; } }
+    {   
+        public DateTime date;
+        public  Boolean dateOverride = false;
+        private static readonly System.Lazy<SystemDate> lazy =
+            new Lazy<SystemDate>(() => new SystemDate());
 
-    private SystemDate()
-    {
+        public static SystemDate Instance { 
+            get { 
+                    return lazy.Value; 
+                }
+         }
+
+        private SystemDate()
+        {
+        }
     }
-}
 }

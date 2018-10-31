@@ -1,10 +1,12 @@
+
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv
 @{
     ViewData["Title"] = "Home Page";
 }
+<!-- <p> ASPNETCORE_ENVIRONMENT = @hostingEnv.EnvironmentName</p> -->
+<app asp-prerender-module="ClientApp/dist/main-server">Vega Planner Server Up and Running With Cors V6. Environmnent = @hostingEnv.EnvironmentName</app>
 
-<app asp-prerender-module="ClientApp/dist/main-server">Vega Planner Server Up and Running With Cors V4...</app>
-
-<script src="~/dist/vendor.js" asp-append-version="true"></script>
+<!-- <script src="~/dist/vendor.js" asp-append-version="true"></script>
 @section scripts {
     <script src="~/dist/main-client.js" asp-append-version="true"></script>
-}
+} -->

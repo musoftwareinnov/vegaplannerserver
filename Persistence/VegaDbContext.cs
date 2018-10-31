@@ -4,12 +4,13 @@ using vega.Core.Models;
 using vega.Core.Models.States;
 using vegaplanner.Core.Models;
 using vegaplanner.Core.Models.Security;
+using vegaplannerserver.Core.Models.Settings;
 
 namespace vega.Persistence
 {
     public class VegaDbContext : IdentityDbContext<AppUser>
     {
-        
+        public DbSet<BusinessDate> BusinessDates { get; set; }      
         public DbSet<Make> Makes { get; set; }
         public DbSet<Feature> Features { get; set; }
         public DbSet<Contact> Contacts { get; set; }

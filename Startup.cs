@@ -28,6 +28,9 @@ using Microsoft.AspNetCore.Diagnostics;
 using vegaplanner.Core.Models.Security.Auth;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Http;
+using Scheduler.Code;
+using Scheduler.Code.Scheduling;
+using vegaplannerserver.Core;
 
 namespace vega
 {
@@ -65,10 +68,13 @@ namespace vega
         public void setApplicationDate(string currentDateOverride)
         {
             var currentDate = DateTime.Now;
-            if(currentDateOverride != "")
-                currentDate = currentDateOverride.ParseInputDate();
-
-            SystemDate.Instance.date = currentDate;
+            if(currentDateOverride != "") { 
+                SystemDate.Instance.date = currentDateOverride.ParseInputDate();      
+            }
+            else {
+                SystemDate.Instance.date = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, 0, 0, 0);
+            }
+            Console.WriteLine("Business Date : " + SystemDate.Instance.date);
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -91,11 +97,21 @@ namespace vega
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IDrawingRepository, DrawingRepository>(); 
             services.AddScoped<IPlanningStatisticsRepository, PlanningStatisticsRepository>(); 
+            //services.AddScoped<IBusinessDateRepository, BusinessDateRepository>(); 
 
             //Security 
             services.AddScoped<IUserRepository, UserRepository>(); 
             services.AddSingleton<IJwtFactory, JwtFactory>();
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
+
+            // Add scheduled tasks & scheduler NOT USED ATM
+            //services.AddSingleton<IScheduledTask, QuoteOfTheDayTask>();
+            //services.AddSingleton<IScheduledTask, RollBusinessDate>();
+            // services.AddScheduler((sender, args) =>
+            // {
+            //     Console.Write(args.Exception.Message);
+            //     args.SetObserved();
+            // });
 
             //Allow Cross Origin
             services.AddCors(options => options.AddPolicy("AllowAll", 
@@ -182,6 +198,8 @@ namespace vega
         {
             if (env.IsDevelopment())
             {
+                Console.WriteLine("In Development mode");
+                Console.WriteLine("Database Connection String: " + Configuration.GetConnectionString("Default"));              
                 // app.UseDeveloperExceptionPage();
                 // app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 // {
@@ -228,7 +246,13 @@ namespace vega
                     defaults: new { controller = "Home", action = "Index" });
             });
 
-            
+
+
         }
     }
+
+    // public static class GetMeSomeServiceLocator
+    // {
+    //     public static IServiceProvider Instance { get; set; }
+    // }
 }
