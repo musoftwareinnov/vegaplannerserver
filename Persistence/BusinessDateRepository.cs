@@ -10,6 +10,7 @@ using vega.Extensions;
 using vega.Core.Models.States;
 using Microsoft.Extensions.Options;
 using vegaplannerserver.Core;
+using vegaplannerserver.Core.Models.Settings;
 
 namespace vega.Persistence
 {
@@ -22,36 +23,27 @@ namespace vega.Persistence
             this.vegaDbContext = vegaDbContext;
         }
 
-        public DateTime GetBusinessDate()
+        public async Task<BusinessDate> GetBusinessDate()
         {   
-            /* TODO:
-            ** Future method is to go to a database table and extract a rolled business date
-            ** eg,   await vegaDbContext.BusinessDates.SingleOrDefaultAsync();
-             */
-            //var bd =  await vegaDbContext.BusinessDates.SingleOrDefaultAsync();
-
-            //Currently just get the system date 
-            var businessDate = DateTime.Now;
-            businessDate = new DateTime(businessDate.Year, businessDate.Month, businessDate.Day, 0, 0, 0);
-
-
-
-            Console.WriteLine("Business Date Access : " + businessDate.ToString());
-
-            return businessDate;
+                return await vegaDbContext.BusinessDates.FirstAsync();
         }
 
-        /*
-         * Not Curerntly used
-         */
         public void SetBusinessDate(DateTime businessDate)
         {   
             //Remove time part 
             businessDate = new DateTime(businessDate.Year, businessDate.Month, businessDate.Day, 0, 0, 0);
-            var businessDates =  vegaDbContext.BusinessDates.SingleOrDefault();
-            businessDates.CurrBusDate = businessDate;
-            
-            Console.WriteLine("Business Date set to :" + businessDates.CurrBusDate);
+     
+            foreach (var entity in vegaDbContext.BusinessDates)
+                vegaDbContext.BusinessDates.Remove(entity);     
+     
+            BusinessDate currBusinessDate = new BusinessDate();
+            currBusinessDate.CurrBusDate = businessDate;
+            currBusinessDate.PrevBusDate = businessDate;
+            currBusinessDate.NextBusDate = businessDate;
+            this.vegaDbContext.Add(currBusinessDate);
+
+            Console.WriteLine("Business Date set to :" + currBusinessDate.CurrBusDate);
+            this.vegaDbContext.SaveChanges();  //Anti Pattern - should use UnitOfWork (one off! :-)
         }
     }
 }

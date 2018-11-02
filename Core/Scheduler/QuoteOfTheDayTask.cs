@@ -20,8 +20,8 @@ namespace Scheduler.Code
     {
         //public string Schedule => "* */6 * * *";
 
-        private readonly IBusinessDateRepository businessDateRepository;
-        private readonly IUnitOfWork unitOfWork;
+        //private readonly IBusinessDateRepository businessDateRepository;
+        //private readonly IUnitOfWork unitOfWork;
         // public QuoteOfTheDayTask(
         //                              IBusinessDateRepository businessDateRepository, 
         //                              IUnitOfWork unitOfWork )

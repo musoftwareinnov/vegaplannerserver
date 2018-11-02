@@ -59,23 +59,9 @@ namespace vega
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
 
-            //Set global date, ovverride if set
-            var options = new DateSettings();
-            Configuration.GetSection("DateSettings").Bind(options);
-            setApplicationDate(options.CurrentDateOverride);
+
         }
 
-        public void setApplicationDate(string currentDateOverride)
-        {
-            var currentDate = DateTime.Now;
-            if(currentDateOverride != "") { 
-                SystemDate.Instance.date = currentDateOverride.ParseInputDate();      
-            }
-            else {
-                SystemDate.Instance.date = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, 0, 0, 0);
-            }
-            Console.WriteLine("Business Date : " + SystemDate.Instance.date);
-        }
 
         public IConfigurationRoot Configuration { get; }
 
@@ -97,7 +83,7 @@ namespace vega
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IDrawingRepository, DrawingRepository>(); 
             services.AddScoped<IPlanningStatisticsRepository, PlanningStatisticsRepository>(); 
-            //services.AddScoped<IBusinessDateRepository, BusinessDateRepository>(); 
+            services.AddScoped<IBusinessDateRepository, BusinessDateRepository>(); 
 
             //Security 
             services.AddScoped<IUserRepository, UserRepository>(); 
@@ -194,7 +180,7 @@ namespace vega
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IBusinessDateRepository businessDateRepository)
         {
             if (env.IsDevelopment())
             {
@@ -246,13 +232,25 @@ namespace vega
                     defaults: new { controller = "Home", action = "Index" });
             });
 
+            //Set global date, ovverride if set
+            var options = new DateSettings();
+            Configuration.GetSection("DateSettings").Bind(options);
+            setApplicationDate(options.CurrentDateOverride, businessDateRepository);
+        }
 
-
+        
+        public void setApplicationDate(string currentDateOverride, IBusinessDateRepository businessDateRepository)
+        {
+            var currentDate = DateTime.Now;
+            if(currentDateOverride != "") { 
+                SystemDate.Instance.date = currentDateOverride.ParseInputDate();      
+            }
+            else {
+                SystemDate.Instance.date = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, 0, 0, 0);
+            }
+            Console.WriteLine("Business Date : " + SystemDate.Instance.date);
+            businessDateRepository.SetBusinessDate(SystemDate.Instance.date);
         }
     }
-
-    // public static class GetMeSomeServiceLocator
-    // {
-    //     public static IServiceProvider Instance { get; set; }
-    // }
+    
 }
