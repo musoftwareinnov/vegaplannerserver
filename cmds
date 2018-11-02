@@ -38,3 +38,11 @@ webpack -- run to update changes
 
 #usefull to regenerate when upgrading angular or removing/install packages
 npx webpack --config webpack.config.vendor.js
+
+#SQL create script for production 
+dotnet ef migrations script <MIGRATION> (Exclusive)
+
+#publish in release mode
+dotnet publish --output "/Users/paulscollay/development/projects/azure/releases/vegaplannerserver" --configuration release
+cd /Users/paulscollay/development/projects/azure/releases/vegaplannerserver
+dotnet Coreapp.dll
