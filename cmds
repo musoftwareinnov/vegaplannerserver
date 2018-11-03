@@ -20,29 +20,67 @@ npm install @ngtools/webpack@1.10.2 --only=dev -- to build with node
 
 #change env to production
 export ASPNETCORE_ENVIRONMENT=Production
-webpack -- run to update changes  
+
 
 #database stuff
   215  dotnet ef migrations add InitialModel
   217  dotnet ef database update
   219  dotnet ef migrations add AddAnnotations
   220  dotnet ef migrations remove
-  222  dotnet ef migrations add ApplyContraints
-  223  dotnet ef database update
-  225  dotnet ef migrations add SeedDatabase
-  226  dotnet ef database update
-  230  dotnet ef migrations add ApplyContraints
-  231  dotnet ef database update
-  233  dotnet ef migrations update ApplyContraints
-  234  dotnet ef database update ApplyContraints
 
 #usefull to regenerate when upgrading angular or removing/install packages
 npx webpack --config webpack.config.vendor.js
 
+#Production Release :-
 #SQL create script for production 
 dotnet ef migrations script <MIGRATION> (Exclusive)
+#Run script into production
+#Test Client using local machine
 
 #publish in release mode
 dotnet publish --output "/Users/paulscollay/development/projects/azure/releases/vegaplannerserver" --configuration release
 cd /Users/paulscollay/development/projects/azure/releases/vegaplannerserver
 dotnet Coreapp.dll
+
+#deploy
+#Check deployment centre (in VS Code)
+
+#POWERSHELL !!!sudo!!!!
+sudo pwsh
+Install-Module Az (only once)
+Enable-AzureRmAlias (every time)
+ Login-AzureRmAccount   (login)
+
+#Create a profile for azure (use for web jobs)
+Save-AzureRmProfile -Path “c:\folder\azureprofile.json”
+
+#To Create an Add
+Creating a new Application in AAD (App URI - http://VSO.root.360fd0fe-b3ed-41d1-a76e-a248815833cf)
+VERBOSE: Performing the operation "Adding a new application with display name 'VSO.root.360fd0fe-b3ed-41d1-a76e-a248815833cf'" on target "VSO.root.360fd0fe-b3ed-41d1-a76e-a248815833cf".
+Azure AAD Application creation completed successfully (Application Id: 0b5cf302-3f75-45d2-a514-616f770c9156)
+Creating a new SPN
+SPN creation completed successfully (SPN Name: )
+Waiting for SPN creation to reflect in Directory before Role assignment
+Assigning role (owner) to SPN App (0b5cf302-3f75-45d2-a514-616f770c9156)
+
+RoleAssignmentId   : /subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668/providers/Microsoft.Authorization/roleAssignments/f0ceceec-4744-416e-ad57-f29445d85864
+Scope              : /subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668
+DisplayName        : VSO.root.360fd0fe-b3ed-41d1-a76e-a248815833cf
+SignInName         : 
+RoleDefinitionName : Owner
+RoleDefinitionId   : 8e3af657-a8ff-443c-a75c-2fe8c4bcb635
+ObjectId           : f3bc15f2-e587-45e0-8646-b8210eb17470
+ObjectType         : ServicePrincipal
+CanDelegate        : False
+
+SPN role assignment completed successfully
+
+Copy and Paste below values for Service Connection
+***************************************************************************
+Connection Name: (SPN)
+Subscription Id: e69f7c40-76f1-464d-babc-0c47f2963668
+Subscription Name: 
+Service Principal Id: 0b5cf302-3f75-45d2-a514-616f770c9156
+Service Principal key: <Password that you typed in>
+Tenant Id: b22a1039-f55e-46d8-973f-60d92cad894d
+***************************************************************************
