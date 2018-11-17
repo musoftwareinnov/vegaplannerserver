@@ -31,6 +31,8 @@ using Microsoft.AspNetCore.Http;
 using Scheduler.Code;
 using Scheduler.Code.Scheduling;
 using vegaplannerserver.Core;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace vega
 {
@@ -44,6 +46,7 @@ namespace vega
         private const string SecretKey = "H14LwZOakkopDONR3tiEGqcsz6tgLjNl"; // gen from https://randomkeygen.com/
         private readonly SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
 
+        
         //setup CORS access (TODO : move to settings file)
         private string[] allowCors = {
             "http://localhost:4200",
@@ -89,6 +92,8 @@ namespace vega
             services.AddScoped<IUserRepository, UserRepository>(); 
             services.AddSingleton<IJwtFactory, JwtFactory>();
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<RoleManager<IdentityRole>>();
+            services.AddScoped<UserManager<AppUser>>();
 
             // Add scheduled tasks & scheduler NOT USED ATM
             //services.AddSingleton<IScheduledTask, QuoteOfTheDayTask>();
@@ -153,10 +158,14 @@ namespace vega
                     configureOptions.SaveToken = true;
             });
 
+
             // api user claim policy
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess));
+                options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.rol, Constants.Strings.JwtClaims.AdminUser, Constants.Strings.JwtClaims.ReadOnlyUser ));
+                options.AddPolicy("AdminUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.rol, Constants.Strings.JwtClaims.AdminUser));
+                options.AddPolicy("CustomerUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.rol, Constants.Strings.JwtClaims.AdminUser,Constants.Strings.JwtClaims.CustomerMaintenenceUser));
+                options.AddPolicy("NextStateUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.rol, Constants.Strings.JwtClaims.AdminUser,Constants.Strings.JwtClaims.NextStateUser));
             });
 
             // SECURITY && JWT Setup END
@@ -164,7 +173,6 @@ namespace vega
             // Configure identity options
             var builder = services.AddIdentityCore<AppUser>(o =>
             {
-
                 o.Password.RequireDigit = false;
                 o.Password.RequireLowercase = false;
                 o.Password.RequireUppercase = false;
@@ -172,7 +180,8 @@ namespace vega
                 o.Password.RequiredLength = 6;
             });
 
-            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
+            //Set identity to connect to db contect
+            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);           
             builder.AddEntityFrameworkStores<VegaDbContext>().AddDefaultTokenProviders();
 
             //MVC
@@ -180,7 +189,8 @@ namespace vega
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IBusinessDateRepository businessDateRepository)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, RoleManager<IdentityRole> roleManager,
+                                IBusinessDateRepository businessDateRepository, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -231,6 +241,10 @@ namespace vega
                     name: "spa-fallback",
                     defaults: new { controller = "Home", action = "Index" });
             });
+            app.UseAuthentication();
+            //Add Admin Role to Admin User
+
+            CreateUserRoles(serviceProvider).Wait();
 
             //Set global date, ovverride if set
             var options = new DateSettings();
@@ -238,6 +252,74 @@ namespace vega
             setApplicationDate(options.CurrentDateOverride, businessDateRepository);
         }
 
+        private async Task CreateUserRoles(IServiceProvider serviceProvider)  
+        {     
+            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>(); 
+            var UserManager = serviceProvider.GetRequiredService<UserManager<AppUser>>(); 
+            var UserRepository = serviceProvider.GetRequiredService<IUserRepository>(); 
+            var UnitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+    
+
+                     
+
+            bool x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.AdminUser);
+            if (!x)
+            {
+                // first we create Admin rool    
+                var role = new IdentityRole();
+                role.Name = Constants.Strings.JwtClaims.AdminUser;
+                await RoleManager.CreateAsync(role);
+            }
+
+            //Role : Allow readonly access to all controllers
+            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.ReadOnlyUser);
+            if (!x)
+            {   
+                var role = new IdentityRole();
+                role.Name = Constants.Strings.JwtClaims.ReadOnlyUser;
+                await RoleManager.CreateAsync(role);
+            }
+
+            //Role : Allow user CRUD on customers
+            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.CustomerMaintenenceUser);
+            if (!x)
+            {   
+                var role = new IdentityRole();
+                role.Name = Constants.Strings.JwtClaims.CustomerMaintenenceUser;
+                await RoleManager.CreateAsync(role);
+            }
+
+            //Role : Allow user to go to next state 
+            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.NextStateUser);
+            if (!x)
+            {
+                // first we create Admin rool    
+                var role = new IdentityRole();
+                role.Name = Constants.Strings.JwtClaims.NextStateUser;
+                await RoleManager.CreateAsync(role);
+            }
+
+            // Add admin user if not already exist
+            var user = await UserManager.FindByEmailAsync(Constants.Strings.AdminUser.Email); 
+
+            if(user == null) {
+                var userIdentity = new AppUser();
+
+                userIdentity.UserName = Constants.Strings.AdminUser.Email;
+                userIdentity.FirstName = Constants.Strings.AdminUser.FirstName;
+                userIdentity.LastName = Constants.Strings.AdminUser.LastName;
+                userIdentity.Email = Constants.Strings.AdminUser.Email;
+        
+                var result = await UserManager.CreateAsync(userIdentity, "admpassword"); //CHANGE To ENCRYPT!!!!!!
+
+                if (result.Succeeded) {
+                    UserRepository.Add(new InternalAppUser { IdentityId = userIdentity.Id, Location = "Nowhere" });    
+                    await UserManager.AddToRoleAsync(userIdentity, Constants.Strings.JwtClaims.AdminUser);  
+                    await UnitOfWork.CompleteAsync();
+                }
+            } 
+  
+        }
         
         public void setApplicationDate(string currentDateOverride, IBusinessDateRepository businessDateRepository)
         {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using vegaplanner.Core.Models.Security.JWT;
 using vegaplanner.Core.Models.Security.Helpers;
+using System.Collections.Generic;
 
 namespace vegaplanner.Core.Models.Security.Auth
 {
@@ -19,14 +20,16 @@ namespace vegaplanner.Core.Models.Security.Auth
             ThrowIfInvalidOptions(_jwtOptions);
         }
 
-        public async Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity)
+        public async Task<string> GenerateEncodedToken(string userName, 
+                                                        ClaimsIdentity identity)
         {
             var claims = new[]
          {
                  new Claim(JwtRegisteredClaimNames.Sub, userName),
                  new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
                  new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
-                 identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Rol),
+   
+                 identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.rol),
                  identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Id)
              };
 
@@ -44,12 +47,19 @@ namespace vegaplanner.Core.Models.Security.Auth
             return encodedJwt;
         }
 
-        public ClaimsIdentity GenerateClaimsIdentity(string userName, string id)
+        public ClaimsIdentity GenerateClaimsIdentity(string userName, string id, IList<string> roles)
         {
+            //We should only have one role
+            if(roles.Count == 0) 
+                roles.Add(Constants.Strings.JwtClaims.ReadOnlyUser);
+            
+            var role = roles[0];
+            
             return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
             {
-                new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id),
-                new Claim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess)
+                new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id),  //User Id
+                //new Claim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess),
+                new Claim(Constants.Strings.JwtClaimIdentifiers.rol, role)
             });
         }
 

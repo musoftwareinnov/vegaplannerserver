@@ -23,17 +23,19 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace vegaplanner.Controllers
 {
-    //[Authorize(Policy = "ApiUser")]
+    [Authorize(Policy = "AdminUser")]
     [Route("api/[controller]")]
     public class AccountsController : Controller
     {
         private readonly IUserRepository userRepository;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<AppUser> userManager;
         private readonly IMapper mapper;
         private readonly IUnitOfWork unitOfWork;
         private readonly IHttpContextAccessor httpContextAccessor;
 
         public AccountsController(UserManager<AppUser> userManager, 
+                                 RoleManager<IdentityRole> roleManager,
                                     IMapper mapper, 
                                     IUserRepository userRepository,
                                     IUnitOfWork unitOfWork,
@@ -43,6 +45,7 @@ namespace vegaplanner.Controllers
             this.mapper = mapper;
             this.userRepository = userRepository;
             this.unitOfWork = unitOfWork;
+            this._roleManager = roleManager;
             this.httpContextAccessor = httpContextAccessor;
         }
 
@@ -62,6 +65,13 @@ namespace vegaplanner.Controllers
             if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
 
             userRepository.Add(new InternalAppUser { IdentityId = userIdentity.Id, Location = model.Location });
+
+            //Check if Role specified for user exists
+            bool x = await _roleManager.RoleExistsAsync(model.Role);
+
+            if (!x) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+
+            result = await userManager.AddToRoleAsync(userIdentity, model.Role);
 
             await unitOfWork.CompleteAsync();
 
@@ -90,13 +100,13 @@ namespace vegaplanner.Controllers
         });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Accounts()
-        {
-            var users = await userRepository.Get();
+        // [HttpGet]
+        // public async Task<IActionResult> Accounts()
+        // {
+        //     var users = await userRepository.Get();
         
-            return Ok();
-        }
+        //     return Ok();
+        // }
     }
 
 }

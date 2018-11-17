@@ -11,6 +11,7 @@ using vegaplanner.Core.Models.Security.Resources;
 using AutoMapper;
 using vegaplannerserver.Core;
 using vega.Extensions.DateTime;
+using System.Collections.Generic;
 
 namespace vegaplanner.Core.Models.Security.Controllers
 {
@@ -18,12 +19,15 @@ namespace vegaplanner.Core.Models.Security.Controllers
     public class AuthController : Controller
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+
         private readonly IJwtFactory _jwtFactory;
         private readonly JwtIssuerOptions _jwtOptions;
         public IMapper Mapper;
         private readonly IUserRepository userRepository;
         IBusinessDateRepository businessDateRepository;
         public AuthController(UserManager<AppUser> userManager,
+                                RoleManager<IdentityRole> roleManager,
                                 IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions,
                                 IUserRepository userRepository, IMapper mapper,
                                 IBusinessDateRepository businessDateRepository)
@@ -45,18 +49,27 @@ namespace vegaplanner.Core.Models.Security.Controllers
                 return BadRequest(ModelState);
             }
 
+
+
+
             var identity = await GetClaimsIdentity(credentials.UserName, credentials.Password);
             if (identity == null)
             {
                 return BadRequest(Errors.AddErrorToModelState("login_failure", "Invalid username or password.", ModelState));
             }
 
-            var jwt = await Tokens.GenerateJwt(identity, _jwtFactory, credentials.UserName, _jwtOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
+
+
+            //Take first role (should only have one as this is claims based authorisation)
+            var jwt = await Tokens.GenerateJwt(identity, _jwtFactory, credentials.UserName, _jwtOptions, 
+                            new JsonSerializerSettings { Formatting = Formatting.Indented }, 
+                            Constants.Strings.JwtClaimIdentifiers.rol);
 
             var jwtResource = Mapper.Map<JwtModel, JwtResource>(jwt);
 
             //Add username to token for convenience
             var user = await userRepository.Get(jwt.Id);
+
             jwtResource.UserName = user.Identity.FirstName + " " + user.Identity.LastName;
 
             var bd = await businessDateRepository.GetBusinessDate();
@@ -71,17 +84,31 @@ namespace vegaplanner.Core.Models.Security.Controllers
 
             // get the user to verifty
             var userToVerify = await _userManager.FindByNameAsync(userName);
-
-            if (userToVerify == null) return await Task.FromResult<ClaimsIdentity>(null);
+            if (userToVerify == null) return await Task.FromResult<ClaimsIdentity>(null);   
 
             // check the credentials
             if (await _userManager.CheckPasswordAsync(userToVerify, password))
             {
-                return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id));
+                var roles = await GetUserRole(userName, password);
+                return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id, roles));
             }
 
             // Credentials are invalid, or account doesn't exist
             return await Task.FromResult<ClaimsIdentity>(null);
+        }
+
+        private async Task<IList<string>> GetUserRole(string userName, string password) {
+
+            IList<string> userRoles = new List<string>();
+            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+                return await Task.FromResult<IList<string>>(null);
+
+            // get the user to verifty
+            var userToVerify = await _userManager.FindByNameAsync(userName);
+            if (userToVerify != null) {        
+                userRoles = await _userManager.GetRolesAsync(userToVerify);
+            }
+            return userRoles;
         }
     }
 }
