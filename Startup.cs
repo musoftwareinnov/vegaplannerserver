@@ -42,7 +42,7 @@ namespace vega
     }
     public class Startup
     {
-        //Secret Key for JWT generation
+        //Secret Key for JWT generation MOVE TO AZURE SECRET KEYS
         private const string SecretKey = "H14LwZOakkopDONR3tiEGqcsz6tgLjNl"; // gen from https://randomkeygen.com/
         private readonly SymmetricSecurityKey _signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
 
