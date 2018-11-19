@@ -7,6 +7,7 @@ namespace vega.Controllers.Resources
         public int CustomerId { get; set; }
         public string CustomerName { get; set; }
         public string Name { get; set; }
+        public string DescriptionOfWork { get; set; }
         public string PlanningStatus { get; set; }
         public string CurrentStateStatus { get; set; }
         public string CurrentState { get; set; }

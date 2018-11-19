@@ -7,6 +7,7 @@ namespace vega.Controllers.Resources
     {
         public int StateInitialiserId { get; set; }
         public int CustomerId { get; set; }
+        public string DescriptionOfWork { get; set; }
         public string Name { get; set; }
         public ContactResource Developer { get; set; }
         public Address DevelopmentAddress { get; set; }

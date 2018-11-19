@@ -19,8 +19,6 @@ namespace vegaplanner.Core.Models.Security.Controllers
     public class AuthController : Controller
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-
         private readonly IJwtFactory _jwtFactory;
         private readonly JwtIssuerOptions _jwtOptions;
         public IMapper Mapper;

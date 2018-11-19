@@ -61,8 +61,6 @@ namespace vega
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
-
-
         }
 
 
@@ -84,6 +82,7 @@ namespace vega
             services.AddScoped<IPlanningAppStateRepository, PlanningAppStateRepository>();
             services.AddScoped<IStateStatusRepository, StateStatusRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IDescriptionOfWorkRepository, DescriptionOfWorkRepository>(); 
             services.AddScoped<IDrawingRepository, DrawingRepository>(); 
             services.AddScoped<IPlanningStatisticsRepository, PlanningStatisticsRepository>(); 
             services.AddScoped<IBusinessDateRepository, BusinessDateRepository>(); 
@@ -257,10 +256,7 @@ namespace vega
             var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>(); 
             var UserManager = serviceProvider.GetRequiredService<UserManager<AppUser>>(); 
             var UserRepository = serviceProvider.GetRequiredService<IUserRepository>(); 
-            var UnitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
-    
-
-                     
+            var UnitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();            
 
             bool x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.AdminUser);
             if (!x)

@@ -36,6 +36,7 @@ namespace vega.Core.Models
         // 
         public IList<PlanningAppState> PlanningAppStates { get; set; }
         public ICollection<Drawing> Drawings { get; set; }
+        public string DescriptionOfWork { get; set; }
         public string Notes { get; set; }
 
         public PlanningApp()

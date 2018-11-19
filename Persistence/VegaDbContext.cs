@@ -4,6 +4,7 @@ using vega.Core.Models;
 using vega.Core.Models.States;
 using vegaplanner.Core.Models;
 using vegaplanner.Core.Models.Security;
+using vegaplannerserver.Core.Models;
 using vegaplannerserver.Core.Models.Settings;
 
 namespace vega.Persistence
@@ -28,7 +29,8 @@ namespace vega.Persistence
         public DbSet<Address> DevelopmentAddress { get; set; }
         public DbSet<StateInitialiserCustomField> StateInitialiserCustomFields { get; set; }
         public DbSet<DevelopmentType> DevelopmentType { get; set; }
-
+        public DbSet<DescriptionOfWork> DescriptionOfWork { get; set; }
+    
         //Security based contexts
         public DbSet<InternalAppUser> AppUsers { get; set; }
 
