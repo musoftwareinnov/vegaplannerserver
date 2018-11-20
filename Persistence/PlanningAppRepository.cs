@@ -120,6 +120,40 @@ namespace vega.Persistence
             return result;
         }
 
+        public QueryResult<PlanningApp> GetPlanningAppsSearchCriteria(PlanningAppQuery queryObj)
+        {
+            var result = new QueryResult<PlanningApp>();
+            var resList = new List<PlanningApp>();
+
+            //Provide sorting list for columns if required
+            var columnsMap = new Dictionary<string, Expression<Func<PlanningApp, object>>>()
+            {
+                ["planningReferenceId"] = r => r.PlanningReferenceId,
+                ["descriptionOfWork"] = v => v.DescriptionOfWork,
+            };
+
+            var query =  vegaDbContext.PlanningApps
+                                .Include(b => b.CurrentPlanningStatus) 
+                                .Include(t => t.PlanningAppStates)
+                                    .ThenInclude(a => a.StateStatus)
+                                .Include(t => t.PlanningAppStates)
+                                    .ThenInclude(s => s.state)
+                                .Include(c => c.Customer.CustomerContact)                           
+                                .AsQueryable();
+
+            if(queryObj.PlanningReferenceId != null) {
+                query = query.Where(r => r.PlanningReferenceId.Contains(queryObj.PlanningReferenceId));
+            }
+
+            query = query.ApplyOrdering(queryObj, columnsMap);
+            
+
+            result.TotalItems =  query.Count();
+            query = query.ApplyPaging(queryObj); 
+            result.Items = query.ToList();
+            return result;
+        }
+
         public List<PlanningApp> getAppsWithStatus(IQueryable<PlanningApp> query, string planningAppType) {
 
             var statusListInProgress = stateStatusRepository.GetStateStatusListGroup(StatusList.AppInProgress);

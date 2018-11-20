@@ -10,8 +10,8 @@ namespace vega.Core
         void Add(PlanningApp planningApp, StateInitialiser stateInitialiser);
         Task<PlanningApp> GetPlanningApp(int id, bool includeRelated = true);
         QueryResult<PlanningApp> GetPlanningApps(PlanningAppQuery queryObj);
+        QueryResult<PlanningApp> GetPlanningAppsSearchCriteria(PlanningAppQuery queryObj);
         PlanningApp UpdatePlanningApp(PlanningApp planningApp);
-    
         List<PlanningApp> GetPlanningAppsUsingGenerator(int generatorId, bool inProgress = true);
     }
 }

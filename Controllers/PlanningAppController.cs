@@ -162,7 +162,11 @@ namespace vega.Controllers
         {
             var filter = mapper.Map<PlanningAppQueryResource, PlanningAppQuery>(filterResource);
             
-            var queryResult = repository.GetPlanningApps(filter);
+            var queryResult = new QueryResult<PlanningApp>();
+            if(filterResource.SearchCriteria == true)
+                queryResult = repository.GetPlanningAppsSearchCriteria(filter);  
+            else 
+                 queryResult = repository.GetPlanningApps(filter);             
 
             return mapper.Map<QueryResult<PlanningApp>, QueryResultResource<PlanningAppSummaryResource>>(queryResult);
         }

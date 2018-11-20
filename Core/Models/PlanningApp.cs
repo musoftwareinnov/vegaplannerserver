@@ -267,11 +267,11 @@ namespace vega.Core.Models
         //Planning id for customer usage
         public void genCustomerReferenceId(Customer customer) {
 
-            PlanningReferenceId = "CDS/" + customer.CustomerContact.FirstName.Substring(0,1)
+            PlanningReferenceId = "CDS/" + this.Id.ToString("D5")
+                                        + "/"                                      
+                                        + customer.CustomerContact.FirstName.Substring(0,1)
                                         + customer.CustomerContact.LastName.Substring(0,1)
-                                        + customer.CustomerAddress.Postcode.Substring(0,3)
-                                        + "/"
-                                        + this.Id.ToString("D5");
+                                        + customer.CustomerAddress.Postcode.Substring(0,3);
         }
 
         public void SetCurrent(PlanningAppState planningAppState) {
