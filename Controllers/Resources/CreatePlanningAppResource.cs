@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using vega.Controllers.Resources.Contact;
 using vega.Core.Models;
 
@@ -12,6 +13,7 @@ namespace vega.Controllers.Resources
         public ContactResource Developer { get; set; }
         public Address DevelopmentAddress { get; set; }
 
+        public ICollection<int> Surveyors { get; set; }
 
         public CreatePlanningAppResource()
         {

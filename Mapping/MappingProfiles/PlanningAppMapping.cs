@@ -31,7 +31,8 @@ namespace vega.Mapping.MappingProfiles
                     opt => opt.MapFrom(ps => ps.CompletionDate().SettingDateFormat())); 
                     
             
-            CreateMap<CreatePlanningAppResource, PlanningApp>();
+            CreateMap<CreatePlanningAppResource, PlanningApp>()
+                .ForMember(s => s.Surveyors, opt => opt.Ignore());
 
             CreateMap<UpdatePlanningAppResource, PlanningApp>();
         }

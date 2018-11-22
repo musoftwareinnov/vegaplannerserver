@@ -35,8 +35,6 @@ namespace vega.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCustomer(int id)  
         {
-            //var filter = mapper.Map<CustomerQueryResource, CustomerQuery>(filterResource);
-
             var customer = await customerRepository.GetCustomer(id);
 
             if (customer == null)

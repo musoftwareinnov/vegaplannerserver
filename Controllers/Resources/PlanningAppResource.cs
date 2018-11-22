@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using vega.Controllers.Resources.Contact;
 using vega.Core.Models;
+using vegaplannerserver.Core.Models;
 
 namespace vega.Controllers.Resources
 {
@@ -23,6 +24,7 @@ namespace vega.Controllers.Resources
         public string Generator { get; set; }
         public ContactResource Developer { get; set; }
         public Address DevelopmentAddress { get; set; }
+        public int[] surveyorIds { get; set; }
         public string Notes { get; set; }
 
         public ICollection<PlanningAppStateResource> PlanningAppStates { get; set; }

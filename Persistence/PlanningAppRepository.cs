@@ -9,6 +9,8 @@ using System;
 using vega.Extensions;
 using vega.Core.Models.States;
 using Microsoft.Extensions.Options;
+using vegaplannerserver.Core.Models;
+using vegaplanner.Core.Models.Security;
 
 namespace vega.Persistence
 {
@@ -18,17 +20,20 @@ namespace vega.Persistence
         private readonly IStateInitialiserRepository stateInitialiserRepository;
 
         private readonly IStateInitialiserStateRepository stateInitialiserStateRepository;
+        private readonly IUserRepository userRepository;
 
         public PlanningAppRepository(VegaDbContext vegaDbContext, 
                                      IStateStatusRepository stateStatusRepository,
                                      IStateInitialiserRepository stateInitialiserRepository,
                                      IStateInitialiserStateRepository stateInitialiserStateRepository,
+                                     IUserRepository userRepository,
                                      IOptionsSnapshot<StateStatusSettings> options)
         {
             this.vegaDbContext = vegaDbContext;
             this.stateStatusRepository = stateStatusRepository;
             this.stateInitialiserRepository = stateInitialiserRepository;
             this.stateInitialiserStateRepository = stateInitialiserStateRepository;
+            this.userRepository = userRepository;
             stateStatusSettings = options.Value;
         }
 
@@ -42,6 +47,14 @@ namespace vega.Persistence
             var initialStatus = vegaDbContext.StateStatus.Where(s => s.Name == stateStatusSettings.STATE_ON_TIME).SingleOrDefault();
             var initialStatusList  = vegaDbContext.StateStatus.ToList();
             
+
+            // //Add surveyors to planning app
+            // PlanningAppSurveyors planningAppSurveyors = new PlanningAppSurveyors();
+            // planningAppSurveyors.PlanningApp = planningApp;
+            // planningAppSurveyors.InternalAppUser = userRepository.GetByInternalId(10);
+            // planningApp.Surveyors.Add(planningAppSurveyors);
+
+
             planningApp = planningApp.GeneratePlanningStates(stateInitialiser.States, initialStatusList);
             vegaDbContext.Add(planningApp);   
         }

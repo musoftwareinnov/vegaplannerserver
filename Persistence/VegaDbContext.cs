@@ -30,7 +30,10 @@ namespace vega.Persistence
         public DbSet<StateInitialiserCustomField> StateInitialiserCustomFields { get; set; }
         public DbSet<DevelopmentType> DevelopmentType { get; set; }
         public DbSet<DescriptionOfWork> DescriptionOfWork { get; set; }
-    
+
+        // public DbSet<PlanningSurveyor> PlanningSurveryors { get; set; }
+        // public DbSet<PlanningDrawer> PlanningDrawers { get; set; }
+
         //Security based contexts
         public DbSet<InternalAppUser> AppUsers { get; set; }
 
@@ -43,6 +46,9 @@ namespace vega.Persistence
                 base.OnModelCreating(modelBuilder);    //Required for Identity User!!!!
 
                 modelBuilder.Entity<VehicleFeature>().HasKey(vf => new { vf.VehicleId, vf.FeatureId });
+
+                modelBuilder.Entity<PlanningAppSurveyors>().HasKey(pu => new { pu.PlanningAppId, pu.InternalAppUserId });
+
                 modelBuilder.Entity<Vehicle>().OwnsOne(c => c.Contact);
 
                 modelBuilder.Entity<PlanningApp>().OwnsOne(c => c.Developer);

@@ -27,6 +27,11 @@ namespace vegaplanner.Core.Models.Security.Persistence
                                         .SingleAsync(c => c.Identity.Id == userId.Value);
         }
 
+        public InternalAppUser GetByInternalId(int internalUserId) {
+            return vegaDbContext.AppUsers.Include(c => c.Identity)
+                                        .Single(c => c.Id == internalUserId);
+        }
+
         public async Task<List<InternalAppUser>> Get() {
 
             var users =  await vegaDbContext.AppUsers.Include(c => c.Identity).ToListAsync();

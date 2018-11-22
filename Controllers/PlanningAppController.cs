@@ -13,6 +13,8 @@ using Microsoft.Extensions.Options;
 using vega.Core.Models.Settings;
 using vega.Core.Utils;
 using Microsoft.AspNetCore.Authorization;
+using vegaplannerserver.Core.Models;
+using vegaplanner.Core.Models.Security;
 
 namespace vega.Controllers
 {
@@ -27,6 +29,7 @@ namespace vega.Controllers
         private readonly IPlanningAppStateRepository planningAppStateRepository;
 
         private readonly ICustomerRepository customerRepository;
+        private readonly IUserRepository userRepository;
 
         public IStateStatusRepository statusListRepository { get; }
         public DateSettings dateSettings { get; set; }
@@ -40,6 +43,7 @@ namespace vega.Controllers
                                      IUnitOfWork unitOfWork,
                                      IStateStatusRepository statusListRepository,
                                      ICustomerRepository customerRepository,
+                                     IUserRepository userRepository,
                                      IStateInitialiserRepository stateInitialiserRepository)
         {
             this.unitOfWork = unitOfWork;
@@ -49,6 +53,7 @@ namespace vega.Controllers
             this.statusListRepository = statusListRepository;
             this.stateInitialiserRepository = stateInitialiserRepository;
             this.customerRepository = customerRepository;
+            this.userRepository = userRepository;
         }
 
         [HttpPost]
@@ -65,6 +70,12 @@ namespace vega.Controllers
 
             if(stateInitialiser.States.Count > 0)
             {
+                foreach(int surveyorId in planningResource.Surveyors) {
+                    PlanningAppSurveyors planningAppSurveyors = new PlanningAppSurveyors();
+                    planningAppSurveyors.PlanningApp = planningApp;
+                    planningAppSurveyors.InternalAppUser = userRepository.GetByInternalId(surveyorId);
+                    planningApp.Surveyors.Add(planningAppSurveyors);
+                }
 
                 repository.Add(planningApp, stateInitialiser);
                 await unitOfWork.CompleteAsync();

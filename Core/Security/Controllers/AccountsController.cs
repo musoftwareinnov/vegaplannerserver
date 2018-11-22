@@ -78,35 +78,46 @@ namespace vegaplanner.Controllers
             return new OkObjectResult("Account created");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Account()
-        {
-        //Retrieve the user info
-        //HttpContext.User
-        var userId = httpContextAccessor.HttpContext.User.Claims.Single(c => c.Type == "id");
-        var user = await userRepository.Get(userId);
+        // [HttpGet]
+        // public async Task<IActionResult> Account()
+        // {
+        // //Retrieve the user info
+        // //HttpContext.User
+        // var userId = httpContextAccessor.HttpContext.User.Claims.Single(c => c.Type == "id");
+        // var user = await userRepository.Get(userId);
         
-        return new OkObjectResult(new
+        // return new OkObjectResult(new
+        // {
+        //     Message = "This is secure API and user data!",
+        //     user.Identity.FirstName,
+        //     user.Identity.LastName,
+        //     user.Identity.PictureUrl,
+        //     user.Identity.FacebookId,
+        //     user.Identity.Email,
+        //     user.Location,
+        //     user.Locale,
+        //     user.Gender
+        // });
+        // }
+
+        [HttpGet]
+        public async Task<IActionResult> Accounts()
         {
-            Message = "This is secure API and user data!",
-            user.Identity.FirstName,
-            user.Identity.LastName,
-            user.Identity.PictureUrl,
-            user.Identity.FacebookId,
-            user.Identity.Email,
-            user.Location,
-            user.Locale,
-            user.Gender
-        });
+            var users = await userRepository.Get();     
+
+            return Ok(users);
         }
 
-        // [HttpGet]
-        // public async Task<IActionResult> Accounts()
-        // {
-        //     var users = await userRepository.Get();
-        
-        //     return Ok();
-        // }
+        [Authorize(Policy = "ApiUser")]   //Okay to get list of users with no security info
+        [HttpGet("userSelect")]
+        public async Task<IActionResult> UserSelect()
+        {
+            var users = await userRepository.Get();     
+
+            var result = mapper.Map<List<InternalAppUser>, List<InternalAppUserSelectResource>>(users);
+
+            return Ok(result);
+        }
     }
 
 }
