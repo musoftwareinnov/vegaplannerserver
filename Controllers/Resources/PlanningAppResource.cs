@@ -24,7 +24,9 @@ namespace vega.Controllers.Resources
         public string Generator { get; set; }
         public ContactResource Developer { get; set; }
         public Address DevelopmentAddress { get; set; }
-        public int[] surveyorIds { get; set; }
+        public ICollection<string> Surveyors { get; set; }
+        public ICollection<string> Drawers { get; set; }
+        public string DescriptionOfWork { get; set; }
         public string Notes { get; set; }
 
         public ICollection<PlanningAppStateResource> PlanningAppStates { get; set; }

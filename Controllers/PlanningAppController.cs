@@ -70,11 +70,18 @@ namespace vega.Controllers
 
             if(stateInitialiser.States.Count > 0)
             {
+                //TODO Refactor surveyors/drawers
                 foreach(int surveyorId in planningResource.Surveyors) {
                     PlanningAppSurveyors planningAppSurveyors = new PlanningAppSurveyors();
                     planningAppSurveyors.PlanningApp = planningApp;
                     planningAppSurveyors.InternalAppUser = userRepository.GetByInternalId(surveyorId);
                     planningApp.Surveyors.Add(planningAppSurveyors);
+                }
+                foreach(int surveyorId in planningResource.Drawers) {
+                    PlanningAppDrawers planningAppDrawers = new PlanningAppDrawers();
+                    planningAppDrawers.PlanningApp = planningApp;
+                    planningAppDrawers.InternalAppUser = userRepository.GetByInternalId(surveyorId);
+                    planningApp.Drawers.Add(planningAppDrawers);
                 }
 
                 repository.Add(planningApp, stateInitialiser);

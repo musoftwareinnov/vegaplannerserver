@@ -28,11 +28,18 @@ namespace vega.Mapping.MappingProfiles
                 .ForMember(psr => psr.Generator, 
                     opt => opt.MapFrom(ps => ps.StateInitialiser.Name))
                 .ForMember(psr => psr.CompletionDate, 
-                    opt => opt.MapFrom(ps => ps.CompletionDate().SettingDateFormat())); 
-                    
+                    opt => opt.MapFrom(ps => ps.CompletionDate().SettingDateFormat())) 
+                .ForMember(psr => psr.Surveyors, 
+                    opt => opt.MapFrom(v => v.Surveyors.Select(vf => vf.InternalAppUser.Identity.FirstName
+                                                                        + ' ' + vf.InternalAppUser.Identity.LastName)))
+                .ForMember(psr => psr.Drawers, 
+                    opt => opt.MapFrom(v => v.Drawers.Select(vf => vf.InternalAppUser.Identity.FirstName
+                                                                        + ' ' + vf.InternalAppUser.Identity.LastName)));
+   
             
             CreateMap<CreatePlanningAppResource, PlanningApp>()
-                .ForMember(s => s.Surveyors, opt => opt.Ignore());
+                .ForMember(s => s.Surveyors, opt => opt.Ignore())
+                .ForMember(s => s.Drawers, opt => opt.Ignore());
 
             CreateMap<UpdatePlanningAppResource, PlanningApp>();
         }

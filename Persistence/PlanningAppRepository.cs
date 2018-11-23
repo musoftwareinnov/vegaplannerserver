@@ -46,14 +46,6 @@ namespace vega.Persistence
 
             var initialStatus = vegaDbContext.StateStatus.Where(s => s.Name == stateStatusSettings.STATE_ON_TIME).SingleOrDefault();
             var initialStatusList  = vegaDbContext.StateStatus.ToList();
-            
-
-            // //Add surveyors to planning app
-            // PlanningAppSurveyors planningAppSurveyors = new PlanningAppSurveyors();
-            // planningAppSurveyors.PlanningApp = planningApp;
-            // planningAppSurveyors.InternalAppUser = userRepository.GetByInternalId(10);
-            // planningApp.Surveyors.Add(planningAppSurveyors);
-
 
             planningApp = planningApp.GeneratePlanningStates(stateInitialiser.States, initialStatusList);
             vegaDbContext.Add(planningApp);   
@@ -79,6 +71,12 @@ namespace vega.Persistence
                                     .Include(c => c.Customer.CustomerContact)
                                     .Include(c => c.Customer.CustomerAddress)
                                     .Include(g => g.StateInitialiser)
+                                    .Include(s => s.Surveyors)
+                                        .ThenInclude(u => u.InternalAppUser)
+                                            .ThenInclude(i => i.Identity)
+                                    .Include(s => s.Drawers)
+                                        .ThenInclude(u => u.InternalAppUser)
+                                            .ThenInclude(i => i.Identity)
                                     .SingleOrDefault();
 
                 //sort planing states using 

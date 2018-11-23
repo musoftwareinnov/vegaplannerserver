@@ -1,13 +1,10 @@
 using vega.Core.Models;
 using vegaplanner.Core.Models.Security;
+using vegaplannerserver.Core.Models.Generic;
 
 namespace vegaplannerserver.Core.Models
 {
-    public class PlanningAppSurveyors
+    public class PlanningAppSurveyors : PlanningAppUser
     {
-        public int PlanningAppId { get; set; }
-        public int InternalAppUserId { get; set; }
-        public PlanningApp PlanningApp { get; set; }
-        public InternalAppUser InternalAppUser { get; set; }
     }
 }

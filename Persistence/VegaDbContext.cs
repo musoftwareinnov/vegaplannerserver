@@ -31,9 +31,6 @@ namespace vega.Persistence
         public DbSet<DevelopmentType> DevelopmentType { get; set; }
         public DbSet<DescriptionOfWork> DescriptionOfWork { get; set; }
 
-        // public DbSet<PlanningSurveyor> PlanningSurveryors { get; set; }
-        // public DbSet<PlanningDrawer> PlanningDrawers { get; set; }
-
         //Security based contexts
         public DbSet<InternalAppUser> AppUsers { get; set; }
 
@@ -48,6 +45,8 @@ namespace vega.Persistence
                 modelBuilder.Entity<VehicleFeature>().HasKey(vf => new { vf.VehicleId, vf.FeatureId });
 
                 modelBuilder.Entity<PlanningAppSurveyors>().HasKey(pu => new { pu.PlanningAppId, pu.InternalAppUserId });
+
+                modelBuilder.Entity<PlanningAppDrawers>().HasKey(pu => new { pu.PlanningAppId, pu.InternalAppUserId });
 
                 modelBuilder.Entity<Vehicle>().OwnsOne(c => c.Contact);
 
