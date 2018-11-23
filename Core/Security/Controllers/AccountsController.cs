@@ -67,12 +67,13 @@ namespace vegaplanner.Controllers
             userRepository.Add(new InternalAppUser { IdentityId = userIdentity.Id, Location = model.Location });
 
             //Check if Role specified for user exists
-            bool x = await _roleManager.RoleExistsAsync(model.Role);
+            foreach( string role in model.Roles) {
+                bool x = await _roleManager.RoleExistsAsync(role);
 
-            if (!x) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+                if (!x) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
 
-            result = await userManager.AddToRoleAsync(userIdentity, model.Role);
-
+                result = await userManager.AddToRoleAsync(userIdentity, role);
+            }
             await unitOfWork.CompleteAsync();
 
             return new OkObjectResult("Account created");
@@ -117,6 +118,17 @@ namespace vegaplanner.Controllers
             var result = mapper.Map<List<InternalAppUser>, List<InternalAppUserSelectResource>>(users);
 
             return Ok(result);
+        }
+
+        [Authorize(Policy = "ApiUser")]   //Okay to get list of users with no security info
+        [HttpGet("roleUsers/{role}")]
+        public async Task<IActionResult> roleUsers(string role)
+        {
+            var users = await userRepository.GetUsers(role);  
+            
+            //var result = mapper.Map<IList<AppUser>, IList<AppUserSelectResource>>(users);
+
+            return Ok(users);
         }
     }
 

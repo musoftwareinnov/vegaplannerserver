@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
 namespace vegaplanner.Core.Models.Security.Resources
 {
 
@@ -7,7 +11,15 @@ namespace vegaplanner.Core.Models.Security.Resources
         public string Password { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Role { get; set; }
+        public ICollection<string> Roles { get; set; }
         public string Location { get; set; }
+
+        public RegistrationResource()
+        {
+            Roles = new Collection<String>();
+        }
     }
+
+
+
 }

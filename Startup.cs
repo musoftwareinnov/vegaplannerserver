@@ -88,11 +88,13 @@ namespace vega
             services.AddScoped<IBusinessDateRepository, BusinessDateRepository>(); 
 
             //Security 
+            services.AddScoped<UserManager<AppUser>>();
+            // services.AddScoped<UserManager<InternalAppUser>>();
             services.AddScoped<IUserRepository, UserRepository>(); 
             services.AddSingleton<IJwtFactory, JwtFactory>();
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<RoleManager<IdentityRole>>();
-            services.AddScoped<UserManager<AppUser>>();
+
 
             // Add scheduled tasks & scheduler NOT USED ATM
             //services.AddSingleton<IScheduledTask, QuoteOfTheDayTask>();
@@ -161,8 +163,15 @@ namespace vega
             // api user claim policy
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.rol, Constants.Strings.JwtClaims.AdminUser, Constants.Strings.JwtClaims.ReadOnlyUser ));
-                options.AddPolicy("AdminUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.rol, Constants.Strings.JwtClaims.AdminUser));
+                options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.rol, 
+                                                        Constants.Strings.JwtClaims.AdminUser, 
+                                                        Constants.Strings.JwtClaims.DesignerSurveyUser,
+                                                        Constants.Strings.JwtClaims.DesignerDrawingUser));
+
+                options.AddPolicy("AdminUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.rol, 
+                                                        Constants.Strings.JwtClaims.AdminUser));
+
+                //Not Currently used                                            
                 options.AddPolicy("CustomerUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.rol, Constants.Strings.JwtClaims.AdminUser,Constants.Strings.JwtClaims.CustomerMaintenenceUser));
                 options.AddPolicy("NextStateUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.rol, Constants.Strings.JwtClaims.AdminUser,Constants.Strings.JwtClaims.NextStateUser));
             });
@@ -195,11 +204,7 @@ namespace vega
             {
                 Console.WriteLine("In Development mode");
                 Console.WriteLine("Database Connection String: " + Configuration.GetConnectionString("Default"));              
-                // app.UseDeveloperExceptionPage();
-                // app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                // {
-                //     HotModuleReplacement = true
-                // });
+                // Note: HotModuleRelacement removed, client separate application
             }
             else
             {
@@ -267,6 +272,25 @@ namespace vega
                 await RoleManager.CreateAsync(role);
             }
 
+            //Role : Designer Survey
+            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.DesignerSurveyUser);
+            if (!x)
+            {   
+                var role = new IdentityRole();
+                role.Name = Constants.Strings.JwtClaims.DesignerSurveyUser;
+                await RoleManager.CreateAsync(role);
+            }  
+
+            //Role : Designer Survey
+            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.DesignerDrawingUser);
+            if (!x)
+            {   
+                var role = new IdentityRole();
+                role.Name = Constants.Strings.JwtClaims.DesignerDrawingUser;
+                await RoleManager.CreateAsync(role);
+            }            
+
+            //NOTE : Roles below not currently used
             //Role : Allow readonly access to all controllers
             x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.ReadOnlyUser);
             if (!x)

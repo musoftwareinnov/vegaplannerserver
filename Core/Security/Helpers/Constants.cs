@@ -11,6 +11,8 @@ namespace vegaplanner.Core.Models.Security.Helpers
 
             public static class JwtClaims
             {
+                public const string DesignerSurveyUser = "designerSurveyUser";
+                public const string DesignerDrawingUser = "designerDrawingUser";
                 public const string ReadOnlyUser = "readOnlyUser";
                 public const string AdminUser = "adminUser";
                 public const string CustomerMaintenenceUser = "customerMaintenenceUser";   

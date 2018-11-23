@@ -12,6 +12,9 @@ namespace vegaplanner.Core.Models.Security.Mapping
 
             CreateMap<InternalAppUser, InternalAppUserSelectResource>().ForMember(su => su.FullName, 
                         map => map.MapFrom(su => su.Identity.FirstName + " " + su.Identity.LastName));
+
+            CreateMap<AppUser, AppUserSelectResource>().ForMember(su => su.FullName, 
+                        map => map.MapFrom(su => su.FirstName + " " + su.LastName));
         }
     }
 }
