@@ -62,7 +62,17 @@
             migrationBuilder.Sql("INSERT INTO StateInitialiserStateCustomFields(StateInitialiserStateId, StateInitialiserCustomFieldId ) VALUES ((select id from  StateInitialiserState  where name = 'Building Regs Complete'),(select id from  StateInitialiserCustomFields  where name = 'Buidling Regs 2'))");  
             migrationBuilder.Sql("INSERT INTO StateInitialiserStateCustomFields(StateInitialiserStateId, StateInitialiserCustomFieldId ) VALUES ((select id from  StateInitialiserState  where name = 'Building Regs Complete'),(select id from  StateInitialiserCustomFields  where name = 'Buidling Regs 3'))");  
   
-
+            migrationBuilder.Sql("INSERT INTO DescriptionOfWork (Name, LastUpdate) VALUES ('Single Storey Rear Planning', getdate())");
+            migrationBuilder.Sql("INSERT INTO DescriptionOfWork (Name, LastUpdate) VALUES ('Single Storey Rear - PD', getdate())");
+            migrationBuilder.Sql("INSERT INTO DescriptionOfWork (Name, LastUpdate) VALUES ('Loft Conversions - PD', getdate())");
+            migrationBuilder.Sql("INSERT INTO DescriptionOfWork (Name, LastUpdate) VALUES ('Loft Conversion Planning', getdate())");
+            migrationBuilder.Sql("INSERT INTO DescriptionOfWork (Name, LastUpdate) VALUES ('Single Storey Side/Rear', getdate())");
+            migrationBuilder.Sql("INSERT INTO DescriptionOfWork (Name, LastUpdate) VALUES ('Two Storey Side', getdate())");
+            migrationBuilder.Sql("INSERT INTO DescriptionOfWork (Name, LastUpdate) VALUES ('Two Storey Rear', getdate())");
+            migrationBuilder.Sql("INSERT INTO DescriptionOfWork (Name, LastUpdate) VALUES ('Garden Room', getdate())");
+            migrationBuilder.Sql("INSERT INTO DescriptionOfWork (Name, LastUpdate) VALUES ('First Floor Side', getdate())");
+            migrationBuilder.Sql("INSERT INTO DescriptionOfWork (Name, LastUpdate) VALUES ('New Build House', getdate())");
+            
             //migrationBuilder.Sql("INSERT INTO StateInitialiserStateRules(StateInitialiserStateId, StateRuleId ) VALUES (
             //            (select id from  StateInitialiserState  where name = 'Site Survey Completed'),
             //            (select id from  StateRule  where name = 'ApplicationNo') ) ");

@@ -12,16 +12,14 @@ namespace vegaplanner.Core.Models.Security.Helpers
     {
       public static async Task<JwtModel> GenerateJwt(ClaimsIdentity identity, 
                               IJwtFactory jwtFactory,
-                              string userName, 
                               JwtIssuerOptions jwtOptions, 
-                              JsonSerializerSettings serializerSettings,
-                              string roleId
+                              JsonSerializerSettings serializerSettings
                               )
       {
         var response = new JwtModel
         {
           Id = identity.Claims.Single(c => c.Type == "id"),
-          AuthToken = await jwtFactory.GenerateEncodedToken(userName, identity),
+          AuthToken = await jwtFactory.GenerateEncodedToken(identity),
           Expiry = (int)jwtOptions.ValidFor.TotalSeconds
         };
         return response;

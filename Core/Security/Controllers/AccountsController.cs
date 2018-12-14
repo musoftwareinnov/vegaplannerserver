@@ -50,6 +50,7 @@ namespace vegaplanner.Controllers
         }
 
         // POST api/accounts
+        [Authorize(Policy = "AdminUser")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]RegistrationResource model)
         {
@@ -64,7 +65,7 @@ namespace vegaplanner.Controllers
 
             if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
 
-            userRepository.Add(new InternalAppUser { IdentityId = userIdentity.Id, Location = model.Location });
+            //userRepository.Add(new InternalAppUser { IdentityId = userIdentity.Id, Location = model.Location });
 
             //Check if Role specified for user exists
             foreach( string role in model.Roles) {
@@ -101,34 +102,15 @@ namespace vegaplanner.Controllers
         // });
         // }
 
-        [HttpGet]
-        public async Task<IActionResult> Accounts()
-        {
-            var users = await userRepository.Get();     
-
-            return Ok(users);
-        }
-
-        [Authorize(Policy = "ApiUser")]   //Okay to get list of users with no security info
-        [HttpGet("userSelect")]
-        public async Task<IActionResult> UserSelect()
-        {
-            var users = await userRepository.Get();     
-
-            var result = mapper.Map<List<InternalAppUser>, List<InternalAppUserSelectResource>>(users);
-
-            return Ok(result);
-        }
-
-        [Authorize(Policy = "ApiUser")]   //Okay to get list of users with no security info
+        [Authorize(Policy = "ApiUser")]
         [HttpGet("roleUsers/{role}")]
         public async Task<IActionResult> roleUsers(string role)
         {
-            var users = await userRepository.GetUsers(role);  
-            
-            //var result = mapper.Map<IList<AppUser>, IList<AppUserSelectResource>>(users);
+            var users = await userManager.GetUsersInRoleAsync(role)   ;  
 
-            return Ok(users);
+            var result = mapper.Map<IList<AppUser>, IList<AppUserSelectResource>>(users);
+
+            return Ok(result);
         }
     }
 

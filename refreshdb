@@ -1,0 +1,17 @@
+#Create New Server
+# sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=MyComplexPassword!1234' -p 1433:1433 -d microsoft/mssql-server-linux
+
+#Comment out the following in startup :-
+# CreateUserRoles(serviceProvider).Wait();
+# setApplicationDate(options.CurrentDateOverride, businessDateRepository)
+
+#Run Migrations Scripts
+ dotnet ef database update InitialModel
+ dotnet ef database update SeedDatabase
+ dotnet ef database update AddCityCountyAddress
+ dotnet ef database update BusinessDates
+ dotnet ef database update DescriptionOfWorkModel
+ dotnet ef database update SeedDescriptionOfWorkModel
+ dotnet ef database update AddSurveyors
+ dotnet ef database update AddDrawers
+ dotnet ef database update ChangeAppUserType

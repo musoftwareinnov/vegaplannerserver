@@ -33,6 +33,7 @@ using Scheduler.Code.Scheduling;
 using vegaplannerserver.Core;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using vegaplannerserver.Core.Security;
 
 namespace vega
 {
@@ -89,12 +90,10 @@ namespace vega
 
             //Security 
             services.AddScoped<UserManager<AppUser>>();
-            // services.AddScoped<UserManager<InternalAppUser>>();
+            services.AddScoped<RoleManager<IdentityRole>>();
             services.AddScoped<IUserRepository, UserRepository>(); 
             services.AddSingleton<IJwtFactory, JwtFactory>();
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<RoleManager<IdentityRole>>();
-
 
             // Add scheduled tasks & scheduler NOT USED ATM
             //services.AddSingleton<IScheduledTask, QuoteOfTheDayTask>();
@@ -246,79 +245,25 @@ namespace vega
                     defaults: new { controller = "Home", action = "Index" });
             });
             app.UseAuthentication();
-            //Add Admin Role to Admin User
 
+            //Create Roles if not exist
+            //CORE DUMP ONCE SET!!!!!!!! TODO!!!!!!
             CreateUserRoles(serviceProvider).Wait();
+
+            //Create Admin User if not exist
+            CreateAdminUser(serviceProvider).Wait();
 
             //Set global date, ovverride if set
             var options = new DateSettings();
             Configuration.GetSection("DateSettings").Bind(options);
-            setApplicationDate(options.CurrentDateOverride, businessDateRepository);
+            //setApplicationDate(options.CurrentDateOverride, businessDateRepository);
         }
 
-        private async Task CreateUserRoles(IServiceProvider serviceProvider)  
+        private async Task CreateAdminUser(IServiceProvider serviceProvider)  
         {     
-            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>(); 
             var UserManager = serviceProvider.GetRequiredService<UserManager<AppUser>>(); 
-            var UserRepository = serviceProvider.GetRequiredService<IUserRepository>(); 
-            var UnitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();            
-
-            bool x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.AdminUser);
-            if (!x)
-            {
-                // first we create Admin rool    
-                var role = new IdentityRole();
-                role.Name = Constants.Strings.JwtClaims.AdminUser;
-                await RoleManager.CreateAsync(role);
-            }
-
-            //Role : Designer Survey
-            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.DesignerSurveyUser);
-            if (!x)
-            {   
-                var role = new IdentityRole();
-                role.Name = Constants.Strings.JwtClaims.DesignerSurveyUser;
-                await RoleManager.CreateAsync(role);
-            }  
-
-            //Role : Designer Survey
-            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.DesignerDrawingUser);
-            if (!x)
-            {   
-                var role = new IdentityRole();
-                role.Name = Constants.Strings.JwtClaims.DesignerDrawingUser;
-                await RoleManager.CreateAsync(role);
-            }            
-
-            //NOTE : Roles below not currently used
-            //Role : Allow readonly access to all controllers
-            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.ReadOnlyUser);
-            if (!x)
-            {   
-                var role = new IdentityRole();
-                role.Name = Constants.Strings.JwtClaims.ReadOnlyUser;
-                await RoleManager.CreateAsync(role);
-            }
-
-            //Role : Allow user CRUD on customers
-            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.CustomerMaintenenceUser);
-            if (!x)
-            {   
-                var role = new IdentityRole();
-                role.Name = Constants.Strings.JwtClaims.CustomerMaintenenceUser;
-                await RoleManager.CreateAsync(role);
-            }
-
-            //Role : Allow user to go to next state 
-            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.NextStateUser);
-            if (!x)
-            {
-                // first we create Admin rool    
-                var role = new IdentityRole();
-                role.Name = Constants.Strings.JwtClaims.NextStateUser;
-                await RoleManager.CreateAsync(role);
-            }
-
+            var UserRepository = serviceProvider.GetRequiredService<IUserRepository>();
+            var UnitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();  
             // Add admin user if not already exist
             var user = await UserManager.FindByEmailAsync(Constants.Strings.AdminUser.Email); 
 
@@ -333,18 +278,64 @@ namespace vega
                 var result = await UserManager.CreateAsync(userIdentity, "admpassword"); //CHANGE To ENCRYPT!!!!!!
 
                 if (result.Succeeded) {
-                    UserRepository.Add(new InternalAppUser { IdentityId = userIdentity.Id, Location = "Nowhere" });    
-                    await UserManager.AddToRoleAsync(userIdentity, Constants.Strings.JwtClaims.AdminUser);  
+                    //IAU Deprecated -> UserRepository.Add(new InternalAppUser { IdentityId = userIdentity.Id, Location = "Nowhere" });    
+                    var adminClaims = RoleClaimSetup.RoleClaimSetupAdmin();
+                    await UserManager.AddToRoleAsync(userIdentity, adminClaims.Role.Name); 
                     await UnitOfWork.CompleteAsync();
                 }
             } 
-  
+        }
+        private async Task CreateUserRoles(IServiceProvider serviceProvider)  
+        {     
+            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();       
+
+            bool x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.AdminUser);
+            if (!x)
+            {
+
+                var claims = RoleClaimSetup.RoleClaimSetupAdmin();
+                await RoleManager.CreateAsync(claims.Role);
+
+                foreach(var claim in claims.Claims) {
+                    await RoleManager.AddClaimAsync(claims.Role, claim);
+                }
+            }
+
+            //Role : Designer Survey
+            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.DesignerSurveyUser);
+            if (!x) {
+                 var claims = RoleClaimSetup.RoleClaimSetupDesignerSurvey();
+                await RoleManager.CreateAsync(claims.Role);
+
+                foreach(var claim in claims.Claims) {
+                    await RoleManager.AddClaimAsync(claims.Role, claim);  
+                }             
+            }
+
+            x = await RoleManager.RoleExistsAsync(Constants.Strings.JwtClaims.DesignerDrawingUser);
+            if (!x) {
+                 var claims = RoleClaimSetup.RoleClaimSetupDesignerDrawer();
+                await RoleManager.CreateAsync(claims.Role);
+
+                foreach(var claim in claims.Claims) {
+                    await RoleManager.AddClaimAsync(claims.Role, claim);  
+                }             
+            }           
+        }
+
+        private async void setupClaimsForRole(RoleManager<IdentityRole> roleManager, RoleClaim roleClaims)
+        {
+                await roleManager.CreateAsync(roleClaims.Role);
+
+                foreach(var claim in roleClaims.Claims) {
+                    await roleManager.AddClaimAsync(roleClaims.Role, claim);
+                } 
         }
         
         public void setApplicationDate(string currentDateOverride, IBusinessDateRepository businessDateRepository)
         {
             var currentDate = DateTime.Now;
-            if(currentDateOverride != "") { 
+            if(string.IsNullOrEmpty(currentDateOverride)) { 
                 SystemDate.Instance.date = currentDateOverride.ParseInputDate();      
             }
             else {

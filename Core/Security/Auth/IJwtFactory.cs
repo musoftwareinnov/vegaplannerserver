@@ -6,7 +6,7 @@ namespace vegaplanner.Core.Models.Security.Auth
 {
     public interface IJwtFactory
     {
-        Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity);
-        ClaimsIdentity GenerateClaimsIdentity(string userName, string id, IList<string> roles);
+        Task<string> GenerateEncodedToken(ClaimsIdentity identity);
+        ClaimsIdentity GenerateClaimsIdentity(string userName, string id, List<Claim> claimSet);
     }
 }

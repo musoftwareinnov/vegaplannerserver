@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using vegaplanner.Core.Models.Security.JWT;
 using vegaplanner.Core.Models.Security.Helpers;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace vegaplanner.Core.Models.Security.Auth
 {
@@ -18,26 +19,28 @@ namespace vegaplanner.Core.Models.Security.Auth
         {
             _jwtOptions = jwtOptions.Value;
             ThrowIfInvalidOptions(_jwtOptions);
+
         }
 
-        public async Task<string> GenerateEncodedToken(string userName, 
-                                                        ClaimsIdentity identity)
+        public async Task<string> GenerateEncodedToken(ClaimsIdentity identity)
         {
             var claims = new[]
          {
-                 new Claim(JwtRegisteredClaimNames.Sub, userName),
+                 new Claim(JwtRegisteredClaimNames.Sub, identity.Name),
                  new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
                  new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
    
-                 identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.rol),
-                 identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Id)
+                //  identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.rol),
+                //  identity.FindFirst(Constants.Strings.JwtClaimIdentifiers.Id)
              };
+
+            identity.AddClaims(claims);
 
             // Create the JWT security token and encode it.
             var jwt = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
-                claims: claims,
+                claims: identity.Claims,
                 notBefore: _jwtOptions.NotBefore,
                 expires: _jwtOptions.Expiration,
                 signingCredentials: _jwtOptions.SigningCredentials);
@@ -47,19 +50,19 @@ namespace vegaplanner.Core.Models.Security.Auth
             return encodedJwt;
         }
 
-        public ClaimsIdentity GenerateClaimsIdentity(string userName, string id, IList<string> roles)
+        public ClaimsIdentity GenerateClaimsIdentity(string userName, string id, List<Claim> claimSet)
         {
-            //We should only have one role
-            if(roles.Count == 0) 
-                roles.Add(Constants.Strings.JwtClaims.ReadOnlyUser);
+            var claimsIdentity = new ClaimsIdentity(new GenericIdentity(userName, "Token"), claimSet);
             
-            var role = roles[0];
-            
-            return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
-            {
-                new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id),  //User Id
-                new Claim(Constants.Strings.JwtClaimIdentifiers.rol, role)
-            });
+            //Add User Id Claim
+            claimsIdentity.AddClaim(new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id));
+
+            return claimsIdentity;
+            // return new ClaimsIdentity(new GenericIdentity(userName, "Token"), new[]
+            // {
+            //     new Claim(Constants.Strings.JwtClaimIdentifiers.Id, id),  //User Id
+            //     new Claim(Constants.Strings.JwtClaimIdentifiers.rol, role)
+            // });
         }
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>

@@ -32,7 +32,7 @@ namespace vega.Persistence
         public DbSet<DescriptionOfWork> DescriptionOfWork { get; set; }
 
         //Security based contexts
-        public DbSet<InternalAppUser> AppUsers { get; set; }
+        //public DbSet<InternalAppUser> AppUsers { get; set; }
 
         public VegaDbContext(DbContextOptions<VegaDbContext> options) : base (options)
         {
@@ -44,9 +44,9 @@ namespace vega.Persistence
 
                 modelBuilder.Entity<VehicleFeature>().HasKey(vf => new { vf.VehicleId, vf.FeatureId });
 
-                modelBuilder.Entity<PlanningAppSurveyors>().HasKey(pu => new { pu.PlanningAppId, pu.InternalAppUserId });
+                modelBuilder.Entity<PlanningAppSurveyors>().HasKey(pu => new { pu.PlanningAppId, pu.AppUserId });
 
-                modelBuilder.Entity<PlanningAppDrawers>().HasKey(pu => new { pu.PlanningAppId, pu.InternalAppUserId });
+                modelBuilder.Entity<PlanningAppDrawers>().HasKey(pu => new { pu.PlanningAppId, pu.AppUserId });
 
                 modelBuilder.Entity<Vehicle>().OwnsOne(c => c.Contact);
 

@@ -6,8 +6,8 @@ namespace vegaplannerserver.Core.Models.Generic
     public class PlanningAppUser
     {
         public int PlanningAppId { get; set; }
-        public int InternalAppUserId { get; set; }
+        public string AppUserId { get; set; }
         public PlanningApp PlanningApp { get; set; }
-        public InternalAppUser InternalAppUser { get; set; }
+        public AppUser AppUser { get; set; }
     }
 }

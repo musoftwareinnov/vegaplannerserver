@@ -12,6 +12,7 @@ using AutoMapper;
 using vegaplannerserver.Core;
 using vega.Extensions.DateTime;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace vegaplanner.Core.Models.Security.Controllers
 {
@@ -19,6 +20,7 @@ namespace vegaplanner.Core.Models.Security.Controllers
     public class AuthController : Controller
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IJwtFactory _jwtFactory;
         private readonly JwtIssuerOptions _jwtOptions;
         public IMapper Mapper;
@@ -32,6 +34,7 @@ namespace vegaplanner.Core.Models.Security.Controllers
         {
             this.userRepository = userRepository;
             _userManager = userManager;
+            _roleManager = roleManager;
             _jwtFactory = jwtFactory;
             _jwtOptions = jwtOptions.Value;
             this.Mapper = mapper;
@@ -47,28 +50,16 @@ namespace vegaplanner.Core.Models.Security.Controllers
                 return BadRequest(ModelState);
             }
 
-
-
-
             var identity = await GetClaimsIdentity(credentials.UserName, credentials.Password);
             if (identity == null)
             {
                 return BadRequest(Errors.AddErrorToModelState("login_failure", "Invalid username or password.", ModelState));
             }
 
-
-
-            //Take first role (should only have one as this is claims based authorisation)
-            var jwt = await Tokens.GenerateJwt(identity, _jwtFactory, credentials.UserName, _jwtOptions, 
-                            new JsonSerializerSettings { Formatting = Formatting.Indented }, 
-                            Constants.Strings.JwtClaimIdentifiers.rol);
+            var jwt = await Tokens.GenerateJwt(identity, _jwtFactory, _jwtOptions,
+                            new JsonSerializerSettings { Formatting = Formatting.Indented });
 
             var jwtResource = Mapper.Map<JwtModel, JwtResource>(jwt);
-
-            //Add username to token for convenience
-            var user = await userRepository.Get(jwt.Id);
-
-            jwtResource.UserName = user.Identity.FirstName + " " + user.Identity.LastName;
 
             var bd = await businessDateRepository.GetBusinessDate();
             jwtResource.BusinessDate = bd.CurrBusDate.SettingDateFormat();
@@ -84,11 +75,27 @@ namespace vegaplanner.Core.Models.Security.Controllers
             var userToVerify = await _userManager.FindByNameAsync(userName);
             if (userToVerify == null) return await Task.FromResult<ClaimsIdentity>(null);   
 
+            //YEAH, this is the one to determin designer/drawing surveys
+            //_userManager.GetUsersInRoleAsync()
             // check the credentials
             if (await _userManager.CheckPasswordAsync(userToVerify, password))
             {
-                var roles = await GetUserRole(userName, password);
-                return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id, roles));
+                //Get Claims Here From ROLES and Merge Claims (Using HashSet) then pass to GenerateClaimsIdentity
+                List<Claim> claimSet = new List<Claim>();
+                var roles = await _userManager.GetRolesAsync(userToVerify);
+                
+                foreach(var role in roles) {
+                    var idrole = await _roleManager.FindByNameAsync(role);
+                    var claims = await _roleManager.GetClaimsAsync(idrole);
+                    foreach(var claim in claims)
+                        if(!claimSet.Any(c => c.Type == claim.Type))
+                            claimSet.Add(claim);
+                }
+
+                //Add Real User Name
+                claimSet.Add(new Claim("usr", userToVerify.FirstName + ' ' + userToVerify.LastName));     
+
+                return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id, claimSet.ToList()));
             }
 
             // Credentials are invalid, or account doesn't exist

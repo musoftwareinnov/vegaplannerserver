@@ -15,6 +15,9 @@ using vega.Core.Utils;
 using Microsoft.AspNetCore.Authorization;
 using vegaplannerserver.Core.Models;
 using vegaplanner.Core.Models.Security;
+using Microsoft.AspNetCore.Identity;
+using static vegaplanner.Core.Models.Security.Helpers.Constants.Strings;
+using System.Security.Claims;
 
 namespace vega.Controllers
 {
@@ -32,10 +35,11 @@ namespace vega.Controllers
         private readonly IUserRepository userRepository;
 
         public IStateStatusRepository statusListRepository { get; }
+        public RoleManager<IdentityRole> RoleManager { get; }
         public DateSettings dateSettings { get; set; }
 
         public DateTime CurrentDate { get; set; }
-
+        UserManager<AppUser> userManager { get; set; }
 
         public PlanningAppController(IMapper mapper, 
                                      IPlanningAppRepository repository, 
@@ -44,7 +48,8 @@ namespace vega.Controllers
                                      IStateStatusRepository statusListRepository,
                                      ICustomerRepository customerRepository,
                                      IUserRepository userRepository,
-                                     IStateInitialiserRepository stateInitialiserRepository)
+                                     IStateInitialiserRepository stateInitialiserRepository,
+                                     UserManager<AppUser> userManager)
         {
             this.unitOfWork = unitOfWork;
             this.repository = repository;
@@ -52,6 +57,7 @@ namespace vega.Controllers
             this.mapper = mapper;
             this.statusListRepository = statusListRepository;
             this.stateInitialiserRepository = stateInitialiserRepository;
+            this.userManager = userManager;
             this.customerRepository = customerRepository;
             this.userRepository = userRepository;
         }
@@ -70,22 +76,24 @@ namespace vega.Controllers
 
             if(stateInitialiser.States.Count > 0)
             {
-                //TODO Refactor surveyors/drawers
-                foreach(int surveyorId in planningResource.Surveyors) {
+                //PJSAPPUSER=>Setup AppUser link  Refactor surveyors/drawers
+                foreach(string surveyorId in planningResource.Surveyors) {
                     PlanningAppSurveyors planningAppSurveyors = new PlanningAppSurveyors();
-                    planningAppSurveyors.PlanningApp = planningApp;
-                    planningAppSurveyors.InternalAppUser = userRepository.GetByInternalId(surveyorId);
+                    planningAppSurveyors.PlanningApp = planningApp;                
+                    planningAppSurveyors.AppUser = await userManager.FindByIdAsync(surveyorId);
                     planningApp.Surveyors.Add(planningAppSurveyors);
                 }
-                foreach(int surveyorId in planningResource.Drawers) {
+
+                foreach(string surveyorId in planningResource.Drawers) {
                     PlanningAppDrawers planningAppDrawers = new PlanningAppDrawers();
-                    planningAppDrawers.PlanningApp = planningApp;
-                    planningAppDrawers.InternalAppUser = userRepository.GetByInternalId(surveyorId);
+                    planningAppDrawers.PlanningApp = planningApp;                
+                    planningAppDrawers.AppUser = await userManager.FindByIdAsync(surveyorId);
                     planningApp.Drawers.Add(planningAppDrawers);
                 }
 
                 repository.Add(planningApp, stateInitialiser);
                 await unitOfWork.CompleteAsync();
+
                 planningApp = await repository.GetPlanningApp(planningApp.Id, includeRelated: true);
 
                 //Generate Customer Reference

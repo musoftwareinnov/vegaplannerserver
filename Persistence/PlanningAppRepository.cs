@@ -72,11 +72,11 @@ namespace vega.Persistence
                                     .Include(c => c.Customer.CustomerAddress)
                                     .Include(g => g.StateInitialiser)
                                     .Include(s => s.Surveyors)
-                                        .ThenInclude(u => u.InternalAppUser)
-                                            .ThenInclude(i => i.Identity)
+                                        .ThenInclude(u => u.AppUser)
+                                            //.ThenInclude(i => i.Identity)
                                     .Include(s => s.Drawers)
-                                        .ThenInclude(u => u.InternalAppUser)
-                                            .ThenInclude(i => i.Identity)
+                                        .ThenInclude(u => u.AppUser)
+                                            //.ThenInclude(i => i.Identity)
                                     .SingleOrDefault();
 
                 //sort planing states using 

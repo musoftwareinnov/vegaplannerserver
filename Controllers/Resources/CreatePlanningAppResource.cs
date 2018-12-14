@@ -13,8 +13,8 @@ namespace vega.Controllers.Resources
         public ContactResource Developer { get; set; }
         public Address DevelopmentAddress { get; set; }
 
-        public ICollection<int> Surveyors { get; set; }
-        public ICollection<int> Drawers { get; set; }
+        public ICollection<string> Surveyors { get; set; }
+        public ICollection<string> Drawers { get; set; }
 
         public CreatePlanningAppResource()
         {

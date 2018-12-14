@@ -30,11 +30,11 @@ namespace vega.Mapping.MappingProfiles
                 .ForMember(psr => psr.CompletionDate, 
                     opt => opt.MapFrom(ps => ps.CompletionDate().SettingDateFormat())) 
                 .ForMember(psr => psr.Surveyors, 
-                    opt => opt.MapFrom(v => v.Surveyors.Select(vf => vf.InternalAppUser.Identity.FirstName
-                                                                        + ' ' + vf.InternalAppUser.Identity.LastName)))
+                    opt => opt.MapFrom(v => v.Surveyors.Select(vf => vf.AppUser.FirstName
+                                                                        + ' ' + vf.AppUser.LastName)))
                 .ForMember(psr => psr.Drawers, 
-                    opt => opt.MapFrom(v => v.Drawers.Select(vf => vf.InternalAppUser.Identity.FirstName
-                                                                        + ' ' + vf.InternalAppUser.Identity.LastName)));
+                    opt => opt.MapFrom(v => v.Drawers.Select(vf => vf.AppUser.FirstName
+                                                                        + ' ' + vf.AppUser.LastName)));
    
             
             CreateMap<CreatePlanningAppResource, PlanningApp>()

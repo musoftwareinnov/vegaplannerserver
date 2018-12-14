@@ -52,19 +52,20 @@ namespace vegaplanner.Core.Models.Security
         {
         // retrieve the user info
         //HttpContext.User
-        var userId = _caller.Claims.Single(c => c.Type == "id");
-        var customer = await userRepository.Get(userId);
+        //var userId = _caller.Claims.Single(c => c.Type == "id");
+        //var userId = _caller
+        //var customer = await userRepository.Get(_caller);
+
+        var user = await userManager.GetUserAsync(_caller);
         
         return new OkObjectResult(new
         {
             Message = "This is secure API and user data!",
-            customer.Identity.FirstName,
-            customer.Identity.LastName,
-            customer.Identity.PictureUrl,
-            customer.Identity.FacebookId,
-            customer.Location,
-            customer.Locale,
-            customer.Gender
+
+            user.FirstName,
+            user.LastName,
+            user.PictureUrl,
+            user.FacebookId,
         });
         }
     }

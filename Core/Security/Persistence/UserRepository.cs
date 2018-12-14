@@ -25,32 +25,46 @@ namespace vegaplanner.Core.Models.Security.Persistence
             
  
         }
-        public async void Add(InternalAppUser appUser) {
-            await vegaDbContext.AppUsers.AddAsync(appUser);
-        }
 
-        public async Task<InternalAppUser> Get(Claim userId) {
-            return await vegaDbContext.AppUsers.Include(c => c.Identity)
-                                        .SingleAsync(c => c.Identity.Id == userId.Value);
-        }
+        // public async void Add(AppUser appUser) {
+        //     //await userManager.CreateAsync(appUser);
+        //     await vegaDbContext.AppUser.AddAsync(appUser);           
+        // }   
+
+
+
+        //Deprecated InternalAppUser   
+
+        // public async void Add(InternalAppUser appUser) {
+        //     await vegaDbContext.AppUsers.AddAsync(appUser);           
+        // }
+
+        // public async Task<InternalAppUser> Get(Claim userId) {
+        //     userManager.GetUser;
+
+        //     return await vegaDbContext.AppUsers.Include(c => c.Identity)
+        //                                 .SingleAsync(c => c.Identity.Id == userId.Value);
+
+                                
+        // }
 
         public async Task<IList<AppUser>> GetUsers(string role) {
             var surveyors = new List<AppUser>();
-            var users = userManager.GetUsersInRoleAsync(role)   ;                 
-
+            var users = userManager.GetUsersInRoleAsync(role)   ;               
             return await users;
         }
 
-        public InternalAppUser GetByInternalId(int internalUserId) {
-            return vegaDbContext.AppUsers.Include(c => c.Identity)
-                                        .Single(c => c.Id == internalUserId);
-        }
+        // public InternalAppUser GetByInternalId(int internalUserId) {
+        //     return vegaDbContext.AppUsers.Include(c => c.Identity)
+        //                                 .Single(c => c.Id == internalUserId);
+        // }
 
-        public async Task<List<InternalAppUser>> Get() {
+        //PJSAPPUSER -> get users by Role
+        // public async Task<List<InternalAppUser>> Get() {
 
-            var users =  await vegaDbContext.AppUsers.Include(c => c.Identity).ToListAsync();
-
-            return users;
-        }
+        //     var users =  await vegaDbContext.AppUsers.Include(c => c.Identity).ToListAsync();
+        //     userManager.
+        //     return users;
+        // }
     }
 }
