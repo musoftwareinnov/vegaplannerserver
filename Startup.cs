@@ -256,7 +256,7 @@ namespace vega
             //Set global date, ovverride if set
             var options = new DateSettings();
             Configuration.GetSection("DateSettings").Bind(options);
-            //setApplicationDate(options.CurrentDateOverride, businessDateRepository);
+            setApplicationDate(options.CurrentDateOverride, businessDateRepository);
         }
 
         private async Task CreateAdminUser(IServiceProvider serviceProvider)  
