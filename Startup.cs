@@ -335,7 +335,7 @@ namespace vega
         public void setApplicationDate(string currentDateOverride, IBusinessDateRepository businessDateRepository)
         {
             var currentDate = DateTime.Now;
-            if(string.IsNullOrEmpty(currentDateOverride)) { 
+            if(!string.IsNullOrEmpty(currentDateOverride)) { 
                 SystemDate.Instance.date = currentDateOverride.ParseInputDate();      
             }
             else {
