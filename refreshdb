@@ -14,4 +14,4 @@
  dotnet ef database update SeedDescriptionOfWorkModel
  dotnet ef database update AddSurveyors
  dotnet ef database update AddDrawers
- dotnet ef database update ChangeAppUserType
+ dotnet ef database update ChangAppUserType
