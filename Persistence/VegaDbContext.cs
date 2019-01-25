@@ -15,6 +15,7 @@ namespace vega.Persistence
         public DbSet<Make> Makes { get; set; }
         public DbSet<Feature> Features { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Title> Title { get; set; }
         public DbSet<Vehicle> Vehicle { get; set; }
         public DbSet<Model> Models { get; set; }
         public DbSet<Photo> Photos { get; set; }

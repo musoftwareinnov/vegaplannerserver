@@ -3,6 +3,7 @@
 
 #Comment out the following in startup :-
 # CreateUserRoles(serviceProvider).Wait();
+# CreateAdminUser(serviceProvider).Wait();
 # setApplicationDate(options.CurrentDateOverride, businessDateRepository)
 
 #Run Migrations Scripts

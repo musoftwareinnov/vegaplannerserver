@@ -34,6 +34,7 @@ using vegaplannerserver.Core;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using vegaplannerserver.Core.Security;
+using vegaplannerserver.Persistence;
 
 namespace vega
 {
@@ -87,6 +88,7 @@ namespace vega
             services.AddScoped<IDrawingRepository, DrawingRepository>(); 
             services.AddScoped<IPlanningStatisticsRepository, PlanningStatisticsRepository>(); 
             services.AddScoped<IBusinessDateRepository, BusinessDateRepository>(); 
+            services.AddScoped<IStaticDataRepository, StaticDataRepository>(); 
 
             //Security 
             services.AddScoped<UserManager<AppUser>>();

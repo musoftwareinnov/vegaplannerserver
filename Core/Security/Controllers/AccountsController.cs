@@ -80,11 +80,16 @@ namespace vegaplanner.Controllers
             return new OkObjectResult("Account created");
         }
 
-        // [HttpGet]
-        // public async Task<IActionResult> Account()
-        // {
-        // //Retrieve the user info
-        // //HttpContext.User
+        [Authorize(Policy = "AdminUser")]
+        [HttpGet("users")]
+        public IActionResult Account()
+        {
+
+            var users = userManager.Users ; 
+
+            return Ok(users); 
+        //Retrieve the user info
+        //HttpContext.User
         // var userId = httpContextAccessor.HttpContext.User.Claims.Single(c => c.Type == "id");
         // var user = await userRepository.Get(userId);
         
@@ -100,7 +105,7 @@ namespace vegaplanner.Controllers
         //     user.Locale,
         //     user.Gender
         // });
-        // }
+        }
 
         [Authorize(Policy = "ApiUser")]
         [HttpGet("roleUsers/{role}")]

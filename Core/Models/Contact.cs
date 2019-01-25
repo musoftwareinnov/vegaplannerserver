@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using vegaplannerserver.Core.Models;
 
 namespace vega.Core.Models
 {
     public class Contact
     {
-
+        public Title Title { get; set; }
+        
         [StringLength(30)]
         public string FirstName { get; set;}
         [StringLength(30)]

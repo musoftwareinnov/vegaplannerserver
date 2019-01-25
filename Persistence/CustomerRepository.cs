@@ -28,6 +28,7 @@ namespace vega.Persistence
                                 .Include(t => t.planningApps)
                                         .ThenInclude(t => t.PlanningAppStates) 
                                             .ThenInclude(a => a.StateStatus)
+                                .Include(t => t.CustomerContact.Title)
                                 .SingleOrDefaultAsync(v => v.Id == id);
 
                 //Important to keep order of states as they can be added and removed - 
@@ -46,7 +47,7 @@ namespace vega.Persistence
 
             var query = vegaDbContext.Customers
                                 .OrderBy(c => c.CustomerContact.LastName)
-                                //   .Include(pa => pa.planningApps)
+                                .Include(t => t.CustomerContact.Title)
                                 .AsQueryable();
 
             if(queryObj.SearchCriteria != null)

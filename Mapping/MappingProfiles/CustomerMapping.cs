@@ -37,6 +37,8 @@ namespace vega.Mapping.MappingProfiles
             CreateMap<Customer, CustomerResource>()
 
                     //Contact Details
+                    .ForMember(psr => psr.Title,                    
+                        opt => opt.MapFrom(ps =>  ps.CustomerContact.Title.Name))
                     .ForMember(psr => psr.FirstName,                    
                         opt => opt.MapFrom(ps =>  ps.CustomerContact.FirstName))
                     .ForMember(psr => psr.LastName,                    
@@ -83,6 +85,8 @@ namespace vega.Mapping.MappingProfiles
             CreateMap<CustomerResource, Customer>()
 
                 //Contact Details
+                .ForPath(d => d.CustomerContact.Title.Name, 
+                        o => o.MapFrom(s => s.Title))
                 .ForPath(d => d.CustomerContact.FirstName, 
                         o => o.MapFrom(s => s.FirstName))
                 .ForPath(d => d.CustomerContact.LastName, 
