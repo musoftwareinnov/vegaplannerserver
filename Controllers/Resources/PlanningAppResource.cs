@@ -26,6 +26,7 @@ namespace vega.Controllers.Resources
         public Address DevelopmentAddress { get; set; }
         public ICollection<string> Surveyors { get; set; }
         public ICollection<string> Drawers { get; set; }
+        public ICollection<string> Admins { get; set; }
         public string DescriptionOfWork { get; set; }
         public string Notes { get; set; }
 
@@ -34,6 +35,9 @@ namespace vega.Controllers.Resources
         public PlanningAppResource()
         {
             PlanningAppStates = new Collection<PlanningAppStateResource>();
+            Surveyors = new Collection<string>();
+            Drawers = new Collection<string>();
+            Admins = new Collection<string>();
         }
     }
 }

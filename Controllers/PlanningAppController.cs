@@ -76,7 +76,8 @@ namespace vega.Controllers
 
             if(stateInitialiser.States.Count > 0)
             {
-                //PJSAPPUSER=>Setup AppUser link  Refactor surveyors/drawers
+                //REFACTOR SORT NULL PROBLEM, SHOULD BE ALLOCATED IN RESOURCE!!!!!
+                if(planningResource.Surveyors !=null)
                 foreach(string surveyorId in planningResource.Surveyors) {
                     PlanningAppSurveyors planningAppSurveyors = new PlanningAppSurveyors();
                     planningAppSurveyors.PlanningApp = planningApp;                
@@ -84,11 +85,19 @@ namespace vega.Controllers
                     planningApp.Surveyors.Add(planningAppSurveyors);
                 }
 
+                if(planningResource.Drawers !=null)
                 foreach(string surveyorId in planningResource.Drawers) {
                     PlanningAppDrawers planningAppDrawers = new PlanningAppDrawers();
                     planningAppDrawers.PlanningApp = planningApp;                
                     planningAppDrawers.AppUser = await userManager.FindByIdAsync(surveyorId);
                     planningApp.Drawers.Add(planningAppDrawers);
+                }
+                if(planningResource.Admins !=null)
+                foreach(string adminId in planningResource.Admins) {
+                    PlanningAppAdmins planningAppAdmins = new PlanningAppAdmins();
+                    planningAppAdmins.PlanningApp = planningApp;                
+                    planningAppAdmins.AppUser = await userManager.FindByIdAsync(adminId);
+                    planningApp.Admins.Add(planningAppAdmins);
                 }
 
                 repository.Add(planningApp, stateInitialiser);
@@ -110,8 +119,7 @@ namespace vega.Controllers
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPlanningApp(int id)
-        {
-                
+        {              
             var planningApp = await repository.GetPlanningApp(id, includeRelated: true);
 
             if (planningApp == null)
@@ -157,7 +165,7 @@ namespace vega.Controllers
                 //No state specified just save details that can be modified by the user
                 //PlanningApp res = mapper.Map<UpdatePlanningAppResource, PlanningApp>(planningResource);
 
-                //Refactor!!!!!!
+                //REFACTOR!!!!!!
                 planningApp.Notes = planningResource.Notes;
                 planningApp.Developer.FirstName = planningResource.Developer.FirstName;
                 planningApp.Developer.LastName = planningResource.Developer.LastName;

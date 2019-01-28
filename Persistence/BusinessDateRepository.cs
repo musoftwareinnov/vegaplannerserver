@@ -25,7 +25,7 @@ namespace vega.Persistence
 
         public async Task<BusinessDate> GetBusinessDate()
         {   
-                return await vegaDbContext.BusinessDates.FirstAsync();
+                return await vegaDbContext.BusinessDates.SingleOrDefaultAsync();
         }
 
         public void SetBusinessDate(DateTime businessDate)

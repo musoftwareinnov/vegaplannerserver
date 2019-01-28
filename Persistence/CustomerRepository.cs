@@ -33,7 +33,10 @@ namespace vega.Persistence
 
                 //Important to keep order of states as they can be added and removed - 
                 //EF Core cant do Include(t => t.States.Orderby)
-                var orderedStates = customer.planningApps.OrderBy(o => o.Id);
+
+                if(customer.planningApps.Count > 0)
+                    customer.planningApps.OrderBy(o => o.Id);
+                    
                 return customer;
             }
             else {

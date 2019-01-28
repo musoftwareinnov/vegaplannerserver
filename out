@@ -1,0 +1,99 @@
+In Development mode
+Database Connection String: server=localhost; database=vega; user id=sa; password=MyComplexPassword!1234
+Business Date : 04/02/2020 00:00:00
+Business Date set to :04/02/2020 00:00:00
+ALTER TABLE [Vehicles] ADD [Contact_TitleId] int NULL;
+
+GO
+
+ALTER TABLE [PlanningApps] ADD [Developer_TitleId] int NULL;
+
+GO
+
+ALTER TABLE [Customers] ADD [CustomerContact_TitleId] int NULL;
+
+GO
+
+CREATE TABLE [Title] (
+    [Id] int NOT NULL IDENTITY,
+    [LastUpdate] datetime2 NOT NULL,
+    [Name] nvarchar(255) NOT NULL,
+    CONSTRAINT [PK_Title] PRIMARY KEY ([Id])
+);
+
+GO
+
+CREATE INDEX [IX_Vehicles_Contact_TitleId] ON [Vehicles] ([Contact_TitleId]);
+
+GO
+
+CREATE INDEX [IX_PlanningApps_Developer_TitleId] ON [PlanningApps] ([Developer_TitleId]);
+
+GO
+
+CREATE INDEX [IX_Customers_CustomerContact_TitleId] ON [Customers] ([CustomerContact_TitleId]);
+
+GO
+
+ALTER TABLE [Customers] ADD CONSTRAINT [FK_Customers_Title_CustomerContact_TitleId] FOREIGN KEY ([CustomerContact_TitleId]) REFERENCES [Title] ([Id]) ON DELETE NO ACTION;
+
+GO
+
+ALTER TABLE [PlanningApps] ADD CONSTRAINT [FK_PlanningApps_Title_Developer_TitleId] FOREIGN KEY ([Developer_TitleId]) REFERENCES [Title] ([Id]) ON DELETE NO ACTION;
+
+GO
+
+ALTER TABLE [Vehicles] ADD CONSTRAINT [FK_Vehicles_Title_Contact_TitleId] FOREIGN KEY ([Contact_TitleId]) REFERENCES [Title] ([Id]) ON DELETE NO ACTION;
+
+GO
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20190125105755_CustomerTitle', N'2.0.2-rtm-10011');
+
+GO
+
+INSERT INTO Title (Name, LastUpdate) VALUES ('Mr', getdate())
+
+GO
+
+INSERT INTO Title (Name, LastUpdate) VALUES ('Mrs', getdate())
+
+GO
+
+INSERT INTO Title (Name, LastUpdate) VALUES ('Ms', getdate())
+
+GO
+
+INSERT INTO Title (Name, LastUpdate) VALUES ('Dr', getdate())
+
+GO
+
+INSERT INTO Title (Name, LastUpdate) VALUES ('Sir', getdate())
+
+GO
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20190125110114_SeedCustomerTitle', N'2.0.2-rtm-10011');
+
+GO
+
+CREATE TABLE [PlanningAppAdmins] (
+    [PlanningAppId] int NOT NULL,
+    [AppUserId] nvarchar(450) NOT NULL,
+    CONSTRAINT [PK_PlanningAppAdmins] PRIMARY KEY ([PlanningAppId], [AppUserId]),
+    CONSTRAINT [FK_PlanningAppAdmins_AspNetUsers_AppUserId] FOREIGN KEY ([AppUserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_PlanningAppAdmins_PlanningApps_PlanningAppId] FOREIGN KEY ([PlanningAppId]) REFERENCES [PlanningApps] ([Id]) ON DELETE CASCADE
+);
+
+GO
+
+CREATE INDEX [IX_PlanningAppAdmins_AppUserId] ON [PlanningAppAdmins] ([AppUserId]);
+
+GO
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20190128161229_AdminUserOnApplication', N'2.0.2-rtm-10011');
+
+GO
+
+

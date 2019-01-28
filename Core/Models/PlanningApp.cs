@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using vega.Controllers.Resources;
 using vega.Core.Models.Generic;
 using vega.Core.Models.States;
@@ -40,6 +41,7 @@ namespace vega.Core.Models
         public ICollection<Drawing> Drawings { get; set; }
         public ICollection<PlanningAppSurveyors> Surveyors { get; set; }
         public ICollection<PlanningAppDrawers> Drawers { get; set; }
+        public ICollection<PlanningAppAdmins> Admins { get; set; }
         public string DescriptionOfWork { get; set; }
         public string Notes { get; set; }
 
@@ -49,6 +51,7 @@ namespace vega.Core.Models
             Drawings = new Collection<Drawing>();
             Surveyors = new Collection<PlanningAppSurveyors>();
             Drawers = new Collection<PlanningAppDrawers>();
+            Admins = new Collection<PlanningAppAdmins>();
         }
 
         public PlanningApp GeneratePlanningStates(List<StateInitialiserState> stateInitialisers, 
@@ -273,12 +276,32 @@ namespace vega.Core.Models
         //Planning id for customer usage
         public void genCustomerReferenceId(Customer customer) {
 
-            PlanningReferenceId = "CDS/" + this.Id.ToString("D5")
-                                        + "/"                                      
-                                        + customer.CustomerContact.FirstName.Substring(0,1)
-                                        + customer.CustomerContact.LastName.Substring(0,1)
-                                        + customer.CustomerAddress.Postcode.Substring(0,3);
+            //Get List of Designers and Surveyors and tag to reference number
+            //NOTE: Refactor!!!!!!
+            var drawersInitialsList = Drawers.Select(d => d.AppUser.FirstName.Substring(0,1) + 
+                                                    d.AppUser.LastName.Substring(0,1)).ToList();
+
+            var drawersInitials = string.Join(StringConstants.IDil, drawersInitialsList).ToString().TrimEnd(StringConstants.IDil);
+  
+            var surveyorsInitialsList = Surveyors.Select(d => d.AppUser.FirstName.Substring(0,1) + 
+                                                    d.AppUser.LastName.Substring(0,1)).ToList();
+
+            var surveyorsInitials = string.Join(StringConstants.IDil, surveyorsInitialsList).ToString().TrimEnd(StringConstants.IDil);
+
+            var adminsInitialsList = Admins.Select(d => d.AppUser.FirstName.Substring(0,1) + 
+                                                    d.AppUser.LastName.Substring(0,1)).ToList();
+
+            var adminsInitials = string.Join(StringConstants.IDil, adminsInitialsList).ToString().TrimEnd(StringConstants.IDil);
+          
+
+            PlanningReferenceId = "CDS/" + this.Id.ToString("D6") + "/"                                      
+                                        + adminsInitials + '/'
+                                        + surveyorsInitials + '/'
+                                        + drawersInitials ;
+
         }
+
+
 
         public void SetCurrent(PlanningAppState planningAppState) {
 

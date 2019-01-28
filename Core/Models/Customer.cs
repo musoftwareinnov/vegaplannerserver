@@ -9,7 +9,6 @@ namespace vega.Core.Models
         public int Id { get; set; }
 
         public Contact CustomerContact { get; set; }
-
         public Address CustomerAddress { get; set; }
         public string SearchCriteria { get; set; }
 

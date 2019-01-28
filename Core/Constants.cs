@@ -7,4 +7,11 @@ namespace vega.Core
         Terminate,
         Archive
     }
+
+    static class StringConstants {
+        public const string SurveyorsInitials = "SI";
+        public const string DrawersInitials = "DI";
+        public const char IDil = ':';
+
+    }
 }

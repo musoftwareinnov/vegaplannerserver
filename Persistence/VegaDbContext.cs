@@ -49,6 +49,8 @@ namespace vega.Persistence
 
                 modelBuilder.Entity<PlanningAppDrawers>().HasKey(pu => new { pu.PlanningAppId, pu.AppUserId });
 
+                modelBuilder.Entity<PlanningAppAdmins>().HasKey(pu => new { pu.PlanningAppId, pu.AppUserId });
+
                 modelBuilder.Entity<Vehicle>().OwnsOne(c => c.Contact);
 
                 modelBuilder.Entity<PlanningApp>().OwnsOne(c => c.Developer);

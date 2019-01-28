@@ -39,6 +39,8 @@ namespace vega.Mapping.MappingProfiles
                     //Contact Details
                     .ForMember(psr => psr.Title,                    
                         opt => opt.MapFrom(ps =>  ps.CustomerContact.Title.Name))
+                    .ForMember(psr => psr.TitleId,                    
+                        opt => opt.MapFrom(ps =>  ps.CustomerContact.Title.Id))
                     .ForMember(psr => psr.FirstName,                    
                         opt => opt.MapFrom(ps =>  ps.CustomerContact.FirstName))
                     .ForMember(psr => psr.LastName,                    

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using vega.Controllers.Resources.Contact;
 using vega.Core.Models;
 
@@ -15,11 +16,15 @@ namespace vega.Controllers.Resources
 
         public ICollection<string> Surveyors { get; set; }
         public ICollection<string> Drawers { get; set; }
+        public ICollection<string> Admins { get; set; }
 
         public CreatePlanningAppResource()
         {
             Developer = new ContactResource();
             DevelopmentAddress = new Address();
+            Surveyors = new Collection<string>();
+            Drawers = new Collection<string>();
+            Admins = new Collection<string>();
         }
     }
 

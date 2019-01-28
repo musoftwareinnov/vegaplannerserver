@@ -34,12 +34,16 @@ namespace vega.Mapping.MappingProfiles
                                                                         + ' ' + vf.AppUser.LastName)))
                 .ForMember(psr => psr.Drawers, 
                     opt => opt.MapFrom(v => v.Drawers.Select(vf => vf.AppUser.FirstName
+                                                                        + ' ' + vf.AppUser.LastName)))
+                .ForMember(psr => psr.Admins, 
+                    opt => opt.MapFrom(v => v.Admins.Select(vf => vf.AppUser.FirstName
                                                                         + ' ' + vf.AppUser.LastName)));
    
             
             CreateMap<CreatePlanningAppResource, PlanningApp>()
                 .ForMember(s => s.Surveyors, opt => opt.Ignore())
-                .ForMember(s => s.Drawers, opt => opt.Ignore());
+                .ForMember(s => s.Drawers, opt => opt.Ignore())
+                .ForMember(s => s.Admins, opt => opt.Ignore());
 
             CreateMap<UpdatePlanningAppResource, PlanningApp>();
         }
