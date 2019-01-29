@@ -18,6 +18,7 @@ using vegaplanner.Core.Models.Security;
 using Microsoft.AspNetCore.Identity;
 using static vegaplanner.Core.Models.Security.Helpers.Constants.Strings;
 using System.Security.Claims;
+using vegaplannerserver.Core.Models.Generic;
 
 namespace vega.Controllers
 {
@@ -83,6 +84,8 @@ namespace vega.Controllers
                     planningAppSurveyors.PlanningApp = planningApp;                
                     planningAppSurveyors.AppUser = await userManager.FindByIdAsync(surveyorId);
                     planningApp.Surveyors.Add(planningAppSurveyors);
+
+                    contravar(planningAppSurveyors);
                 }
 
                 if(planningResource.Drawers !=null)
@@ -98,7 +101,7 @@ namespace vega.Controllers
                     planningAppAdmins.PlanningApp = planningApp;                
                     planningAppAdmins.AppUser = await userManager.FindByIdAsync(adminId);
                     planningApp.Admins.Add(planningAppAdmins);
-                }
+                } 
 
                 repository.Add(planningApp, stateInitialiser);
                 await unitOfWork.CompleteAsync();
@@ -117,6 +120,9 @@ namespace vega.Controllers
             return Ok(result);
         }
 
+        private void contravar(PlanningAppUser planningAppUser) {
+
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPlanningApp(int id)
         {              

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using vega.Controllers.Resources.Contact;
 using vega.Core.Models;
+using vegaplannerserver.Controllers.Resources;
 using vegaplannerserver.Core.Models;
 
 namespace vega.Controllers.Resources
@@ -31,10 +32,12 @@ namespace vega.Controllers.Resources
         public string Notes { get; set; }
 
         public ICollection<PlanningAppStateResource> PlanningAppStates { get; set; }
+        public ICollection<PlanningAppFeesResource> PlanningAppFees { get; set; }
 
         public PlanningAppResource()
         {
             PlanningAppStates = new Collection<PlanningAppStateResource>();
+            PlanningAppFees = new Collection<PlanningAppFeesResource>();
             Surveyors = new Collection<string>();
             Drawers = new Collection<string>();
             Admins = new Collection<string>();

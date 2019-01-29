@@ -13,6 +13,8 @@ namespace vega.Persistence
     {
         public DbSet<BusinessDate> BusinessDates { get; set; }      
         public DbSet<Make> Makes { get; set; }
+        public DbSet<PlanningAppFees> PlanningAppFees { get; set; }
+        public DbSet<Fee> Fees { get; set; }
         public DbSet<Feature> Features { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Title> Title { get; set; }
@@ -50,6 +52,8 @@ namespace vega.Persistence
                 modelBuilder.Entity<PlanningAppDrawers>().HasKey(pu => new { pu.PlanningAppId, pu.AppUserId });
 
                 modelBuilder.Entity<PlanningAppAdmins>().HasKey(pu => new { pu.PlanningAppId, pu.AppUserId });
+
+                modelBuilder.Entity<PlanningAppFees>().HasKey(pu => new { pu.PlanningAppId, pu.FeeId });
 
                 modelBuilder.Entity<Vehicle>().OwnsOne(c => c.Contact);
 

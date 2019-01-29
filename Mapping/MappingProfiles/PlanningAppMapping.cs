@@ -3,6 +3,7 @@ using AutoMapper;
 using vega.Controllers.Resources;
 using vega.Core.Models;
 using vega.Extensions.DateTime;
+using vegaplannerserver.Controllers.Resources;
 
 namespace vega.Mapping.MappingProfiles
 {
@@ -37,8 +38,10 @@ namespace vega.Mapping.MappingProfiles
                                                                         + ' ' + vf.AppUser.LastName)))
                 .ForMember(psr => psr.Admins, 
                     opt => opt.MapFrom(v => v.Admins.Select(vf => vf.AppUser.FirstName
-                                                                        + ' ' + vf.AppUser.LastName)));
-   
+                                                                        + ' ' + vf.AppUser.LastName)))
+                .ForMember(psr => psr.PlanningAppFees, 
+                    opt => opt.MapFrom(v => v.Fees.Select(vf => new PlanningAppFeesResource { Id = vf.Fee.Id, Name = vf.Fee.Name, Amount = vf.Amount })));
+
             
             CreateMap<CreatePlanningAppResource, PlanningApp>()
                 .ForMember(s => s.Surveyors, opt => opt.Ignore())

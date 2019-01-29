@@ -42,6 +42,7 @@ namespace vega.Core.Models
         public ICollection<PlanningAppSurveyors> Surveyors { get; set; }
         public ICollection<PlanningAppDrawers> Drawers { get; set; }
         public ICollection<PlanningAppAdmins> Admins { get; set; }
+        public ICollection<PlanningAppFees> Fees { get; set; }
         public string DescriptionOfWork { get; set; }
         public string Notes { get; set; }
 
@@ -52,6 +53,7 @@ namespace vega.Core.Models
             Surveyors = new Collection<PlanningAppSurveyors>();
             Drawers = new Collection<PlanningAppDrawers>();
             Admins = new Collection<PlanningAppAdmins>();
+            Fees = new Collection<PlanningAppFees>();
         }
 
         public PlanningApp GeneratePlanningStates(List<StateInitialiserState> stateInitialisers, 

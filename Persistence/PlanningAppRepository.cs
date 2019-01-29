@@ -48,6 +48,12 @@ namespace vega.Persistence
             var initialStatusList  = vegaDbContext.StateStatus.ToList();
 
             planningApp = planningApp.GeneratePlanningStates(stateInitialiser.States, initialStatusList);
+
+            //Create Fees
+            foreach(var fee in vegaDbContext.Fees) {
+                PlanningAppFees planningAppFees = new PlanningAppFees { Amount = 0, Fee = fee};
+                planningApp.Fees.Add(planningAppFees);
+            }
             vegaDbContext.Add(planningApp);   
         }
 
@@ -77,6 +83,8 @@ namespace vega.Persistence
                                         .ThenInclude(u => u.AppUser)
                                     .Include(s => s.Admins)
                                         .ThenInclude(u => u.AppUser)
+                                    .Include(s => s.Fees)
+                                        .ThenInclude(u => u.Fee)
                                     .SingleOrDefault();
 
                 //sort planing states using 
