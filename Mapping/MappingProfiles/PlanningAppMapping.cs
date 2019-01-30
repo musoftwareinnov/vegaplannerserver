@@ -50,15 +50,11 @@ namespace vega.Mapping.MappingProfiles
 
             CreateMap<UpdatePlanningAppResource, PlanningApp>()                
                     .AfterMap((vr, v) => {
-                    // Remove unselected features
+                    //Update Fees
                     var updatedFees = v.Fees.ToList();
                     foreach (var f in updatedFees) {
                         f.Amount = vr.planningAppFees.Where(rf => rf.Id == f.FeeId).SingleOrDefault().Amount;
                     }
-                    // // Add new features
-                    // var addedFeatures = vr.Features.Where(id => !v.Features.Any(f => f.FeatureId == id)).Select(id => new VehicleFeature { FeatureId = id }).ToList();   
-                    // foreach (var f in addedFeatures)
-                    //     v.Features.Add(f);
                 });
         }
     }
