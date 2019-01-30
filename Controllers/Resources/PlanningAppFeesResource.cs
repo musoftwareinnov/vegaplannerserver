@@ -1,4 +1,4 @@
-namespace vegaplannerserver.Controllers.Resources
+namespace vega.Controllers.Resources
 {
     public class PlanningAppFeesResource
     {

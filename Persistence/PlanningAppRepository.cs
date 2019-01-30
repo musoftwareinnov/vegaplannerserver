@@ -51,7 +51,7 @@ namespace vega.Persistence
 
             //Create Fees
             foreach(var fee in vegaDbContext.Fees) {
-                PlanningAppFees planningAppFees = new PlanningAppFees { Amount = 0, Fee = fee};
+                PlanningAppFees planningAppFees = new PlanningAppFees { Amount = fee.DefaultAmount, Fee = fee};
                 planningApp.Fees.Add(planningAppFees);
             }
             vegaDbContext.Add(planningApp);   

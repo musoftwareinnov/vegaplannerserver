@@ -11,8 +11,8 @@ using vega.Persistence;
 namespace vega.Migrations
 {
     [DbContext(typeof(VegaDbContext))]
-    [Migration("20190129151114_SeedPlanningFees")]
-    partial class SeedPlanningFees
+    [Migration("20190130094340_Fees")]
+    partial class Fees
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -547,6 +547,8 @@ namespace vega.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<decimal>("DefaultAmount");
 
                     b.Property<string>("Name");
 

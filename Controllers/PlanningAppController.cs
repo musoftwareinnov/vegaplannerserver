@@ -137,8 +137,8 @@ namespace vega.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePlanningAppState(int id, [FromBody] UpdatePlanningAppResource planningResource)
+        [HttpPut("nextstate/{id}")]
+        public async Task<IActionResult> NextPlanningAppState(int id)
         {
             DateTime currentDate = DateTime.Now;
             var stateStatusList = await statusListRepository.GetStateStatusList(); //List of possible statuses
@@ -149,51 +149,97 @@ namespace vega.Controllers
                 return NotFound();
 
             //TODO!!!!!!!Inject Logger to say what changed state by which user
-            if(planningResource.method == (int) StateAction.NextState) {
-                
-                //Validate that custom mandatory fields have been set
-                var currentStateId = planningApp.Current().Id;
+            var currentStateId = planningApp.Current().Id;
 
-                //get full entities, including custom state rules
-                var currentState = await planningAppStateRepository.GetPlanningAppState(currentStateId);
-                if(currentState.isValid())
-                    planningApp.NextState(stateStatusList);
-                else
-                    return BadRequest(new { message = "bad request for next state"});
-            }
-            else if (planningResource.method == (int) StateAction.PrevState) 
-                planningApp.PrevState(stateStatusList);
-
-            else if (planningResource.method == (int) StateAction.Terminate) 
-                planningApp.Terminate(stateStatusList);
-            else 
-                {
-                //No state specified just save details that can be modified by the user
-                //PlanningApp res = mapper.Map<UpdatePlanningAppResource, PlanningApp>(planningResource);
-
-                //REFACTOR!!!!!!
-                planningApp.Notes = planningResource.Notes;
-                planningApp.Developer.FirstName = planningResource.Developer.FirstName;
-                planningApp.Developer.LastName = planningResource.Developer.LastName;
-                planningApp.Developer.EmailAddress = planningResource.Developer.EmailAddress;
-                planningApp.Developer.TelephoneMobile = planningResource.Developer.TelephoneMobile;
-                planningApp.Developer.TelephoneWork = planningResource.Developer.TelephoneWork;
-
-                planningApp.DevelopmentAddress.CompanyName = planningResource.DevelopmentAddress.CompanyName;
-                planningApp.DevelopmentAddress.AddressLine1 = planningResource.DevelopmentAddress.AddressLine1;
-                planningApp.DevelopmentAddress.City = planningResource.DevelopmentAddress.City;
-                planningApp.DevelopmentAddress.County = planningResource.DevelopmentAddress.County;
-                planningApp.DevelopmentAddress.Postcode = planningResource.DevelopmentAddress.Postcode;
-                planningApp.DevelopmentAddress.GeoLocation = planningResource.DevelopmentAddress.GeoLocation;               
-                }    
+            //get full entities, including custom state rules
+            var currentState = await planningAppStateRepository.GetPlanningAppState(currentStateId);
+            if(currentState.isValid())
+                planningApp.NextState(stateStatusList);
+            else
+                return BadRequest(new { message = "bad request for next state"});
       
             repository.UpdatePlanningApp(planningApp);
             await unitOfWork.CompleteAsync();
 
             var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
             result.BusinessDate = CurrentDate.SettingDateFormat();
+            return Ok(result);
+        }
 
-            planningApp = await repository.GetPlanningApp(id, includeRelated: true);
+        [HttpPut("prevstate/{id}")]
+        public async Task<IActionResult> PrevPlanningAppState(int id)
+        {
+            DateTime currentDate = DateTime.Now;
+            var stateStatusList = await statusListRepository.GetStateStatusList(); //List of possible statuses
+
+            var planningApp = await repository.GetPlanningApp(id, includeRelated: true);
+
+            if (planningApp == null)
+                return NotFound();
+
+            //TODO!!!!!!!Inject Logger to say what changed state by which user
+            var currentStateId = planningApp.Current().Id;
+
+            //get full entities, including custom state rules
+            var currentState = await planningAppStateRepository.GetPlanningAppState(currentStateId);
+            if(currentState.isValid())
+                planningApp.PrevState(stateStatusList);
+            else
+                return BadRequest(new { message = "bad request for next state"});
+      
+            repository.UpdatePlanningApp(planningApp);
+            await unitOfWork.CompleteAsync();
+
+            var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
+            result.BusinessDate = CurrentDate.SettingDateFormat();
+            return Ok(result);
+        }
+
+        [HttpPut("terminate/{id}")]
+        public async Task<IActionResult> TerminatePlanningApp(int id)
+        {
+            DateTime currentDate = DateTime.Now;
+            var stateStatusList = await statusListRepository.GetStateStatusList(); //List of possible statuses
+
+            var planningApp = await repository.GetPlanningApp(id, includeRelated: true);
+
+            if (planningApp == null)
+                return NotFound();
+
+            //TODO!!!!!!!Inject Logger to say what changed state by which user
+            var currentStateId = planningApp.Current().Id;
+
+            //get full entities, including custom state rules
+            var currentState = await planningAppStateRepository.GetPlanningAppState(currentStateId);
+            if(currentState.isValid())
+                planningApp.Terminate(stateStatusList);
+            else
+                return BadRequest(new { message = "bad request for next state"});
+      
+            repository.UpdatePlanningApp(planningApp);
+            await unitOfWork.CompleteAsync();
+
+            var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
+            result.BusinessDate = CurrentDate.SettingDateFormat();
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdatePlanningApp(int id, [FromBody] UpdatePlanningAppResource planningResource)
+        {
+            var planningApp = await repository.GetPlanningApp(id, includeRelated: true);
+
+            if (planningApp == null)
+                return NotFound();
+
+            PlanningApp updatedPlanningApp = mapper.Map<UpdatePlanningAppResource, PlanningApp>(planningResource, planningApp);           
+                
+            repository.UpdatePlanningApp(updatedPlanningApp);
+            await unitOfWork.CompleteAsync();
+
+            var result = mapper.Map<PlanningApp, PlanningAppResource>(updatedPlanningApp);
+            result.BusinessDate = CurrentDate.SettingDateFormat();
+
             return Ok(result);
         }
 

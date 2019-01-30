@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace vega.Migrations
 {
-    public partial class PlanningFees : Migration
+    public partial class Fees : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,6 +15,7 @@ namespace vega.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    DefaultAmount = table.Column<decimal>(nullable: false),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
