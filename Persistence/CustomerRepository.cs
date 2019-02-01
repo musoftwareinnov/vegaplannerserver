@@ -57,8 +57,6 @@ namespace vega.Persistence
 
             result.TotalItems =  query.ToList().Count();
             query = query.ApplyPaging(queryObj).Include(pa => pa.planningApps);
-            // query = query.Include(pa => pa.planningApps)
-            //              .Include(c => c.CustomerContact).
 
             result.Items = await query.ToListAsync();
             return result;
@@ -66,15 +64,11 @@ namespace vega.Persistence
 
         public void Add(Customer customer)
         {
-            //Store Customer Title for convenience
-            customer.CustomerContact.CustomerTitle = vegaDbContext.Title.Where(t => t.Id == customer.CustomerContact.CustomerTitleId).SingleOrDefault().Name;
             vegaDbContext.Add(customer);
-
         }
 
         public void Update(Customer customer)
         {
-            customer.CustomerContact.CustomerTitle = vegaDbContext.Title.Where(t => t.Id == customer.CustomerContact.CustomerTitleId).SingleOrDefault().Name;
             vegaDbContext.Update(customer);
         }
 

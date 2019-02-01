@@ -34,7 +34,6 @@ using vegaplannerserver.Core;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using vegaplannerserver.Core.Security;
-using vegaplannerserver.Persistence;
 
 namespace vega
 {

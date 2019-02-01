@@ -24,10 +24,15 @@ namespace vega.Controllers
         private readonly IMapper mapper;
         private readonly ICustomerRepository customerRepository;
         private readonly IUnitOfWork unitOfWork;
-        public CustomerController(IMapper mapper, ICustomerRepository customerRepository, IUnitOfWork unitOfWork)
+        private readonly IStaticDataRepository staticDataRepository;
+        public CustomerController(IMapper mapper, 
+                                  ICustomerRepository customerRepository, 
+                                  IUnitOfWork unitOfWork,
+                                  IStaticDataRepository staticDataRepository)
         {
             this.unitOfWork = unitOfWork;
             this.customerRepository = customerRepository;
+            this.staticDataRepository = staticDataRepository;
             this.mapper = mapper;
         }
    
@@ -68,6 +73,7 @@ namespace vega.Controllers
                 return BadRequest(Errors.AddErrorToModelState("login_failure", "Username already taken.", ModelState));
             }
 
+            customer.CustomerContact.CustomerTitle=staticDataRepository.GetTitle(customerResource.TitleId);
             customerRepository.Add(customer);
 
             await unitOfWork.CompleteAsync();
@@ -88,7 +94,7 @@ namespace vega.Controllers
             var customerctx = await customerRepository.GetCustomer(customerResource.Id);
             mapper.Map<CustomerResource, Customer>(customerResource,customerctx) ;
 
-
+            customerctx.CustomerContact.CustomerTitle=staticDataRepository.GetTitle(customerResource.TitleId);
             customerRepository.Update(customerctx);
 
             await unitOfWork.CompleteAsync();

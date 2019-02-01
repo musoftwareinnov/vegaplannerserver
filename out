@@ -2,49 +2,86 @@ In Development mode
 Database Connection String: server=localhost; database=vega; user id=sa; password=MyComplexPassword!1234
 Business Date : 04/02/2020 00:00:00
 Business Date set to :04/02/2020 00:00:00
-CREATE TABLE [Fees] (
-    [Id] int NOT NULL IDENTITY,
-    [DefaultAmount] decimal(18, 2) NOT NULL,
-    [Name] nvarchar(max) NULL,
-    CONSTRAINT [PK_Fees] PRIMARY KEY ([Id])
-);
+ALTER TABLE [Customers] DROP CONSTRAINT [FK_Customers_Title_CustomerContact_TitleId];
 
 GO
 
-CREATE TABLE [PlanningAppFees] (
-    [PlanningAppId] int NOT NULL,
-    [FeeId] int NOT NULL,
-    [Amount] decimal(18, 2) NOT NULL,
-    CONSTRAINT [PK_PlanningAppFees] PRIMARY KEY ([PlanningAppId], [FeeId]),
-    CONSTRAINT [FK_PlanningAppFees_Fees_FeeId] FOREIGN KEY ([FeeId]) REFERENCES [Fees] ([Id]) ON DELETE CASCADE,
-    CONSTRAINT [FK_PlanningAppFees_PlanningApps_PlanningAppId] FOREIGN KEY ([PlanningAppId]) REFERENCES [PlanningApps] ([Id]) ON DELETE CASCADE
-);
+ALTER TABLE [PlanningApps] DROP CONSTRAINT [FK_PlanningApps_Title_Developer_TitleId];
 
 GO
 
-CREATE INDEX [IX_PlanningAppFees_FeeId] ON [PlanningAppFees] ([FeeId]);
+ALTER TABLE [Vehicles] DROP CONSTRAINT [FK_Vehicles_Title_Contact_TitleId];
+
+GO
+
+DROP INDEX [IX_Vehicles_Contact_TitleId] ON [Vehicles];
+
+GO
+
+DROP INDEX [IX_PlanningApps_Developer_TitleId] ON [PlanningApps];
+
+GO
+
+DROP INDEX [IX_Customers_CustomerContact_TitleId] ON [Customers];
+
+GO
+
+DECLARE @var0 sysname;
+SELECT @var0 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'Vehicles') AND [c].[name] = N'Contact_TitleId');
+IF @var0 IS NOT NULL EXEC(N'ALTER TABLE [Vehicles] DROP CONSTRAINT [' + @var0 + '];');
+ALTER TABLE [Vehicles] DROP COLUMN [Contact_TitleId];
+
+GO
+
+DECLARE @var1 sysname;
+SELECT @var1 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'PlanningApps') AND [c].[name] = N'Developer_TitleId');
+IF @var1 IS NOT NULL EXEC(N'ALTER TABLE [PlanningApps] DROP CONSTRAINT [' + @var1 + '];');
+ALTER TABLE [PlanningApps] DROP COLUMN [Developer_TitleId];
+
+GO
+
+DECLARE @var2 sysname;
+SELECT @var2 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'Customers') AND [c].[name] = N'CustomerContact_TitleId');
+IF @var2 IS NOT NULL EXEC(N'ALTER TABLE [Customers] DROP CONSTRAINT [' + @var2 + '];');
+ALTER TABLE [Customers] DROP COLUMN [CustomerContact_TitleId];
+
+GO
+
+ALTER TABLE [Vehicles] ADD [Contact_CustomerTitle] nvarchar(max) NULL;
+
+GO
+
+ALTER TABLE [Vehicles] ADD [Contact_CustomerTitleId] int NOT NULL DEFAULT 0;
+
+GO
+
+ALTER TABLE [PlanningApps] ADD [Developer_CustomerTitle] nvarchar(max) NULL;
+
+GO
+
+ALTER TABLE [PlanningApps] ADD [Developer_CustomerTitleId] int NOT NULL DEFAULT 0;
+
+GO
+
+ALTER TABLE [Customers] ADD [CustomerContact_CustomerTitle] nvarchar(max) NULL;
+
+GO
+
+ALTER TABLE [Customers] ADD [CustomerContact_CustomerTitleId] int NOT NULL DEFAULT 0;
 
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20190130094340_Fees', N'2.0.2-rtm-10011');
-
-GO
-
-INSERT INTO Fees (Name, DefaultAmount) VALUES ('Feasibility', 100)
-
-GO
-
-INSERT INTO Fees (Name, DefaultAmount) VALUES ('Planning', 102)
-
-GO
-
-INSERT INTO Fees (Name, DefaultAmount) VALUES ('Building Regs', 103)
-
-GO
-
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20190130094441_SeedFees', N'2.0.2-rtm-10011');
+VALUES (N'20190201154138_CustomerTitleLookup', N'2.0.2-rtm-10011');
 
 GO
 
