@@ -16,3 +16,15 @@
  dotnet ef database update AddSurveyors
  dotnet ef database update AddDrawers
  dotnet ef database update ChangAppUserType
+ dotnet ef database update Fees
+ dotnet ef database update SeedFees
+
+#Clear down database
+#truncate table PlanningAppFees
+#truncate table PlanningAppStateCustomFields
+#truncate table PlanningAppSurveyors
+#truncate table PlanningAppDrawers
+#truncate table PlanningAppAdmins
+#delete PlanningAppState
+#delete PlanningApps
+

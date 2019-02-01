@@ -1,11 +1,15 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using vegaplannerserver.Core.Models;
 
 namespace vega.Core.Models
 {
     public class Contact
     {
-        public Title Title { get; set; }
+
+        public int CustomerTitleId { get; set; }
+        
+        public string CustomerTitle { get; set; }
         
         [StringLength(30)]
         public string FirstName { get; set;}

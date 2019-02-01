@@ -14,6 +14,7 @@ namespace vega.Controllers.Resources
         public string PlanningReferenceId { get; set; }
         public PlanningCustomerResource Customer { get; set; }
         public string Name { get; set; }
+        public string CustomerName { get; set; }
         public string BusinessDate { get; set; }
         public string PlanningStatus { get; set; }
         public string CurrentStateStatus { get; set; }

@@ -85,15 +85,17 @@ namespace vega.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var customer = mapper.Map<CustomerResource, Customer>(customerResource);
+            var customerctx = await customerRepository.GetCustomer(customerResource.Id);
+            mapper.Map<CustomerResource, Customer>(customerResource,customerctx) ;
 
-            customerRepository.Update(customer);
+
+            customerRepository.Update(customerctx);
 
             await unitOfWork.CompleteAsync();
 
-            customer = await customerRepository.GetCustomer(customer.Id);
+            //var customer = await customerRepository.GetCustomer(customerctx.Id);
 
-            var result = mapper.Map<Customer, CustomerResource>(customer);
+            var result = mapper.Map<Customer, CustomerResource>(customerctx);
  
             return Ok(result);
         } 

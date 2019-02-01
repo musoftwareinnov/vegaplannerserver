@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using vega.Core;
 using vega.Core.Models;
 using vega.Extensions;
+using vegaplannerserver.Core.Models;
 
 namespace vega.Persistence
 {
@@ -28,9 +29,8 @@ namespace vega.Persistence
                                 .Include(t => t.planningApps)
                                         .ThenInclude(t => t.PlanningAppStates) 
                                             .ThenInclude(a => a.StateStatus)
-                                .Include(t => t.CustomerContact.Title)
                                 .SingleOrDefaultAsync(v => v.Id == id);
-
+                
                 //Important to keep order of states as they can be added and removed - 
                 //EF Core cant do Include(t => t.States.Orderby)
 
@@ -50,7 +50,6 @@ namespace vega.Persistence
 
             var query = vegaDbContext.Customers
                                 .OrderBy(c => c.CustomerContact.LastName)
-                                .Include(t => t.CustomerContact.Title)
                                 .AsQueryable();
 
             if(queryObj.SearchCriteria != null)
@@ -67,14 +66,16 @@ namespace vega.Persistence
 
         public void Add(Customer customer)
         {
+            //Store Customer Title for convenience
+            customer.CustomerContact.CustomerTitle = vegaDbContext.Title.Where(t => t.Id == customer.CustomerContact.CustomerTitleId).SingleOrDefault().Name;
             vegaDbContext.Add(customer);
 
         }
 
         public void Update(Customer customer)
         {
+            customer.CustomerContact.CustomerTitle = vegaDbContext.Title.Where(t => t.Id == customer.CustomerContact.CustomerTitleId).SingleOrDefault().Name;
             vegaDbContext.Update(customer);
-
         }
 
         public bool CustomerExists(Customer customer)

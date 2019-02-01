@@ -30,6 +30,10 @@ namespace vega.Mapping.MappingProfiles
                     opt => opt.MapFrom(ps => ps.StateInitialiser.Name))
                 .ForMember(psr => psr.CompletionDate, 
                     opt => opt.MapFrom(ps => ps.CompletionDate().SettingDateFormat())) 
+                .ForMember(psr => psr.CustomerName,
+                    opt => opt.MapFrom(ps => ps.Customer.CustomerContact.CustomerTitle
+                                            + ' ' + ps.Customer.CustomerContact.FirstName 
+                                            + ' ' + ps.Customer.CustomerContact.LastName))
                 .ForMember(psr => psr.Surveyors, 
                     opt => opt.MapFrom(v => v.Surveyors.Select(vf => vf.AppUser.FirstName
                                                                         + ' ' + vf.AppUser.LastName)))
