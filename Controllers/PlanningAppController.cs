@@ -78,14 +78,13 @@ namespace vega.Controllers
             if(stateInitialiser.States.Count > 0)
             {
                 //REFACTOR SORT NULL PROBLEM, SHOULD BE ALLOCATED IN RESOURCE!!!!!
-                if(planningResource.Surveyors !=null)
-                foreach(string surveyorId in planningResource.Surveyors) {
-                    PlanningAppSurveyors planningAppSurveyors = new PlanningAppSurveyors();
-                    planningAppSurveyors.PlanningApp = planningApp;                
-                    planningAppSurveyors.AppUser = await userManager.FindByIdAsync(surveyorId);
-                    planningApp.Surveyors.Add(planningAppSurveyors);
-
-                    contravar(planningAppSurveyors);
+                if(planningResource.Surveyors !=null) {
+                    foreach(string surveyorId in planningResource.Surveyors) {
+                        PlanningAppSurveyors planningAppSurveyors = new PlanningAppSurveyors();
+                        planningAppSurveyors.PlanningApp = planningApp;                
+                        planningAppSurveyors.AppUser = await userManager.FindByIdAsync(surveyorId);
+                        planningApp.Surveyors.Add(planningAppSurveyors);
+                    }
                 }
 
                 if(planningResource.Drawers !=null)
@@ -120,9 +119,23 @@ namespace vega.Controllers
             return Ok(result);
         }
 
-        private void contravar(PlanningAppUser planningAppUser) {
+        private void contravar(List<string> planningAppUser) {
 
+        }   
+
+        [HttpPost("appendgenerator")]
+        public async Task<IActionResult> AppendGenerator([FromBody] CreatePlanningAppResource planningResource)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            //var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
+            //result.BusinessDate = CurrentDate.SettingDateFormat();
+            //return Ok(result);
+            throw new NotImplementedException();
         }
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPlanningApp(int id)
         {              
@@ -136,6 +149,8 @@ namespace vega.Controllers
 
             return Ok(result);
         }
+
+        //TODO: REFACTOR state transition
 
         [HttpPut("nextstate/{id}")]
         public async Task<IActionResult> NextPlanningAppState(int id)

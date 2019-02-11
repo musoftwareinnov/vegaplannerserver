@@ -56,23 +56,78 @@ namespace vega.Core.Models
             Fees = new Collection<PlanningAppFees>();
         }
 
-        public PlanningApp GeneratePlanningStates(List<StateInitialiserState> stateInitialisers, 
+        //Version 2 multiple generators per project
+        public PlanningApp GeneratePlanningStatesV2(ProjectGenerator projectGenerator, 
+                                                    IEnumerable<StateStatus> stateStatus) 
+        {
+            var currentDate = SystemDate.Instance.date;
+            int generatorOrder = 0;   // keeps order of generators/states
+            var statusOnTime = stateStatus.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();
+
+            foreach(var generator in projectGenerator.Generators)
+            {
+                foreach(var stateInialiserState in generator.States) 
+                {
+                    InsertGenNewPlanningStateV2(stateInialiserState, statusOnTime, generatorOrder);
+                }              
+                generatorOrder++;
+            }           
+
+            //set first state to current state
+            if(PlanningAppStates.Count > 0)
+                 PlanningAppStates[0].CurrentState = true;
+
+            //Set overall Status to InProgress
+            CurrentPlanningStatus = stateStatus.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault();
+        
+            return this;
+        }
+
+        //Version 2 multiple generators per project
+        public void InsertGenNewPlanningStateV2(StateInitialiserState stateInitialiserState, StateStatus stateStatus, int generatorOrder) 
+        {
+            PlanningAppState newPlanningAppState = new PlanningAppState();
+            PlanningAppState prevState;
+            var stateCount = PlanningAppStates.Count;
+            if(stateCount > 0) {
+                prevState =  PlanningAppStates[stateCount-1];
+                newPlanningAppState.DueByDate =  prevState.DueByDate.AddBusinessDays(stateInitialiserState.CompletionTime);
+            }
+            else 
+                newPlanningAppState.DueByDate = SystemDate.Instance.date.AddBusinessDays(stateInitialiserState.CompletionTime);
+
+            //Add custom fields to state if exist
+            foreach(var stateInitialiserStateCustomField in newPlanningAppState.state.StateInitialiserStateCustomFields) {
+                newPlanningAppState.customFields
+                        .Add(new PlanningAppStateCustomField { StateInitialiserStateCustomFieldId = stateInitialiserStateCustomField.StateInitialiserCustomFieldId });
+            }
+
+            newPlanningAppState.GeneratorOrder = generatorOrder;
+            newPlanningAppState.state = stateInitialiserState;
+            newPlanningAppState.StateStatus = stateStatus;
+
+            PlanningAppStates.Add(newPlanningAppState);
+        }
+
+        //===========================================================================================
+        //Version 1 Single Generator Per Planning App
+        public PlanningApp GeneratePlanningStates(List<StateInitialiserState> stateInitialiserStates, 
                                                     IEnumerable<StateStatus> stateStatus) 
         {
             var currentDate = SystemDate.Instance.date;
 
-            foreach(var stateInialiser in stateInitialisers) {
+            foreach(var stateInialiserState in stateInitialiserStates) {
                 PlanningAppState newPlanningAppState = new PlanningAppState();
-                newPlanningAppState.state = stateInialiser;
+                newPlanningAppState.state = stateInialiserState;
 
                 PlanningAppState prevState;
                 var stateCount = PlanningAppStates.Count;
                 if(stateCount > 0) {
                     prevState =  PlanningAppStates[stateCount-1];
-                    newPlanningAppState.DueByDate =  prevState.DueByDate.AddBusinessDays(stateInialiser.CompletionTime);
+                    newPlanningAppState.DueByDate =  prevState.DueByDate.AddBusinessDays(stateInialiserState.CompletionTime);
                 }
                 else 
-                    newPlanningAppState.DueByDate = currentDate.AddBusinessDays(stateInialiser.CompletionTime);
+                    newPlanningAppState.DueByDate = currentDate.AddBusinessDays(stateInialiserState.CompletionTime);
 
                 newPlanningAppState.StateStatus = stateStatus.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();
                 //Add custom fields to state if exist
@@ -91,20 +146,19 @@ namespace vega.Core.Models
         
             return this;
         }
-
-       public PlanningApp InsertNewPlanningState(StateInitialiserState newStateInitialiser, IEnumerable<StateStatus> stateStatus) 
+       public PlanningApp InsertNewPlanningState(StateInitialiserState newStateInitialiserState, IEnumerable<StateStatus> stateStatus) 
         {
 
             if(!Completed()) {
                 var currentState = Current();
 
-                if(newStateInitialiser.OrderId > currentState.state.OrderId) {
+                if(newStateInitialiserState.OrderId > currentState.state.OrderId) {
 
                     //Remove states after current state
                     var states = this.PlanningAppStates.ToList();
 
                     PlanningAppState newState = new PlanningAppState();
-                    newState.state = newStateInitialiser;
+                    newState.state = newStateInitialiserState;
                     newState.CurrentState = false;
                     newState.StateStatus = stateStatus.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();
                     newState.CompletionDate = null;
@@ -116,6 +170,8 @@ namespace vega.Core.Models
             }
             return this;
         }
+
+
 
         public void RemovePlanningState(StateInitialiserState stateInitialiserState) 
         {
@@ -279,7 +335,7 @@ namespace vega.Core.Models
         public void genCustomerReferenceId(Customer customer) {
 
             //Get List of Designers and Surveyors and tag to reference number
-            //NOTE: Refactor!!!!!!
+            //TODO NOTE: Refactor!!!!!!
             var drawersInitialsList = Drawers.Select(d => d.AppUser.FirstName.Substring(0,1) + 
                                                     d.AppUser.LastName.Substring(0,1)).ToList();
 
@@ -295,7 +351,7 @@ namespace vega.Core.Models
 
             var adminsInitials = string.Join(StringConstants.IDil, adminsInitialsList).ToString().TrimEnd(StringConstants.IDil);
           
-
+            //TODO CDS -> take from settings file or database
             PlanningReferenceId = "CDS/" + this.Id.ToString("D6") + "/"                                      
                                         + adminsInitials + '/'
                                         + surveyorsInitials + '/'

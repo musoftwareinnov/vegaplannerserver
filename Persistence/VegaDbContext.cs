@@ -21,6 +21,7 @@ namespace vega.Persistence
         public DbSet<Vehicle> Vehicle { get; set; }
         public DbSet<Model> Models { get; set; }
         public DbSet<Photo> Photos { get; set; }
+        public DbSet<ProjectGenerator> ProjectGenerators { get; set; }
         public DbSet<StateInitialiser> StateInitialisers { get; set; }
         public DbSet<StateInitialiserState> StateInitialiserState { get; set; }
         public DbSet<PlanningApp> PlanningApps { get; set; }

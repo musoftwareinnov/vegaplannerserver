@@ -2,9 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <!-- <Version>1.1</Version>
+    <Authors>Paul Scollay</Authors>
+    <Company>MU Software Innovations</Company>
+    <Product>Vega Planner/Product>
+    <PackageId>Vega</PackageId>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Description>Description here</Description>
+    <Copyright>Copyright</Copyright> -->
+    <!-- <PackageLicenseUrl>License URL</PackageLicenseUrl>
+    <PackageProjectUrl>Project URL</PackageProjectUrl>
+    <PackageIconUrl>Icon URL</PackageIconUrl>
+    <RepositoryUrl>Repo URL</RepositoryUrl>
+    <RepositoryType>Repo type</RepositoryType>
+    <PackageTags>Tags</PackageTags>
+    <PackageReleaseNotes>Release</PackageReleaseNotes>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
-    <IsPackable>false</IsPackable>
+    <IsPackable>false</IsPackable> -->
   </PropertyGroup>
 
   <ItemGroup>

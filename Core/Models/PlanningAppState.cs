@@ -15,9 +15,9 @@ namespace vega.Core.Models
     {
 
         public int Id { get; set; }
-
         public int PlanningAppId { get; set; }
         public PlanningApp PlanningApp { get; set; }
+        public int GeneratorOrder { get; set; }  //States must be kept in order  GeneratorOrder/StateOrder
         public int StateInitialiserStateId { get; set; }
         public StateInitialiserState state { get; set; }
         public DateTime DueByDate { get; set; }

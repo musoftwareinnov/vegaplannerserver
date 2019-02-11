@@ -56,6 +56,17 @@ namespace vega.Persistence
             }
             vegaDbContext.Add(planningApp);   
         }
+        public void AppendGenerator(PlanningApp planningApp, StateInitialiser stateInitialiser)
+        {
+
+            var initialStatus = vegaDbContext.StateStatus.Where(s => s.Name == stateStatusSettings.STATE_ON_TIME).SingleOrDefault();
+            var initialStatusList  = vegaDbContext.StateStatus.ToList();
+
+            foreach(var state in stateInitialiser.States) {
+                planningApp = planningApp.InsertNewPlanningState(state, initialStatusList);
+            }
+            //vegaDbContext.Update(planningApp);  
+        }
 
         public async Task<PlanningApp> GetPlanningApp(int id, bool includeRelated = true)
         {
