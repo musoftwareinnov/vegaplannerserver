@@ -66,6 +66,10 @@ namespace vega.Persistence
                 
                 modelBuilder.Entity<StateInitialiserStateCustomField>().HasKey(sr => new { sr.StateInitialiserStateId, sr.StateInitialiserCustomFieldId });
 
+                //Set Decimal Precision on Fees
+                modelBuilder.Entity<Fee>().Property(fee => fee.DefaultAmount).HasColumnType("decimal(10, 2)");
+                modelBuilder.Entity<PlanningAppFees>().Property(fee => fee.Amount).HasColumnType("decimal(10, 2)");
+
                 // modelBuilder.Entity<PlanningAppState>()
                 //     .OwnsOne(b => b.PlanningApp)
                 //     .OnDelete(DeleteBehavior.Restrict);       

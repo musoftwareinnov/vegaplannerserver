@@ -193,7 +193,9 @@ namespace vega
             builder.AddEntityFrameworkStores<VegaDbContext>().AddDefaultTokenProviders();
 
             //MVC
-            services.AddMvc().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -234,7 +236,6 @@ namespace vega
             app.UseDefaultFiles();
             app.UseCors("AllowAll");
             app.UseStaticFiles();
-
             app.UseMvc(routes =>
             {   
                 routes.MapRoute(
