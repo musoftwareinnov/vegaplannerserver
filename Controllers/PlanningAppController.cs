@@ -123,17 +123,17 @@ namespace vega.Controllers
 
         }   
 
-        // [HttpPost("appendgenerator")]
-        // public async Task<IActionResult> AppendGenerator([FromBody] CreatePlanningAppResource planningResource)
-        // {
-        //     if (!ModelState.IsValid)
-        //         return BadRequest(ModelState);
+        [HttpPost("appendgenerator")]
+        public IActionResult AppendGenerator([FromBody] CreatePlanningAppResource planningResource)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //     //var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
-        //     //result.BusinessDate = CurrentDate.SettingDateFormat();
-        //     //return Ok(result);
-        //     throw new NotImplementedException();
-        // }
+            //var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
+            //result.BusinessDate = CurrentDate.SettingDateFormat();
+            //return Ok(result);
+            throw new NotImplementedException();
+        }
 
 
         [HttpGet("{id}")]
