@@ -57,31 +57,31 @@ namespace vega.Core.Models
         }
 
         //Version 2 multiple generators per project
-        public PlanningApp GeneratePlanningStatesV2(ProjectGenerator projectGenerator, 
-                                                    IEnumerable<StateStatus> stateStatus) 
-        {
-            var currentDate = SystemDate.Instance.date;
-            int generatorOrder = 0;   // keeps order of generators/states
-            var statusOnTime = stateStatus.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();
+        // public PlanningApp GeneratePlanningStatesV2(ProjectGenerator projectGenerator, 
+        //                                             IEnumerable<StateStatus> stateStatus) 
+        // {
+        //     var currentDate = SystemDate.Instance.date;
+        //     int generatorOrder = 0;   // keeps order of generators/states
+        //     var statusOnTime = stateStatus.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();
 
-            foreach(var generator in projectGenerator.Generators)
-            {
-                foreach(var stateInialiserState in generator.States) 
-                {
-                    InsertGenNewPlanningStateV2(stateInialiserState, statusOnTime, generatorOrder);
-                }              
-                generatorOrder++;
-            }           
+        //     foreach(var generator in projectGenerator.Generators)
+        //     {
+        //         foreach(var stateInialiserState in generator.States) 
+        //         {
+        //             InsertGenNewPlanningStateV2(stateInialiserState, statusOnTime, generatorOrder);
+        //         }              
+        //         generatorOrder++;
+        //     }           
 
-            //set first state to current state
-            if(PlanningAppStates.Count > 0)
-                 PlanningAppStates[0].CurrentState = true;
+        //     //set first state to current state
+        //     if(PlanningAppStates.Count > 0)
+        //          PlanningAppStates[0].CurrentState = true;
 
-            //Set overall Status to InProgress
-            CurrentPlanningStatus = stateStatus.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault();
+        //     //Set overall Status to InProgress
+        //     CurrentPlanningStatus = stateStatus.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault();
         
-            return this;
-        }
+        //     return this;
+        // }
 
         //Version 2 multiple generators per project
         public void InsertGenNewPlanningStateV2(StateInitialiserState stateInitialiserState, StateStatus stateStatus, int generatorOrder) 

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.0</Version> 
+    <!-- <Version>2.0</Version> 
     <Authors>Paul Scollay</Authors>
     <Company>MU Software Innovations</Company>
     <Product>Vega Planner</Product>
@@ -11,7 +11,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <Description>Architectural Planning Software</Description>
     <Copyright>Copyright 2019</Copyright>
-    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel> -->
     <!--<PackageLicenseUrl>License URL</PackageLicenseUrl>
     <PackageProjectUrl>Project URL</PackageProjectUrl>
     <PackageIconUrl>Icon URL</PackageIconUrl>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using vega.Core.Models;
+using vega.Core.Models.States;
 
 namespace vega.Extensions
 {
@@ -29,5 +30,9 @@ namespace vega.Extensions
 
          return query.Skip((queryObj.Page - 1) * queryObj.PageSize).Take(queryObj.PageSize);
       }
+    
+
     }
+
+
 }

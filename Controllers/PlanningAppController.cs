@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Identity;
 using static vegaplanner.Core.Models.Security.Helpers.Constants.Strings;
 using System.Security.Claims;
 using vegaplannerserver.Core.Models.Generic;
+using vega.Services.Interfaces;
 
 namespace vega.Controllers
 {
@@ -36,6 +37,7 @@ namespace vega.Controllers
         private readonly IUserRepository userRepository;
 
         public IStateStatusRepository statusListRepository { get; }
+        public IPlanningAppService planningAppService { get; }
         public RoleManager<IdentityRole> RoleManager { get; }
         public DateSettings dateSettings { get; set; }
 
@@ -43,6 +45,7 @@ namespace vega.Controllers
         UserManager<AppUser> userManager { get; set; }
 
         public PlanningAppController(IMapper mapper, 
+                                     IPlanningAppService planningAppService,
                                      IPlanningAppRepository repository, 
                                      IPlanningAppStateRepository planningAppStateRepository, 
                                      IUnitOfWork unitOfWork,
@@ -61,6 +64,7 @@ namespace vega.Controllers
             this.userManager = userManager;
             this.customerRepository = customerRepository;
             this.userRepository = userRepository;
+            this.planningAppService = planningAppService;
         }
 
         [HttpPost]
@@ -68,6 +72,8 @@ namespace vega.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var pa = planningAppService.Create(planningResource);
 
             var planningApp = mapper.Map<CreatePlanningAppResource, PlanningApp>(planningResource);
 
