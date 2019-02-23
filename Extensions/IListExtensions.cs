@@ -9,9 +9,17 @@ namespace vega.Extensions
 {
     public static class IListExtensions
     {
-        public static List<ProjectGeneratorSequence> ApplySequenceSorting<T>(this List<ProjectGeneratorSequence> query) 
+        public static List<T> ApplySequenceSorting<T>(this List<T> query) 
+                    where T : ProjectGeneratorSequence                                                                       
         {
             return query.OrderBy(g => g.SeqId).ToList();
         }
+        public static List<T> ApplyStateSequenceSorting<T>(this List<T> query) 
+                    where T : StateInitialiserState
+                                                                         
+        {
+            return query.OrderBy(g => g.OrderId).ToList();
+        }
     }
+    
 }

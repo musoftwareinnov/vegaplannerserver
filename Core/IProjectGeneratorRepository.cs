@@ -12,8 +12,6 @@ namespace vega.Core
 
         void Add(ProjectGenerator projectGenerator);
 
-        //void Update(ProjectGenerator projectGenerator);
         void InsertGenerator(ProjectGenerator projectGenerator, StateInitialiser newGenerator, int SeqId );
-        void AddGenerator(ProjectGenerator projectGenerator, StateInitialiser newGenerator, StateInitialiser insertAfterGenerator);
     }
 }

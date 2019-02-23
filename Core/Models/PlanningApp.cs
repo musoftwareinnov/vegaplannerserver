@@ -22,6 +22,8 @@ namespace vega.Core.Models
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
         public String PlanningReferenceId { get; set; }
+        public int ProjectGeneratorId { get; set; }
+        public ProjectGenerator ProjectGenerator { get; set; }
         public int StateInitialiserId { get; set; }
         public StateInitialiser StateInitialiser { get; set; }
         public int CurrentPlanningStatusId { get; set; }

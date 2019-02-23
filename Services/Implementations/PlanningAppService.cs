@@ -22,15 +22,22 @@ namespace vega.Services
         public IProjectGeneratorRepository ProjectGeneratorRepository { get; }
 
         private readonly IPlanningAppRepository planningAppRepository;
-        public PlanningApp Create(CreatePlanningAppResource planningResource) {
+        public  PlanningApp Create(CreatePlanningAppResource planningResource) {
             
             var planningApp = Mapper.Map<CreatePlanningAppResource, PlanningApp>(planningResource);
 
-            
+            var projectGenerator = ProjectGeneratorRepository.GetProjectGenerator(planningResource.ProjectGeneratorId).Result;
 
-            var projectGenerator = ProjectGeneratorRepository.GetProjectGenerator(1);
+            // planningApp.ProjectGenerator = projectGenerator; //Assign Project Generator to Planning App
 
-            return new PlanningApp();
+            // foreach(var gen in projectGenerator.Generators) {
+            //     //gen.Generator.Name;
+            //     //Add Generator States to the new planning application
+
+                
+            // }
+
+            return planningApp;
         }
     }
 }

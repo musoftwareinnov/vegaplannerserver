@@ -8,6 +8,7 @@ using vega.Core;
 using vega.Core.Models;
 using vega.Core.Models.States;
 using vega.Extensions;
+using vegaplannerserver.Extensions;
 
 namespace vega.Persistence
 {
@@ -23,10 +24,13 @@ namespace vega.Persistence
             if(includeRelated) {
                 var projectGenerator = await vegaDbContext.ProjectGenerators
                                                             .Include(pg => pg.Generators)
-                                                                //.OrderBy(g => g.SeqId))
+                                                                .ThenInclude(gn => gn.Generator)
+                                                                    .ThenInclude(gns => gns.States)
                                                             .SingleOrDefaultAsync(g => g.Id == id);
-
-                projectGenerator.Generators = projectGenerator.Generators.ApplySequenceSorting<ProjectGeneratorSequence>();
+                //Essential To Sort Generators and States
+                //projectGenerator = projectGenerator.sort();
+                projectGenerator.Generators = projectGenerator.Generators.ApplySequenceSorting();
+                ///var p = projectGenerator.Generators.ForEach(g => g.Generator.States.ApplyStateSequenceSorting());
                 return projectGenerator;
             }
             else 
@@ -47,8 +51,6 @@ namespace vega.Persistence
             vegaDbContext.Add(projectGenerator);
         }
 
-        //void Update(ProjectGenerator projectGenerator);
-
         public void InsertGenerator(ProjectGenerator projectGenerator, StateInitialiser newGenerator, int SeqId) {
 
             ProjectGeneratorSequence pgs = new ProjectGeneratorSequence();
@@ -65,6 +67,23 @@ namespace vega.Persistence
             
             vegaDbContext.Update(projectGenerator);
         }
+
+        public async void RemoveGenerator(ProjectGenerator projectGenerator, StateInitialiser generator) {
+
+            var pg = await GetProjectGenerator(projectGenerator.Id);
+            
+            var rg = pg.Generators.Where(g => g.Generator.Id == generator.Id).SingleOrDefault();
+
+            var SeqId = rg.SeqId; //Store Sequence
+            pg.Generators.Remove(rg);
+
+            projectGenerator.Generators
+                .Where(g => g.SeqId >= SeqId)
+                .ToList()
+                .ForEach(gn => gn.SeqId -= 1);
+            
+            vegaDbContext.Update(projectGenerator);
+        }
         public void AppendGenerator(ProjectGenerator projectGenerator, StateInitialiser newGenerator) {
 
             ProjectGeneratorSequence pgs = new ProjectGeneratorSequence();
@@ -77,27 +96,6 @@ namespace vega.Persistence
             pgs.Generator = newGenerator;
 
             projectGenerator.Generators.Add(pgs);          
-            vegaDbContext.Update(projectGenerator);
-        }
-
-
-        public void AddGenerator(ProjectGenerator projectGenerator, StateInitialiser newGenerator, StateInitialiser insertAfterGenerator) {
-
-            if(insertAfterGenerator.Id == -1) {
-                //Add to front of list
-                if(projectGenerator.Generators.Count() == 0) {
-                    //projectGenerator.Generators.Add(newGenerator);
-                }
-                else {
-                    ///projectGenerator.Generators.Insert(0, newGenerator);
-                }
-            }
-            else {
-                var existingGenerator = projectGenerator.Generators.Where(g => g.Id == insertAfterGenerator.Id);
-
-                //var location = projectGenerator.Generators.IndexOf(insertAfterGenerator);
-                //projectGenerator.Generators.Insert(location+1, newGenerator);
-            }
             vegaDbContext.Update(projectGenerator);
         }
     }
