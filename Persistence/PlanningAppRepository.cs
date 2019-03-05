@@ -41,21 +41,11 @@ namespace vega.Persistence
 
         private IStateStatusRepository stateStatusRepository { get; set; }
  
-        public void Add(PlanningApp planningApp, StateInitialiser stateInitialiser)
+        public void Add(PlanningApp planningApp)
         {
-
-            var initialStatus = vegaDbContext.StateStatus.Where(s => s.Name == stateStatusSettings.STATE_ON_TIME).SingleOrDefault();
-            var initialStatusList  = vegaDbContext.StateStatus.ToList();
-
-            planningApp = planningApp.GeneratePlanningStates(stateInitialiser.States, initialStatusList);
-
-            //Create Fees
-            foreach(var fee in vegaDbContext.Fees) {
-                PlanningAppFees planningAppFees = new PlanningAppFees { Amount = fee.DefaultAmount, Fee = fee};
-                planningApp.Fees.Add(planningAppFees);
-            }
             vegaDbContext.Add(planningApp);   
         }
+        
         public void AppendGenerator(PlanningApp planningApp, StateInitialiser stateInitialiser)
         {
 
@@ -114,12 +104,13 @@ namespace vega.Persistence
             var query =  vegaDbContext.PlanningApps
                                 .Include(b => b.CurrentPlanningStatus) 
                                 .Include(t => t.PlanningAppStates)
-                                    .ThenInclude(a => a.StateStatus)
-                                .Include(t => t.PlanningAppStates)
-                                    .ThenInclude(s => s.state)
-                                .Include(c => c.Customer.CustomerContact)
+                                //     .ThenInclude(a => a.StateStatus)
+                                // .Include(t => t.PlanningAppStates)
+                                //     .ThenInclude(s => s.state)
+                                // .Include(c => c.Customer.CustomerContact)
                                 .AsQueryable();
 
+            var p = query.ToList();
             if(queryObj.CustomerId > 0)
                 query = query.Where(c => c.Customer.Id == queryObj.CustomerId);
  

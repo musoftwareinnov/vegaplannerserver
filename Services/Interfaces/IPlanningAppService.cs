@@ -6,5 +6,6 @@ namespace vega.Services.Interfaces
     public interface IPlanningAppService
     {
         PlanningApp Create(CreatePlanningAppResource planningAppResource);
+        PlanningApp GetPlanningApp(int id);
     }
 }

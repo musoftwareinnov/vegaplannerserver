@@ -75,12 +75,15 @@ namespace vega.Controllers
 
             var pa = planningAppService.Create(planningResource);
 
+            return await GetPlanningApp(pa.Id);
 
 
+            // var result = mapper.Map<PlanningApp, PlanningAppResource>(pa);
+            // result.BusinessDate = CurrentDate.SettingDateFormat();
 
             //var planningApp = mapper.Map<CreatePlanningAppResource, PlanningApp>(planningResource);
 
-            var stateInitialiser = await stateInitialiserRepository.GetStateInitialiser(pa.StateInitialiserId, includeDeleted: false);
+            //var stateInitialiser = await stateInitialiserRepository.GetStateInitialiser(pa.StateInitialiserId, includeDeleted: false);
             
             // PlanningAppResource result = null;
 
@@ -125,27 +128,10 @@ namespace vega.Controllers
             //     result.BusinessDate = CurrentDate.SettingDateFormat();
             // }
 
-            var result = mapper.Map<PlanningApp, PlanningAppResource>(pa);
-            result.BusinessDate = CurrentDate.SettingDateFormat();
 
-            return Ok(result);
-        }
-
-        private void contravar(List<string> planningAppUser) {
-
-        }   
-
-        [HttpPost("appendgenerator")]
-        public IActionResult AppendGenerator([FromBody] CreatePlanningAppResource planningResource)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            //var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
-            //result.BusinessDate = CurrentDate.SettingDateFormat();
             //return Ok(result);
-            throw new NotImplementedException();
         }
+
 
 
         [HttpGet("{id}")]
@@ -282,6 +268,22 @@ namespace vega.Controllers
                  queryResult = repository.GetPlanningApps(filter);             
 
             return mapper.Map<QueryResult<PlanningApp>, QueryResultResource<PlanningAppSummaryResource>>(queryResult);
+        }
+
+        private void contravar(List<string> planningAppUser) {
+
+        }   
+
+        [HttpPost("appendgenerator")]
+        public IActionResult AppendGenerator([FromBody] CreatePlanningAppResource planningResource)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            //var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
+            //result.BusinessDate = CurrentDate.SettingDateFormat();
+            //return Ok(result);
+            throw new NotImplementedException();
         }
     }
 }

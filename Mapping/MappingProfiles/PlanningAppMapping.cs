@@ -12,6 +12,8 @@ namespace vega.Mapping.MappingProfiles
         public PlanningAppMapping()
         { 
             CreateMap<PlanningApp, PlanningAppResource>()
+                .ForMember(psr => psr.ProjectGeneratorName, 
+                    opt => opt.MapFrom(ps => ps.ProjectGenerator.Name))
                 .ForMember(psr => psr.CurrentStateStatus,
                     opt => opt.MapFrom(ps => ps.Current().DynamicStateStatus()))
                 .ForMember(psr => psr.CurrentState,

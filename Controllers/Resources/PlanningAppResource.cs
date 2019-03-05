@@ -13,6 +13,7 @@ namespace vega.Controllers.Resources
         public int Id { get; set; }
         public string PlanningReferenceId { get; set; }
         public PlanningCustomerResource Customer { get; set; }
+        public string ProjectGeneratorName { get; set; }
         public string Name { get; set; }
         public string CustomerName { get; set; }
         public string BusinessDate { get; set; }

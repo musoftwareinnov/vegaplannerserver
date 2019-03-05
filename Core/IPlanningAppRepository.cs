@@ -7,7 +7,7 @@ namespace vega.Core
 { 
     public interface IPlanningAppRepository
     {
-        void Add(PlanningApp planningApp, StateInitialiser stateInitialiser);
+        void Add(PlanningApp planningApp);
         Task<PlanningApp> GetPlanningApp(int id, bool includeRelated = true);
         QueryResult<PlanningApp> GetPlanningApps(PlanningAppQuery queryObj);
         QueryResult<PlanningApp> GetPlanningAppsSearchCriteria(PlanningAppQuery queryObj);
