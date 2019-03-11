@@ -145,6 +145,9 @@ namespace vega.Core.Models
             else    
                 return state.CompletionTime;    
         }
+        public bool isLastGeneratorState() { 
+            return this.PlanningApp.isLastGeneratorState(this.StateInitialiserStateId);   
+        }
 
         public bool isCustomDuration() {
             return this.CustomDurationSet;

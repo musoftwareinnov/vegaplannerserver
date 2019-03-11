@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using vega.Controllers.Resources;
@@ -40,6 +41,13 @@ namespace vega.Core.Models
         // public string CaseOfficer  { get; set; }
         // 
         public IList<PlanningAppState> PlanningAppStates { get; set; }
+        
+        [NotMapped]
+        public IList<PlanningAppState> OrderedPlanningAppStates {
+            get { return this.PlanningAppStates.OrderBy(o => o.GeneratorOrder)
+                                                    .ThenBy(o => o.state.OrderId)
+                                                        .ToList(); } 
+        }
         public ICollection<Drawing> Drawings { get; set; }
         public ICollection<PlanningAppSurveyors> Surveyors { get; set; }
         public ICollection<PlanningAppDrawers> Drawers { get; set; }
@@ -86,68 +94,68 @@ namespace vega.Core.Models
         // }
 
         //Version 2 multiple generators per project
-        public void InsertGenNewPlanningStateV2(StateInitialiserState stateInitialiserState, StateStatus stateStatus, int generatorOrder) 
-        {
-            PlanningAppState newPlanningAppState = new PlanningAppState();
-            PlanningAppState prevState;
-            var stateCount = PlanningAppStates.Count;
-            if(stateCount > 0) {
-                prevState =  PlanningAppStates[stateCount-1];
-                newPlanningAppState.DueByDate =  prevState.DueByDate.AddBusinessDays(stateInitialiserState.CompletionTime);
-            }
-            else 
-                newPlanningAppState.DueByDate = SystemDate.Instance.date.AddBusinessDays(stateInitialiserState.CompletionTime);
+        // public void InsertGenNewPlanningStateV2(StateInitialiserState stateInitialiserState, StateStatus stateStatus, int generatorOrder) 
+        // {
+        //     PlanningAppState newPlanningAppState = new PlanningAppState();
+        //     PlanningAppState prevState;
+        //     var stateCount = PlanningAppStates.Count;
+        //     if(stateCount > 0) {
+        //         prevState =  PlanningAppStates[stateCount-1];
+        //         newPlanningAppState.DueByDate =  prevState.DueByDate.AddBusinessDays(stateInitialiserState.CompletionTime);
+        //     }
+        //     else 
+        //         newPlanningAppState.DueByDate = SystemDate.Instance.date.AddBusinessDays(stateInitialiserState.CompletionTime);
 
-            //Add custom fields to state if exist
-            foreach(var stateInitialiserStateCustomField in newPlanningAppState.state.StateInitialiserStateCustomFields) {
-                newPlanningAppState.customFields
-                        .Add(new PlanningAppStateCustomField { StateInitialiserStateCustomFieldId = stateInitialiserStateCustomField.StateInitialiserCustomFieldId });
-            }
+        //     //Add custom fields to state if exist
+        //     foreach(var stateInitialiserStateCustomField in newPlanningAppState.state.StateInitialiserStateCustomFields) {
+        //         newPlanningAppState.customFields
+        //                 .Add(new PlanningAppStateCustomField { StateInitialiserStateCustomFieldId = stateInitialiserStateCustomField.StateInitialiserCustomFieldId });
+        //     }
 
-            newPlanningAppState.GeneratorOrder = generatorOrder;
-            newPlanningAppState.state = stateInitialiserState;
-            newPlanningAppState.StateStatus = stateStatus;
+        //     newPlanningAppState.GeneratorOrder = generatorOrder;
+        //     newPlanningAppState.state = stateInitialiserState;
+        //     newPlanningAppState.StateStatus = stateStatus;
 
-            PlanningAppStates.Add(newPlanningAppState);
-        }
+        //     PlanningAppStates.Add(newPlanningAppState);
+        // }
 
         //===========================================================================================
         //Version 1 Single Generator Per Planning App
-        public PlanningApp GeneratePlanningStates(List<StateInitialiserState> stateInitialiserStates, 
-                                                    IEnumerable<StateStatus> stateStatus) 
-        {
-            var currentDate = SystemDate.Instance.date;
+        // public PlanningApp GeneratePlanningStates(List<StateInitialiserState> stateInitialiserStates, 
+        //                                             IEnumerable<StateStatus> stateStatus) 
+        // {
+        //     var currentDate = SystemDate.Instance.date;
 
-            foreach(var stateInialiserState in stateInitialiserStates) {
-                PlanningAppState newPlanningAppState = new PlanningAppState();
-                newPlanningAppState.state = stateInialiserState;
+        //     foreach(var stateInialiserState in stateInitialiserStates) {
+        //         PlanningAppState newPlanningAppState = new PlanningAppState();
+        //         newPlanningAppState.state = stateInialiserState;
 
-                PlanningAppState prevState;
-                var stateCount = PlanningAppStates.Count;
-                if(stateCount > 0) {
-                    prevState =  PlanningAppStates[stateCount-1];
-                    newPlanningAppState.DueByDate =  prevState.DueByDate.AddBusinessDays(stateInialiserState.CompletionTime);
-                }
-                else 
-                    newPlanningAppState.DueByDate = currentDate.AddBusinessDays(stateInialiserState.CompletionTime);
+        //         PlanningAppState prevState;
+        //         var stateCount = PlanningAppStates.Count;
+        //         if(stateCount > 0) {
+        //             prevState =  PlanningAppStates[stateCount-1];
+        //             newPlanningAppState.DueByDate =  prevState.DueByDate.AddBusinessDays(stateInialiserState.CompletionTime);
+        //         }
+        //         else 
+        //             newPlanningAppState.DueByDate = currentDate.AddBusinessDays(stateInialiserState.CompletionTime);
 
-                newPlanningAppState.StateStatus = stateStatus.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();
-                //Add custom fields to state if exist
-                foreach(var stateInitialiserStateCustomField in newPlanningAppState.state.StateInitialiserStateCustomFields) {
-                    newPlanningAppState.customFields
-                            .Add(new PlanningAppStateCustomField { StateInitialiserStateCustomFieldId = stateInitialiserStateCustomField.StateInitialiserCustomFieldId });
-                }
-                PlanningAppStates.Add(newPlanningAppState);
-            }
-            //set first state to current state
-            if(PlanningAppStates.Count > 0)
-                 PlanningAppStates[0].CurrentState = true;
+        //         newPlanningAppState.StateStatus = stateStatus.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();
+        //         //Add custom fields to state if exist
+        //         foreach(var stateInitialiserStateCustomField in newPlanningAppState.state.StateInitialiserStateCustomFields) {
+        //             newPlanningAppState.customFields
+        //                     .Add(new PlanningAppStateCustomField { StateInitialiserStateCustomFieldId = stateInitialiserStateCustomField.StateInitialiserCustomFieldId });
+        //         }
+        //         PlanningAppStates.Add(newPlanningAppState);
+        //     }
+        //     //set first state to current state
+        //     if(PlanningAppStates.Count > 0)
+        //          PlanningAppStates[0].CurrentState = true;
 
-            //Set overall Status to InProgress
-            CurrentPlanningStatus = stateStatus.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault();
+        //     //Set overall Status to InProgress
+        //     CurrentPlanningStatus = stateStatus.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault();
         
-            return this;
-        }
+        //     return this;
+        // }
        public PlanningApp InsertNewPlanningState(StateInitialiserState newStateInitialiserState, IEnumerable<StateStatus> stateStatus) 
         {
 
@@ -450,7 +458,23 @@ namespace vega.Core.Models
         {
                 return PlanningAppStates.Count() > 0 ? PlanningAppStates[0] : null;
         }
-
-
+        public bool isLastGeneratorState(int stateInitialiserStateId)
+        {
+            var r = OrderedPlanningAppStates.GetEnumerator();
+            while(r.MoveNext()) {
+                PlanningAppState prev = r.Current;
+                if(r.Current.StateInitialiserStateId == stateInitialiserStateId) {
+                    if(r.MoveNext()) {
+                        if(r.Current.GeneratorOrder != prev.GeneratorOrder)
+                            return true;
+                        else
+                            return false;
+                    }
+                    else 
+                        return true;
+                }
+            }
+            return false;
+        }
     }
 }

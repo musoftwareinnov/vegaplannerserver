@@ -7,6 +7,8 @@ namespace vega.Core
 {    
     public interface IStateStatusRepository
     {
+        void AddStateStatusList( StateStatus stateStatus);
+
         Task<List<StateStatus>> GetStateStatusList (string stateStatus);
 
         List<StateStatus> GetStateStatusListGroup (string stateStatus);

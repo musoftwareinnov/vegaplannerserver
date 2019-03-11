@@ -34,6 +34,10 @@ namespace vega.Persistence
             }
         } 
 
+        public void AddStateStatusList( StateStatus stateStatus) {
+            vegaDbContext.Add(stateStatus);
+        }
+
         public List<StateStatus> GetStateStatusListGroup (string stateStatus)
         {     
             if(stateStatus == StatusList.All) {

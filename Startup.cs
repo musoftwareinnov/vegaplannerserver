@@ -36,6 +36,9 @@ using Microsoft.AspNetCore.Mvc;
 using vegaplannerserver.Core.Security;
 using vega.Services.Interfaces;
 using vega.Services;
+using System.Collections.Generic;
+using vega.Core.Models.States;
+using vega.Services.Implementations;
 
 namespace vega
 {
@@ -73,6 +76,7 @@ namespace vega
         public void ConfigureServices(IServiceCollection services)
         {
             //Core Repositories
+            services.AddSingleton<IDateService, DateService>();
             services.Configure<PhotoSettings>(Configuration.GetSection("PhotoSettings"));
             services.Configure<StateStatusSettings>(Configuration.GetSection("StateStatusSettings"));
             services.Configure<DateFormatSetting>(Configuration.GetSection("DateFormatSetting"));
@@ -121,7 +125,7 @@ namespace vega
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             //AutoMapper
-            services.AddAutoMapper();
+            services.AddAutoMapper(typeof(Startup));
 
             //Database Connection
             services.AddDbContext<VegaDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
@@ -205,8 +209,12 @@ namespace vega
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, RoleManager<IdentityRole> roleManager,
-                                IBusinessDateRepository businessDateRepository, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app,          
+                              IHostingEnvironment env, 
+                              RoleManager<IdentityRole> roleManager,
+                              IBusinessDateRepository businessDateRepository, 
+                              IDateService dateService,
+                              IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -261,11 +269,45 @@ namespace vega
             //Create Admin User if not exist
             CreateAdminUser(serviceProvider).Wait();
 
+            //Create List Of Status if not already set
+            CreatePlanningAppStatuses(serviceProvider).Wait();
+
             //Set global date, ovverride if set
             var options = new DateSettings();
             Configuration.GetSection("DateSettings").Bind(options);
-            setApplicationDate(options.CurrentDateOverride, businessDateRepository);
+            setApplicationDate(options.CurrentDateOverride, dateService, businessDateRepository);
         }
+        private async Task CreatePlanningAppStatuses(IServiceProvider serviceProvider)  
+        { 
+            var UnitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();  
+            var StateStatusRepository = serviceProvider.GetRequiredService<IStateStatusRepository>();  
+
+            var ctr = await StateStatusRepository.GetStateStatusList();
+            if(ctr.Count == 0) {
+                var stateStatus = new StateStatus { GroupType = "InProgress", Name = "InProgress", OrderId = 1 };
+                StateStatusRepository.AddStateStatusList(stateStatus);
+                stateStatus = new StateStatus { GroupType = "InProgress", Name = "Overdue", OrderId = 2 };
+                StateStatusRepository.AddStateStatusList(stateStatus);
+                stateStatus = new StateStatus { GroupType = "InProgress", Name = "Due", OrderId = 3 };
+                StateStatusRepository.AddStateStatusList(stateStatus);
+                stateStatus = new StateStatus { GroupType = "InProgress", Name = "OnTime", OrderId = 4 };
+                StateStatusRepository.AddStateStatusList(stateStatus);
+                stateStatus = new StateStatus { GroupType = "Not InProgress", Name = "Not InProgress", OrderId = 5 };
+                StateStatusRepository.AddStateStatusList(stateStatus);
+                stateStatus = new StateStatus { GroupType = "Not InProgress", Name = "Complete", OrderId = 6 };
+                StateStatusRepository.AddStateStatusList(stateStatus);
+                stateStatus = new StateStatus { GroupType = "Not InProgress", Name = "Overran", OrderId = 7 };
+                StateStatusRepository.AddStateStatusList(stateStatus);
+                stateStatus = new StateStatus { GroupType = "Not InProgress", Name = "Terminated", OrderId = 8 };
+                StateStatusRepository.AddStateStatusList(stateStatus);
+                stateStatus = new StateStatus { GroupType = "Not InProgress", Name = "Archived", OrderId = 9 };
+                StateStatusRepository.AddStateStatusList(stateStatus);
+                stateStatus = new StateStatus { GroupType = "All", Name = "All", OrderId = 10 };
+                StateStatusRepository.AddStateStatusList(stateStatus);
+
+            }
+            await UnitOfWork.CompleteAsync();
+        } 
 
         private async Task CreateAdminUser(IServiceProvider serviceProvider)  
         {     
@@ -340,16 +382,17 @@ namespace vega
                 } 
         }
         
-        public void setApplicationDate(string currentDateOverride, IBusinessDateRepository businessDateRepository)
+        public void setApplicationDate(string currentDateOverride, IDateService dateService, IBusinessDateRepository businessDateRepository)
         {
-            var currentDate = DateTime.Now;
-            if(!string.IsNullOrEmpty(currentDateOverride)) { 
-                SystemDate.Instance.date = currentDateOverride.ParseInputDate();      
-            }
-            else {
-                SystemDate.Instance.date = new DateTime(currentDate.Year, currentDate.Month, currentDate.Day, 0, 0, 0);
-            }
-            Console.WriteLine("Business Date : " + SystemDate.Instance.date);
+            //Console.WriteLine("IDATE Business Date : " + dateService.GetCurrentDate());
+            SystemDate.Instance.date = dateService.GetCurrentDate();
+            // var currentDate = DateTime.Now;
+            // if(!string.IsNullOrEmpty(currentDateOverride)) { 
+            //     SystemDate.Instance.date = currentDateOverride.ParseInputDate();      
+            // }
+            // else {
+            //     SystemDate.Instance.date = dateService.GetCurrentDate();
+            // }
             businessDateRepository.SetBusinessDate(SystemDate.Instance.date);
         }
     }

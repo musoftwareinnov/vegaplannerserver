@@ -43,7 +43,7 @@ namespace vega.Controllers
             var customer = await customerRepository.GetCustomer(id);
 
             if (customer == null)
-                return NotFound();
+                return NotFound("Customer");
 
             var result = mapper.Map<Customer, CustomerResource>(customer);
 

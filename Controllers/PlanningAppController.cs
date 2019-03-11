@@ -73,10 +73,10 @@ namespace vega.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var pa = planningAppService.Create(planningResource);
+            var planningApp = planningAppService.Create(planningResource);
+            await unitOfWork.CompleteAsync();
 
-            return await GetPlanningApp(pa.Id);
-
+            return await GetPlanningApp(planningApp.Id);
 
             // var result = mapper.Map<PlanningApp, PlanningAppResource>(pa);
             // result.BusinessDate = CurrentDate.SettingDateFormat();
@@ -132,16 +132,15 @@ namespace vega.Controllers
             //return Ok(result);
         }
 
-
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPlanningApp(int id)
         {              
-            var planningApp = await repository.GetPlanningApp(id, includeRelated: true);
+            var planningApp = await planningAppService.GetPlanningApp(id);
 
-            if (planningApp == null)
+            if (planningApp == null) {
+                Console.WriteLine("NOTFOUND!!!!!");
                 return NotFound();          
-
+            }
             var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
             result.BusinessDate = CurrentDate.SettingDateFormat();
 

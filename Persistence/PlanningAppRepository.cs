@@ -63,37 +63,32 @@ namespace vega.Persistence
             if(!includeRelated) {
                 return await vegaDbContext.PlanningApps.FindAsync(id);
             }  
-            else {
-                var sortStates =  vegaDbContext.PlanningApps
-                                .Where(s => s.Id == id)
-                                    .Include(b => b.CurrentPlanningStatus)
-                                    .Include(t => t.PlanningAppStates)
-                                        .ThenInclude(s => s.state) 
-                                            .ThenInclude(cs => cs.StateInitialiserStateCustomFields)
-                                                .ThenInclude(cf => cf.StateInitialiserCustomField)
-                                    .Include(t => t.PlanningAppStates)
-                                        .ThenInclude(a => a.StateStatus)
-                                    .Include(t => t.PlanningAppStates)
-                                        .ThenInclude(cf => cf.customFields)
-                                    .Include(c => c.Customer.CustomerContact)
-                                    .Include(c => c.Customer.CustomerAddress)
-                                    .Include(g => g.StateInitialiser)
-                                    .Include(s => s.Surveyors)
-                                        .ThenInclude(u => u.AppUser)
-                                    .Include(s => s.Drawers)
-                                        .ThenInclude(u => u.AppUser)
-                                    .Include(s => s.Admins)
-                                        .ThenInclude(u => u.AppUser)
-                                    .Include(s => s.Fees)
-                                        .ThenInclude(u => u.Fee)
-                                    .SingleOrDefault();
 
-                //sort planing states using 
-                if(sortStates != null)
-                    sortStates.PlanningAppStates = sortStates.PlanningAppStates.OrderBy(o => o.state.OrderId).ToList();
-
-                return sortStates;
-            }            
+            return vegaDbContext.PlanningApps
+                    .Where(s => s.Id == id)
+                        .Include(b => b.CurrentPlanningStatus)
+                        .Include(t => t.PlanningAppStates)
+                            .ThenInclude(s => s.state) 
+                                .ThenInclude(cs => cs.StateInitialiserStateCustomFields)
+                                    .ThenInclude(cf => cf.StateInitialiserCustomField)
+                        .Include(t => t.PlanningAppStates)
+                            .ThenInclude(a => a.StateStatus)
+                        .Include(t => t.PlanningAppStates)
+                            .ThenInclude(cf => cf.customFields)
+                        .Include(c => c.Customer.CustomerContact)
+                        .Include(c => c.Customer.CustomerAddress)
+                        //.Include(g => g.StateInitialiser)
+                        .Include(s => s.Surveyors)
+                            .ThenInclude(u => u.AppUser)
+                        .Include(s => s.Drawers)
+                            .ThenInclude(u => u.AppUser)
+                        .Include(s => s.Admins)
+                            .ThenInclude(u => u.AppUser)
+                        .Include(s => s.Fees)
+                            .ThenInclude(u => u.Fee)
+                        .SingleOrDefault();
+  
+                       
         }
 
         public QueryResult<PlanningApp> GetPlanningApps(PlanningAppQuery queryObj)
