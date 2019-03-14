@@ -132,13 +132,27 @@ namespace vega.Controllers
             //return Ok(result);
         }
 
+        [HttpPut("insertgenerator/{id}")]
+        public async Task<IActionResult> InsertGenerator(int id, [FromBody] AppendAppGeneratorResource appGenResource)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await planningAppService.InsertGenerator(id, appGenResource.OrderId, appGenResource.NewGeneratorId);
+
+            await unitOfWork.CompleteAsync();
+
+            return await GetPlanningApp(appGenResource.PlanningAppId);
+
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPlanningApp(int id)
         {              
             var planningApp = await planningAppService.GetPlanningApp(id);
 
             if (planningApp == null) {
-                Console.WriteLine("NOTFOUND!!!!!");
+                Console.WriteLine("Planning App Not Found!!!!!");
                 return NotFound();          
             }
             var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);

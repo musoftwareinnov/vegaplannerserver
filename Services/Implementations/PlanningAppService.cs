@@ -21,6 +21,7 @@ namespace vega.Services
                                     IPlanningAppRepository PlanningAppRepository,
                                     IProjectGeneratorRepository projectGeneratorRepository,
                                     IStateStatusRepository stateStatusRepository,
+                                    IStateInitialiserRepository stateInitialiserRepository,
                                     ICustomerRepository CustomerRepository,
                                     IDateService dateService,
                                     IUnitOfWork unitOfWork)
@@ -29,6 +30,7 @@ namespace vega.Services
             this.PlanningAppRepository = PlanningAppRepository;
             this.ProjectGeneratorRepository = projectGeneratorRepository;
             this.StateStatusRepository = stateStatusRepository;
+            this.StateInitialiserRepository = stateInitialiserRepository;
             this.CustomerRepository = CustomerRepository;
             this.DateService = dateService;
             this.UnitOfWork = unitOfWork;
@@ -39,13 +41,14 @@ namespace vega.Services
         public IMapper Mapper { get; }
         public IProjectGeneratorRepository ProjectGeneratorRepository { get; }
         public IStateStatusRepository StateStatusRepository { get; }
+        public IStateInitialiserRepository StateInitialiserRepository { get; }
         public ICustomerRepository CustomerRepository { get; }
         public IDateService DateService { get; }
         public IUnitOfWork UnitOfWork { get; }
         public IPlanningAppRepository PlanningAppRepository  { get; }
         public List<StateStatus> statusList  { get; }
 
-        public  Task<PlanningApp> Create(CreatePlanningAppResource planningResource) {
+        public  async Task<PlanningApp> Create(CreatePlanningAppResource planningResource) {
             
             var planningApp = Mapper.Map<CreatePlanningAppResource, PlanningApp>(planningResource);
 
@@ -53,7 +56,7 @@ namespace vega.Services
             Console.WriteLine("Creating New Planning App, Project Generator -> " + planningApp.ProjectGenerator.Name);
 
             //Create States
-            planningApp = CreatePlanningStates(planningApp);
+            planningApp = await CreatePlanningStates(planningApp);
             Console.WriteLine("Generated " + planningApp.PlanningAppStates.Count + " Planning States");
 
             //Create Customer
@@ -68,19 +71,21 @@ namespace vega.Services
             PlanningAppRepository.Add(planningApp); 
 
             //Retrieve planning app from database and return results
-            return PlanningAppRepository.GetPlanningApp(planningApp.Id);
+            return await PlanningAppRepository.GetPlanningApp(planningApp.Id);
         }
         
 
 
-        private PlanningApp CreatePlanningStates(PlanningApp planningApp) 
+        private async Task<PlanningApp> CreatePlanningStates(PlanningApp planningApp) 
         {
             foreach(var gen in planningApp.ProjectGenerator.OrderedGenerators) {
                 Console.WriteLine("Adding Generator " + gen.Generator.Name + " To Planning App");
-                foreach(var state in gen.Generator.OrderedStates) {
-                    Console.WriteLine("Adding States " + state.Name + " To Planning App");   
-                    planningApp = AddPlanningState(planningApp, gen, state);
-                }
+
+                await InsertGenerator(planningApp.Id, gen.SeqId, gen.Id) ;
+                // foreach(var state in gen.Generator.OrderedStates) {
+                //     Console.WriteLine("Adding States " + state.Name + " To Planning App");   
+                //     planningApp = InsertPlanningState(planningApp, gen.SeqId, state);
+                // }
             }
 
             //set first state to current state
@@ -93,37 +98,119 @@ namespace vega.Services
             return planningApp;
         }
 
-        private PlanningApp AddPlanningState(PlanningApp planningApp, ProjectGeneratorSequence seq, StateInitialiserState stateInitialiserState) 
+        private PlanningApp InsertPlanningState(PlanningApp planningApp, int GeneratorOrder, StateInitialiserState stateInitialiserState) 
         {
-            //var currentDate = SystemDate.Instance.date;
-            var currentDate = DateService.GetCurrentDate();
             PlanningAppState newPlanningAppState = new PlanningAppState();
             newPlanningAppState.state = stateInitialiserState;
 
-            PlanningAppState prevState;
-            var stateCount = planningApp.PlanningAppStates.Count;
-            if(stateCount > 0) {
-                prevState =  planningApp.PlanningAppStates[stateCount-1];
-                newPlanningAppState.DueByDate =  prevState.DueByDate.AddBusinessDays(stateInitialiserState.CompletionTime);
-            }
-            else 
-                newPlanningAppState.DueByDate = currentDate.AddBusinessDays(stateInitialiserState.CompletionTime);
-
-            //Add custom fields to state if exist
             foreach(var stateInitialiserStateCustomField in newPlanningAppState.state.StateInitialiserStateCustomFields) {
                 newPlanningAppState.customFields
                         .Add(new PlanningAppStateCustomField { StateInitialiserStateCustomFieldId = stateInitialiserStateCustomField.StateInitialiserCustomFieldId });
             }
- 
-            newPlanningAppState.GeneratorOrder = seq.SeqId;
-            newPlanningAppState.StateStatus = statusList.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();;
 
-            //Add the State To The Planning Application
+            newPlanningAppState.GeneratorOrder = GeneratorOrder;
             planningApp.PlanningAppStates.Add(newPlanningAppState);
+
+            //Get Ordered States and roll date forward from this state
+
+
+            return planningApp;
+         }
+
+        // private PlanningApp AddPlanningState(PlanningApp planningApp, ProjectGeneratorSequence GeneratorOrder, StateInitialiserState stateInitialiserState) 
+        // {
+        //     //var currentDate = SystemDate.Instance.date;
+        //     var currentDate = DateService.GetCurrentDate();
+        //     PlanningAppState newPlanningAppState = new PlanningAppState();
+        //     newPlanningAppState.state = stateInitialiserState;
+
+        //     PlanningAppState prevState;
+        //     var stateCount = planningApp.PlanningAppStates.Count;
+        //     if(stateCount > 0) {
+        //         //Get Previous State
+        //         //If 
+        //         prevState =  planningApp.OrderedPlanningAppStates[stateCount-1];
+        //         newPlanningAppState.DueByDate =  prevState.DueByDate.AddBusinessDays(stateInitialiserState.CompletionTime);
+        //     }
+        //     else 
+        //         newPlanningAppState.DueByDate = currentDate.AddBusinessDays(stateInitialiserState.CompletionTime);
+
+        //     //Add custom fields to state if exist
+        //     foreach(var stateInitialiserStateCustomField in newPlanningAppState.state.StateInitialiserStateCustomFields) {
+        //         newPlanningAppState.customFields
+        //                 .Add(new PlanningAppStateCustomField { StateInitialiserStateCustomFieldId = stateInitialiserStateCustomField.StateInitialiserCustomFieldId });
+        //     }
+ 
+        //     newPlanningAppState.GeneratorOrder = GeneratorOrder.SeqId;
+        //     //Add the State To The Planning Application
+        //     planningApp.PlanningAppStates.Add(newPlanningAppState);
+
+        //     return planningApp;
+        // }
+
+        public async Task<PlanningApp> InsertGenerator(int planningAppId, int SequenceId, int NewGeneratorId) 
+        {
+            //var currentDate = SystemDate.Instance.date;
+            var currentDate = DateService.GetCurrentDate();
+            PlanningAppState newPlanningAppState = new PlanningAppState();
+
+            var planningApp = await PlanningAppRepository.GetPlanningApp(planningAppId);
+            var generator = await StateInitialiserRepository.GetStateInitialiser(NewGeneratorId);
+
+            var generatorExists = planningApp.OrderedPlanningAppStates.Any(ps => ps.GeneratorOrder == SequenceId);
+
+            //increase SequenceId of all future generators ad insert new one
+            if(generatorExists) {
+                planningApp.PlanningAppStates
+                .Where(g => g.GeneratorOrder > SequenceId)
+                .Select(g => {g.GeneratorOrder++ ; return g;})
+                .ToList();               
+            }
+    
+            foreach(var state in generator.OrderedStates) {
+                 InsertPlanningState(planningApp, SequenceId, state);
+            }
+
+
+            //IS LAST STATE SHOULD BE RENAMED "Can Insert New Gen" !!! (After current status)
+            // //Only add new states if the current state precedes (GUI will prevent this but extra check)
+            // if(planningApp.Current().GeneratorOrder <= OrderId) {
+            //     //update generator orders by 1
+            //     if(!planningApp.Completed()) {
+            //         planningApp.PlanningAppStates
+            //             .Where(g => g.GeneratorOrder > OrderId)
+            //             .Select(g => {g.GeneratorOrder++ ; return g;})
+            //             .ToList();  
+            //     }
+            //     //Get Generator States and insert
+            //    // var generator = StateInitialiserRepo
+            // }
+
+            // newPlanningAppState.state = stateInitialiserState;
+
+            // PlanningAppState prevState;
+            // var stateCount = planningApp.PlanningAppStates.Count;
+            // if(stateCount > 0) {
+            //     prevState =  planningApp.PlanningAppStates[stateCount-1];
+            //     newPlanningAppState.DueByDate =  prevState.DueByDate.AddBusinessDays(stateInitialiserState.CompletionTime);
+            // }
+            // else 
+            //     newPlanningAppState.DueByDate = currentDate.AddBusinessDays(stateInitialiserState.CompletionTime);
+
+            // //Add custom fields to state if exist
+            // foreach(var stateInitialiserStateCustomField in newPlanningAppState.state.StateInitialiserStateCustomFields) {
+            //     newPlanningAppState.customFields
+            //             .Add(new PlanningAppStateCustomField { StateInitialiserStateCustomFieldId = stateInitialiserStateCustomField.StateInitialiserCustomFieldId });
+            // }
+ 
+            // newPlanningAppState.GeneratorOrder = seq.SeqId;
+            // //newPlanningAppState.StateStatus = statusList.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();;
+
+            // //Add the State To The Planning Application
+            // planningApp.PlanningAppStates.Add(newPlanningAppState);
 
             return planningApp;
         }
-
         public Task<PlanningApp> GetPlanningApp(int id)
         {
             return PlanningAppRepository.GetPlanningApp(id);                     
