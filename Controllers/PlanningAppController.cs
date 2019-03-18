@@ -37,6 +37,7 @@ namespace vega.Controllers
         private readonly IUserRepository userRepository;
 
         public IStateStatusRepository statusListRepository { get; }
+        public IPlanningAppStateService PlanningAppStateService { get; }
         public IPlanningAppService planningAppService { get; }
         public RoleManager<IdentityRole> RoleManager { get; }
         public DateSettings dateSettings { get; set; }
@@ -53,6 +54,7 @@ namespace vega.Controllers
                                      ICustomerRepository customerRepository,
                                      IUserRepository userRepository,
                                      IStateInitialiserRepository stateInitialiserRepository,
+                                     IPlanningAppStateService PlanningAppStateService,
                                      UserManager<AppUser> userManager)
         {
             this.unitOfWork = unitOfWork;
@@ -61,6 +63,7 @@ namespace vega.Controllers
             this.mapper = mapper;
             this.statusListRepository = statusListRepository;
             this.stateInitialiserRepository = stateInitialiserRepository;
+            this.PlanningAppStateService = PlanningAppStateService;
             this.userManager = userManager;
             this.customerRepository = customerRepository;
             this.userRepository = userRepository;
@@ -73,8 +76,12 @@ namespace vega.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var planningApp = planningAppService.Create(planningResource);
-            await unitOfWork.CompleteAsync();
+            var planningApp = await planningAppService.Create(planningResource);
+
+            //Debug
+            // foreach(var ps in planningApp.OrderedPlanningAppStates) {
+            //     Console.WriteLine(ps);
+            // }
 
             return await GetPlanningApp(planningApp.Id);
 
@@ -133,16 +140,32 @@ namespace vega.Controllers
         }
 
         [HttpPut("insertgenerator/{id}")]
-        public async Task<IActionResult> InsertGenerator(int id, [FromBody] AppendAppGeneratorResource appGenResource)
+        public async Task<IActionResult> InsertGenerator(int id, [FromBody] AppGeneratorResource appGenResource)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await planningAppService.InsertGenerator(id, appGenResource.OrderId, appGenResource.NewGeneratorId);
+            var planningApp  = await planningAppService.GetPlanningApp(id);
+            await planningAppService.InsertGenerator(planningApp, appGenResource.OrderId, appGenResource.GeneratorId);
 
             await unitOfWork.CompleteAsync();
 
-            return await GetPlanningApp(appGenResource.PlanningAppId);
+            return await GetPlanningApp(id);
+
+        }
+
+        [HttpPut("removegenerator/{id}")]
+        public async Task<IActionResult> RemoveGenerator(int id, [FromBody] AppGeneratorResource appGenResource)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var planningApp  = await planningAppService.GetPlanningApp(id);
+            planningAppService.RemoveGenerator(planningApp, appGenResource.OrderId, appGenResource.GeneratorId);
+
+            await unitOfWork.CompleteAsync();
+
+            return await GetPlanningApp(id);
 
         }
 
@@ -161,35 +184,39 @@ namespace vega.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        public QueryResultResource<PlanningAppSummaryResource> GetPlanningApps(PlanningAppQueryResource filterResource)
+        {
+            var filter = mapper.Map<PlanningAppQueryResource, PlanningAppQuery>(filterResource);
+            
+            var queryResult = new QueryResult<PlanningApp>();
+            if(filterResource.SearchCriteria == true)
+                queryResult = repository.GetPlanningAppsSearchCriteria(filter);  
+            else 
+                 queryResult = repository.GetPlanningApps(filter);             
+
+            return mapper.Map<QueryResult<PlanningApp>, QueryResultResource<PlanningAppSummaryResource>>(queryResult);
+        }
+
         //TODO: REFACTOR state transition
 
         [HttpPut("nextstate/{id}")]
         public async Task<IActionResult> NextPlanningAppState(int id)
         {
-            DateTime currentDate = DateTime.Now;
-            var stateStatusList = await statusListRepository.GetStateStatusList(); //List of possible statuses
-
             var planningApp = await repository.GetPlanningApp(id, includeRelated: true);
 
             if (planningApp == null)
                 return NotFound();
 
-            //TODO!!!!!!!Inject Logger to say what changed state by which user
-            var currentStateId = planningApp.Current().Id;
+            if(PlanningAppStateService.IsValid(planningApp.Current())) {//Check Mandatory Fields Set
+                await planningAppService.NextState(planningApp);
+                // //TODO!!!!!!!Inject Logger to say what changed state by which user
+            }
+            else    
+                return BadRequest(new { message = "Mandatory Custom Fields Not Set"});
 
-            //get full entities, including custom state rules
-            var currentState = await planningAppStateRepository.GetPlanningAppState(currentStateId);
-            if(currentState.isValid())
-                planningApp.NextState(stateStatusList);
-            else
-                return BadRequest(new { message = "bad request for next state"});
-      
-            repository.UpdatePlanningApp(planningApp);
-            await unitOfWork.CompleteAsync();
-
-            var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
-            result.BusinessDate = CurrentDate.SettingDateFormat();
-            return Ok(result);
+            await unitOfWork.CompleteAsync();           
+            return await GetPlanningApp(planningApp.Id);
         }
 
         [HttpPut("prevstate/{id}")]
@@ -269,19 +296,7 @@ namespace vega.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        public QueryResultResource<PlanningAppSummaryResource> GetPlanningApps(PlanningAppQueryResource filterResource)
-        {
-            var filter = mapper.Map<PlanningAppQueryResource, PlanningAppQuery>(filterResource);
-            
-            var queryResult = new QueryResult<PlanningApp>();
-            if(filterResource.SearchCriteria == true)
-                queryResult = repository.GetPlanningAppsSearchCriteria(filter);  
-            else 
-                 queryResult = repository.GetPlanningApps(filter);             
 
-            return mapper.Map<QueryResult<PlanningApp>, QueryResultResource<PlanningAppSummaryResource>>(queryResult);
-        }
 
         private void contravar(List<string> planningAppUser) {
 

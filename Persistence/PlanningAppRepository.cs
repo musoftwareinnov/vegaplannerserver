@@ -99,13 +99,12 @@ namespace vega.Persistence
             var query =  vegaDbContext.PlanningApps
                                 .Include(b => b.CurrentPlanningStatus) 
                                 .Include(t => t.PlanningAppStates)
-                                //     .ThenInclude(a => a.StateStatus)
-                                // .Include(t => t.PlanningAppStates)
-                                //     .ThenInclude(s => s.state)
-                                // .Include(c => c.Customer.CustomerContact)
+                                    .ThenInclude(a => a.StateStatus)
+                                .Include(t => t.PlanningAppStates)
+                                    .ThenInclude(s => s.state)
+                                .Include(c => c.Customer.CustomerContact)
                                 .AsQueryable();
 
-            var p = query.ToList();
             if(queryObj.CustomerId > 0)
                 query = query.Where(c => c.Customer.Id == queryObj.CustomerId);
  
@@ -196,7 +195,7 @@ namespace vega.Persistence
             var appsInProgress = query.Where(pa => pa.CurrentPlanningStatus.Name == StatusList.AppInProgress).ToList();
 
             foreach(var app in appsInProgress) {
-                app.PlanningAppStates = app.PlanningAppStates.OrderBy(o => o.state.OrderId).ToList();
+                app.PlanningAppStates = app.OrderedPlanningAppStates.ToList();
             }
             foreach(var status in statusListInProgress) { 
                 planningAppSelectList.AddRange(appsInProgress.Where(pa => pa.Current().DynamicStateStatus() == status.Name)

@@ -8,5 +8,6 @@ namespace vega.Core
 
         Task<PlanningAppState> GetPlanningAppState(int id);
         void Update(PlanningAppState planningAppState);
+        void Remove(PlanningAppState planningAppState);
     }
 }

@@ -47,6 +47,9 @@ namespace vega.Core.Models
         }
 
         /* Helper Methods  */
+        public override string ToString() {
+            return $"{Id} GenOrder:{GeneratorOrder} StateOrder:{state.OrderId} StateName:{state.Name}  DueBy:{DueByDate}".ToString();
+        }
 
         public bool isValid() {
             
@@ -88,6 +91,8 @@ namespace vega.Core.Models
             return StateStatus.Name;
         }
 
+
+        ///IMPORTANT - NEED To RE WRITE!!!!!!!!!!!!
         public DateTime SetMinDueByDate(PlanningApp planningApp) {
             
             DateTime minDueByDate = new DateTime();

@@ -30,6 +30,11 @@ namespace vega.Persistence
             return appState;
         }
 
+        public void Remove(PlanningAppState planningAppState)
+        {
+            vegaDbContext.Remove(planningAppState);
+
+        }
         public void Update(PlanningAppState planningAppState)
         {
             vegaDbContext.Update(planningAppState);

@@ -373,17 +373,17 @@ namespace vega.Core.Models
 
         public void SetCurrent(PlanningAppState planningAppState) {
 
-            foreach ( var state  in PlanningAppStates) {   
+            foreach ( var state  in OrderedPlanningAppStates) {   
                 state.CurrentState = false;
             }
-            PlanningAppStates[PlanningAppStates.IndexOf(planningAppState)].CurrentState = true;
+            OrderedPlanningAppStates[OrderedPlanningAppStates.IndexOf(planningAppState)].CurrentState = true;
         }
 
         public PlanningAppState Next(PlanningAppState planningAppState)
         {       
             PlanningAppState nextState = new PlanningAppState();
             if(!isLastState(planningAppState)) {
-                nextState = PlanningAppStates[PlanningAppStates.IndexOf(planningAppState)+1];
+                nextState = OrderedPlanningAppStates[OrderedPlanningAppStates.IndexOf(planningAppState)+1];
                 planningAppState.CurrentState = false;
                 nextState.CurrentState = true;
                 return nextState;
@@ -394,7 +394,7 @@ namespace vega.Core.Models
         public PlanningAppState SeekNext()
         {       
             if(!Completed() && !isLastState(Current()))
-                return PlanningAppStates[PlanningAppStates.IndexOf(Current())+1]; 
+                return OrderedPlanningAppStates[OrderedPlanningAppStates.IndexOf(Current())+1]; 
             else    
                 return null;
         }
@@ -402,7 +402,7 @@ namespace vega.Core.Models
         public PlanningAppState SeekPrev()  //Get previous state based on CurrentState
         {   
             if(!Completed() && !isFirstState(Current()))
-                return PlanningAppStates[PlanningAppStates.IndexOf(Current())-1]; 
+                return OrderedPlanningAppStates[OrderedPlanningAppStates.IndexOf(Current())-1]; 
             else    
                 return null;
         }
@@ -410,19 +410,19 @@ namespace vega.Core.Models
         public PlanningAppState SeekPrev(PlanningAppState planningAppState) //Get previous state based on specified State
         {   
             if(!Completed() && !isFirstState(planningAppState))
-                return PlanningAppStates[PlanningAppStates.IndexOf(planningAppState)-1]; 
+                return OrderedPlanningAppStates[OrderedPlanningAppStates.IndexOf(planningAppState)-1]; 
             else    
                 return null;
         }
 
         public bool Completed()
         { 
-             return PlanningAppStates.Where(p => p.CurrentState == true).Count() == 0;
+             return OrderedPlanningAppStates.Where(p => p.CurrentState == true).Count() == 0;
         }
 
         public PlanningAppState Current()
         {
-                return PlanningAppStates.Where(s => s.CurrentState == true).SingleOrDefault();
+                return OrderedPlanningAppStates.Where(s => s.CurrentState == true).SingleOrDefault();
         }
 
         public DateTime MinDueByDate() {
@@ -441,22 +441,26 @@ namespace vega.Core.Models
 
         public bool isLastState(PlanningAppState planningAppState)
         {
-                return PlanningAppStates.Count() == (PlanningAppStates.IndexOf(planningAppState) + 1);
+                return OrderedPlanningAppStates.Count() == (OrderedPlanningAppStates.IndexOf(planningAppState) + 1);
         }
 
         public bool isFirstState(PlanningAppState planningAppState)
         {
-                return PlanningAppStates.IndexOf(planningAppState) == 0;
+                return OrderedPlanningAppStates.IndexOf(planningAppState) == 0;
+        }
+        public PlanningAppState FirstState()
+        {
+                return OrderedPlanningAppStates.FirstOrDefault();
         }
         private PlanningAppState SeekLastState()
         {
-                return PlanningAppStates.Count() > 0 ? PlanningAppStates[PlanningAppStates.Count() - 1] : null;
+                return OrderedPlanningAppStates.Count() > 0 ? OrderedPlanningAppStates[OrderedPlanningAppStates.Count() - 1] : null;
                 
         }
 
         private PlanningAppState FirstState(PlanningAppState planningAppState)
         {
-                return PlanningAppStates.Count() > 0 ? PlanningAppStates[0] : null;
+                return OrderedPlanningAppStates.Count() > 0 ? OrderedPlanningAppStates[0] : null;
         }
         public bool isLastGeneratorState(int stateInitialiserStateId)
         {

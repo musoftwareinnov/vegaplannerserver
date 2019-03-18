@@ -98,6 +98,7 @@ namespace vega
 
             //Core Services
             services.AddScoped<IPlanningAppService, PlanningAppService>(); 
+            services.AddScoped<IPlanningAppStateService, PlanningAppStateService>(); 
          
             //Security 
             services.AddScoped<UserManager<AppUser>>();

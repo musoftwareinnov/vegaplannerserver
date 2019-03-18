@@ -18,6 +18,9 @@
  dotnet ef database update ChangAppUserType
  dotnet ef database update Fees
  dotnet ef database update SeedFees
+ dotnet ef database update CustomerTitleLookup
+ dotnet ef database update ProjectGenerator
+ dotnet ef database update ProjectGeneratorSequence
 
 #Clear down database
 #truncate table PlanningAppFees

@@ -67,13 +67,23 @@ namespace vega.Controllers
         }
 
         [HttpGet]
-        public async Task<QueryResultResource<StateInitialiserResource>> GetPlanningApps(StateInitialiserQueryResource filterResource)
+        public async Task<IActionResult> GetGenerators([FromQuery] bool includeDeleted)   
         {
-            var filter = mapper.Map<StateInitialiserQueryResource, StateInitialiserQuery>(filterResource);
-            
-            var queryResult = await stateRepository.GetStateInitialisers(filter);
+            var stateInitialisers = await stateRepository.GetStateInitialisers(new StateInitialiserQuery());
 
-            return mapper.Map<QueryResult<StateInitialiser>, QueryResultResource<StateInitialiserResource>>(queryResult);
+            var result = mapper.Map<QueryResult<StateInitialiser>, QueryResult<StateInitialiserResource>>(stateInitialisers);
+
+            return Ok(result);
         }
+
+        // [HttpGet]
+        // public async Task<QueryResultResource<StateInitialiserResource>> GetPlanningApps(StateInitialiserQueryResource filterResource)
+        // {
+        //     var filter = mapper.Map<StateInitialiserQueryResource, StateInitialiserQuery>(filterResource);
+            
+        //     var queryResult = await stateRepository.GetStateInitialisers(filter);
+
+        //     return mapper.Map<QueryResult<StateInitialiser>, QueryResultResource<StateInitialiserResource>>(queryResult);
+        // }
     }
 }

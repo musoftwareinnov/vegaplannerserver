@@ -31,7 +31,7 @@ namespace vega.Controllers
         {
             var statuses = repository.GetStateStatusListCustomer(customerId);
 
-            return Mapper.Map<List<StateStatus>, List<StateStatusResource>>(statuses);
+            return mapper.Map<List<StateStatus>, List<StateStatusResource>>(statuses);
         }
 
         [HttpGet]
@@ -39,7 +39,7 @@ namespace vega.Controllers
         {
             var statuses = await repository.GetStateStatusList(StatusName);
 
-            return Mapper.Map<List<StateStatus>, List<StateStatusResource>>(statuses);
+            return mapper.Map<List<StateStatus>, List<StateStatusResource>>(statuses);
         }
 
 
