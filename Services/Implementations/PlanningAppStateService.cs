@@ -4,6 +4,7 @@ using System.Linq;
 using vega.Core;
 using vega.Core.Models;
 using vega.Core.Models.States;
+using vega.Core.Utils;
 using vega.Extensions.DateTime;
 using vega.Services.Interfaces;
 
@@ -33,9 +34,31 @@ namespace vega.Services
                 planningAppState.StateStatus = statusList.Where(s => s.Name == StatusList.Complete).SingleOrDefault();
 
             planningAppState.CompletionDate = CompletionDate;
-
+            planningAppState.CurrentState = false;
             //return days diff
             return planningAppState.DueByDate.GetBusinessDays(CompletionDate, new List<DateTime>()); 
+        }
+
+        public DateTime SetMinDueByDate(PlanningApp planningApp, PlanningAppState planningAppState) {
+            
+            DateTime minDueByDate = new DateTime();
+
+            if(!planningApp.Completed()) {
+                var current = planningApp.Current();
+                var currentDate = SystemDate.Instance.date;
+                if(planningAppState.state.OrderId >= current.state.OrderId) {
+                    if(planningApp.isFirstState(planningAppState))
+                        minDueByDate = currentDate.AddBusinessDays(1); //Add one day
+                    else if (planningAppState.CurrentState == true)
+                        minDueByDate = currentDate.AddBusinessDays(1); 
+                    else if (planningApp.SeekPrev(planningAppState).DueByDate <= currentDate)
+                        minDueByDate = currentDate.AddBusinessDays(1); 
+                    else 
+                        minDueByDate = planningApp.SeekPrev(planningAppState).DueByDate.AddBusinessDays(1);
+                }
+            }
+
+            return minDueByDate;
         }
 
         public bool IsValid(PlanningAppState planningAppState) {

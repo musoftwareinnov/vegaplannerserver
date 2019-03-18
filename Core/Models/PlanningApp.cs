@@ -25,8 +25,10 @@ namespace vega.Core.Models
         public String PlanningReferenceId { get; set; }
         public int ProjectGeneratorId { get; set; }
         public ProjectGenerator ProjectGenerator { get; set; }
-        public int StateInitialiserId { get; set; }
-        public StateInitialiser StateInitialiser { get; set; }
+
+        // Deprecate Single Generator Use
+        // public int StateInitialiserId { get; set; }
+        // public StateInitialiser StateInitialiser { get; set; }
         public int CurrentPlanningStatusId { get; set; }
         public StateStatus CurrentPlanningStatus { get; set; }
         public string ApplicationNo { get; set; }
@@ -244,30 +246,30 @@ namespace vega.Core.Models
             }
         }
 
-        public void NextState(List<StateStatus> statusList)
-        {
+        // public void NextState(List<StateStatus> statusList)
+        // {
 
-            if(!Completed()) {
-                PlanningAppStates = PlanningAppStates.OrderBy(s => s.state.OrderId).ToList();
+        //     if(!Completed()) {
+        //         PlanningAppStates = PlanningAppStates.OrderBy(s => s.state.OrderId).ToList();
 
-                var currentDate = SystemDate.Instance.date;
-                var prevState = Current(); //Store reference to current state
+        //         var currentDate = SystemDate.Instance.date;
+        //         var prevState = Current(); //Store reference to current state
 
-                if(!isLastState(prevState)) {
-                        SeekNext().CurrentState = true;   //move to next state
-                }  
-                prevState.CompleteState(currentDate, statusList ); //Close out previouse state
-                //If Overran then roll all future completion dates by business days overdue
-                if(currentDate > prevState.DueByDate) {   
-                    var daysDiff = prevState.DueByDate.GetBusinessDays(currentDate, new List<DateTime>());           
-                    RollForwardDueByDates(daysDiff, prevState);  
-                }  
+        //         if(!isLastState(prevState)) {
+        //                 SeekNext().CurrentState = true;   //move to next state
+        //         }  
+        //         prevState.CompleteState(currentDate, statusList ); //Close out previouse state
+        //         //If Overran then roll all future completion dates by business days overdue
+        //         if(currentDate > prevState.DueByDate) {   
+        //             var daysDiff = prevState.DueByDate.GetBusinessDays(currentDate, new List<DateTime>());           
+        //             RollForwardDueByDates(daysDiff, prevState);  
+        //         }  
                
-            }
-            if(Completed()) {
-                CurrentPlanningStatus = statusList.Where(s => s.Name == StatusList.Complete).SingleOrDefault();
-            }
-        }
+        //     }
+        //     if(Completed()) {
+        //         CurrentPlanningStatus = statusList.Where(s => s.Name == StatusList.Complete).SingleOrDefault();
+        //     }
+        // }
 
         public void PrevState(List<StateStatus> statusList)
         {   

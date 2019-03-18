@@ -3,12 +3,11 @@ using vega.Core.Models.States;
 
 namespace vega.Controllers.Resources
 {
-    public class ProjectGeneratorResource
-    {
-        public int Id { get; set; }
+    public class ProjectGeneratorCreateResource
+    {  
         public string Name { get; set; }
         public List<ProjectGeneratorSequence> Generators { get; set;}
-        public ProjectGeneratorResource()
+        public ProjectGeneratorCreateResource()
         {  
             Generators = new List<ProjectGeneratorSequence>();
         }

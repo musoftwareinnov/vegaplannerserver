@@ -14,6 +14,7 @@ using vega.Core.Models.Settings;
 using vega.Core.Utils;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using vega.Services.Interfaces;
 
 namespace vega.Controllers
 {
@@ -29,14 +30,21 @@ namespace vega.Controllers
         public PlanningAppStateController(IMapper mapper,
                                      IPlanningAppStateRepository repository,
                                      IPlanningAppRepository planningAppRepository,
+                                     IPlanningAppService planningAppService,
+                                     IPlanningAppStateService planningAppStateService,
                                      IUnitOfWork unitOfWork)
         {
             this.planningAppRepository = planningAppRepository;
+            this.PlanningAppService = planningAppService;
+            this.PlanningAppStateService = planningAppStateService;
             this.unitOfWork = unitOfWork;
             this.repository = repository;
             this.mapper = mapper;
 
         }
+
+        public IPlanningAppService PlanningAppService { get; }
+        public IPlanningAppStateService PlanningAppStateService { get; }
 
         [HttpGet("{id}")]
         public async Task<PlanningAppStateFullResource> GetPlanningAppState(int id)
@@ -45,7 +53,7 @@ namespace vega.Controllers
 
             var planningApp = await planningAppRepository.GetPlanningApp(planningAppState.PlanningAppId);
 
-            var planningAppStateResource = Mapper.Map<PlanningAppState, PlanningAppStateFullResource>(planningAppState);
+            var planningAppStateResource = mapper.Map<PlanningAppState, PlanningAppStateFullResource>(planningAppState);
 
             //populate the custom fields with values set in 'customStateValue'
             foreach( var customFieldResource in planningAppStateResource.PlanningAppStateCustomFieldsResource) {
@@ -54,7 +62,7 @@ namespace vega.Controllers
                     customFieldResource.Value = planningAppState.getPlanningAppStateCustomField(customFieldResource.Id).StrValue;
             }
 
-            DateTime minDueDate = planningAppState.SetMinDueByDate(planningApp);
+            DateTime minDueDate = PlanningAppStateService.SetMinDueByDate(planningApp, planningAppState);
             planningAppStateResource.MinDueByDate = minDueDate.SettingDateFormat();
             planningAppStateResource.DueByDateEditable = minDueDate > SystemDate.Instance.date;
             
@@ -71,7 +79,7 @@ namespace vega.Controllers
             
             if(dueByDate != planningAppState.DueByDate) {
                 planningAppState.UpdateCustomDueByDate(dueByDate);
-                planningApp.updateDueByDates();  //Regenerate due by dates
+                PlanningAppService.UpdateDueByDates(planningApp); //Updates all forward dueby dates from current position 
             }
 
             //Set any fields in the PlanningApp table that have been set in the Rule List

@@ -29,13 +29,13 @@ namespace vega.Persistence
                                         .ThenInclude(r => r.StateInitialiserCustomField)         
                                 .SingleOrDefaultAsync();
         
-            IOrderedEnumerable<StateInitialiserState> orderedStates;
+            List<StateInitialiserState> orderedStates;
             if(includeDeleted) 
-                orderedStates =  stateInitialiser.States.OrderBy(o => o.OrderId);
+                orderedStates =  stateInitialiser.OrderedStates;
             else 
-                orderedStates =  stateInitialiser.States.Where(s => s.isDeleted == includeDeleted).OrderBy(o => o.OrderId);
+                orderedStates =  stateInitialiser.OrderedStates.Where(s => s.isDeleted == includeDeleted).ToList();
 
-            stateInitialiser.States = orderedStates.ToList();
+            stateInitialiser.States = orderedStates;
 
             return stateInitialiser;
         }

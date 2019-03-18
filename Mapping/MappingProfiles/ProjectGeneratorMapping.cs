@@ -16,6 +16,12 @@ namespace vega.Mapping.MappingProfiles
 
                 .ForMember(g => g.Generators,
                     opt => opt.MapFrom(g => g.OrderedGenerators));
+
+            CreateMap<ProjectGenerator, ProjectGeneratorSummaryResource>()
+
+                .ForMember(g => g.Generators,
+                    opt => opt.MapFrom(g => g.OrderedGenerators));
+
         }
     }
 }

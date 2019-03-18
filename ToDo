@@ -1,9 +1,10 @@
 
-1/ Refactor Survey/Drawers.Admin
-2. Refactor UpdatePLanningApp (states) - Developer and Address (messy)
-3. Test Why Allocation Fails on Resource when createing planning app
-4. Azure Key Vault
-5. Upgrade to 2.2 Core
-6. Add Logger
-7. Add Testing
+Mandatory Field Set Boolean is the wrong way around
+Min Due By Date Test
+Refactor Survey/Drawers.Admin
+Refactor UpdatePLanningApp (states) - Developer and Address (messy)
+Test Why Allocation Fails on Resource when createing planning app
+Azure Key Vault
+Add Logger
+
 

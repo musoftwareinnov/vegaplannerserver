@@ -51,29 +51,30 @@ namespace vega.Core.Models
             return $"{Id} GenOrder:{GeneratorOrder} StateOrder:{state.OrderId} StateName:{state.Name}  DueBy:{DueByDate}".ToString();
         }
 
-        public bool isValid() {
+        //ONLY CALLED IN TERMINATE - MAY REMOVE!!!!
+        // public bool isValid() {
             
-            foreach(var template in this.state.StateInitialiserStateCustomFields) {
-                var value = getPlanningAppStateCustomField(template.StateInitialiserCustomFieldId);
+        //     foreach(var template in this.state.StateInitialiserStateCustomFields) {
+        //         var value = getPlanningAppStateCustomField(template.StateInitialiserCustomFieldId);
 
-                if(string.IsNullOrWhiteSpace(value.StrValue) && template.StateInitialiserCustomField.isMandatory)
-                    return false;
-            }
-            return true;
-        }
+        //         if(string.IsNullOrWhiteSpace(value.StrValue) && template.StateInitialiserCustomField.isMandatory)
+        //             return false;
+        //     }
+        //     return true;
+        // }
 
-        public int CompleteState(DateTime completionDate, List<StateStatus> stateStatusList) 
-        {
-            CurrentState = false;
-            CompletionDate = completionDate;
+        // public int CompleteState(DateTime completionDate, List<StateStatus> stateStatusList) 
+        // {
+        //     CurrentState = false;
+        //     CompletionDate = completionDate;
 
-            if(CompletionDate > DueByDate)
-                StateStatus = stateStatusList.Where(s => s.Name == StatusList.Overran).SingleOrDefault();
-            else 
-                StateStatus = stateStatusList.Where(s => s.Name == StatusList.Complete).SingleOrDefault();
+        //     if(CompletionDate > DueByDate)
+        //         StateStatus = stateStatusList.Where(s => s.Name == StatusList.Overran).SingleOrDefault();
+        //     else 
+        //         StateStatus = stateStatusList.Where(s => s.Name == StatusList.Complete).SingleOrDefault();
 
-            return DateTime.Compare(CompletionDate.Value, DueByDate); 
-        }
+        //     return DateTime.Compare(CompletionDate.Value, DueByDate); 
+        // }
    
         public string DynamicStateStatus() {
             var alertDate = DueByDate.AddBusinessDays(state.AlertToCompletionTime * -1);
@@ -91,29 +92,27 @@ namespace vega.Core.Models
             return StateStatus.Name;
         }
 
-
-        ///IMPORTANT - NEED To RE WRITE!!!!!!!!!!!!
-        public DateTime SetMinDueByDate(PlanningApp planningApp) {
+        // public DateTime SetMinDueByDate(PlanningApp planningApp) {
             
-            DateTime minDueByDate = new DateTime();
+        //     DateTime minDueByDate = new DateTime();
 
-            if(!planningApp.Completed()) {
-                var current = planningApp.Current();
-                var currentDate = SystemDate.Instance.date;
-                if(this.state.OrderId >= current.state.OrderId) {
-                    if(planningApp.isFirstState(this))
-                        minDueByDate = currentDate.AddBusinessDays(1); //Add one day
-                    else if (this.CurrentState == true)
-                        minDueByDate = currentDate.AddBusinessDays(1); 
-                    else if (planningApp.SeekPrev(this).DueByDate <= currentDate)
-                        minDueByDate = currentDate.AddBusinessDays(1); 
-                    else 
-                        minDueByDate = planningApp.SeekPrev(this).DueByDate.AddBusinessDays(1);
-                }
-            }
+        //     if(!planningApp.Completed()) {
+        //         var current = planningApp.Current();
+        //         var currentDate = SystemDate.Instance.date;
+        //         if(this.state.OrderId >= current.state.OrderId) {
+        //             if(planningApp.isFirstState(this))
+        //                 minDueByDate = currentDate.AddBusinessDays(1); //Add one day
+        //             else if (this.CurrentState == true)
+        //                 minDueByDate = currentDate.AddBusinessDays(1); 
+        //             else if (planningApp.SeekPrev(this).DueByDate <= currentDate)
+        //                 minDueByDate = currentDate.AddBusinessDays(1); 
+        //             else 
+        //                 minDueByDate = planningApp.SeekPrev(this).DueByDate.AddBusinessDays(1);
+        //         }
+        //     }
 
-            return minDueByDate;
-        }
+        //     return minDueByDate;
+        // }
 
         public void AggregateDueByDate(PlanningAppState planningAppState) {
             this.DueByDate = planningAppState.DueByDate.AddBusinessDays(this.CompletionTime());

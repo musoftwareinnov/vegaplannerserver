@@ -217,14 +217,18 @@ namespace vega.Persistence
 
         public List<PlanningApp> GetPlanningAppsUsingGenerator(int generatorId, bool inProgress = true)
         {
-            return  vegaDbContext.PlanningApps
-                                .Where(p => p.StateInitialiserId == generatorId && p.CurrentPlanningStatus.Name == "InProgress")
-                                .Include(b => b.CurrentPlanningStatus) 
-                                .Include(t => t.PlanningAppStates)
-                                    .ThenInclude(a => a.StateStatus)
-                                .Include(t => t.PlanningAppStates)
-                                    .ThenInclude(s => s.state)
-                                .ToList();
+
+            //TODO!!!!!! Change To PRoject Generator!!!!!!
+            // return  vegaDbContext.PlanningApps
+            //                     .Where(p => p.StateInitialiserId == generatorId && p.CurrentPlanningStatus.Name == "InProgress")
+            //                     .Include(b => b.CurrentPlanningStatus) 
+            //                     .Include(t => t.PlanningAppStates)
+            //                         .ThenInclude(a => a.StateStatus)
+            //                     .Include(t => t.PlanningAppStates)
+            //                         .ThenInclude(s => s.state)
+            //                     .ToList();
+
+            return vegaDbContext.PlanningApps.ToList();
         }
 
         public PlanningApp UpdatePlanningApp(PlanningApp planningApp)

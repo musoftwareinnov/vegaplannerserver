@@ -64,10 +64,11 @@ namespace vega.Services
             planningApp.Customer = CustomerRepository.GetCustomer(planningResource.CustomerId).Result;
 
             //Persist new PlanningApp
-            PlanningAppRepository.Add(planningApp); 
-            await UnitOfWork.CompleteAsync();
+            planningApp.CurrentPlanningStatus = statusList.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault();
+            // PlanningAppRepository.Add(planningApp); 
+            // await UnitOfWork.CompleteAsync();
 
-            var ps  = await PlanningAppRepository.GetPlanningApp(planningApp.Id, includeRelated:false);
+            //var ps  = await PlanningAppRepository.GetPlanningApp(planningApp.Id, includeRelated:false);
 
             //Create States
             planningApp = await AddGeneratorStates(planningApp);
@@ -79,7 +80,7 @@ namespace vega.Services
             //     planningApp.Fees.Add(planningAppFees);
             // }
 
-            PlanningAppRepository.UpdatePlanningApp(planningApp); 
+            PlanningAppRepository.Add(planningApp); 
             await UnitOfWork.CompleteAsync();
 
             //Retrieve planning app from database and return results to controller
@@ -90,7 +91,7 @@ namespace vega.Services
         {
             foreach(var gen in planningApp.ProjectGenerator.OrderedGenerators) {
                 //Console.WriteLine("Adding Generator " + gen.Generator.Name + " To Planning App");
-                await InsertGenerator(planningApp, gen.SeqId, gen.Id) ;
+                await InsertGenerator(planningApp, gen.SeqId, gen.Generator.Id) ;
             }
 
             //set first state to current state
@@ -228,6 +229,25 @@ namespace vega.Services
             PlanningAppRepository.UpdatePlanningApp(planningApp);
             
             return GetPlanningApp(planningApp.Id);
+        }
+
+        public void UpdateDueByDates(PlanningApp planningApp)  //Called when inserting a new state to an existing planning app
+        {
+            if(!planningApp.Completed()) {
+                var prevState = new PlanningAppState();
+                var currState = planningApp.Current();
+                var resetCurrent = planningApp.Current();
+
+                while(currState != null) {
+                    if(!planningApp.isFirstState(currState)) {
+                        prevState = planningApp.SeekPrev();
+                        currState.AggregateDueByDate(prevState);
+                    }               
+                    currState = planningApp.Next(currState);
+                }               
+                //Set original state 
+                planningApp.SetCurrent(resetCurrent);
+            }
         }
     }
 }
