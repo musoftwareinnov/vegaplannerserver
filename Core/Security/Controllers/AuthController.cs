@@ -13,6 +13,7 @@ using vegaplannerserver.Core;
 using vega.Extensions.DateTime;
 using System.Collections.Generic;
 using System.Linq;
+using vega.Services.Interfaces;
 
 namespace vegaplanner.Core.Models.Security.Controllers
 {
@@ -25,12 +26,12 @@ namespace vegaplanner.Core.Models.Security.Controllers
         private readonly JwtIssuerOptions _jwtOptions;
         public IMapper Mapper;
         private readonly IUserRepository userRepository;
-        IBusinessDateRepository businessDateRepository;
+        IDateService dateService;
         public AuthController(UserManager<AppUser> userManager,
                                 RoleManager<IdentityRole> roleManager,
                                 IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions,
                                 IUserRepository userRepository, IMapper mapper,
-                                IBusinessDateRepository businessDateRepository)
+                                IDateService dateService)
         {
             this.userRepository = userRepository;
             _userManager = userManager;
@@ -38,7 +39,7 @@ namespace vegaplanner.Core.Models.Security.Controllers
             _jwtFactory = jwtFactory;
             _jwtOptions = jwtOptions.Value;
             this.Mapper = mapper;
-            this.businessDateRepository = businessDateRepository;
+            this.dateService = dateService;
         }
 
         // POST api/auth/login
@@ -61,8 +62,7 @@ namespace vegaplanner.Core.Models.Security.Controllers
 
             var jwtResource = Mapper.Map<JwtModel, JwtResource>(jwt);
 
-            var bd = await businessDateRepository.GetBusinessDate();
-            jwtResource.BusinessDate = bd.CurrBusDate.SettingDateFormat();
+            jwtResource.BusinessDate = dateService.GetCurrentDate().SettingDateFormat();
             return Ok(jwtResource);
         }
 

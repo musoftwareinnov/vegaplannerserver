@@ -11,6 +11,7 @@ using vega.Core.Models.States;
 using Microsoft.Extensions.Options;
 using vegaplannerserver.Core;
 using vegaplannerserver.Core.Models.Settings;
+using vega.Core.Utils;
 
 namespace vega.Persistence
 {
@@ -30,9 +31,6 @@ namespace vega.Persistence
 
         public void SetBusinessDate(DateTime businessDate)
         {   
-            //Remove time part 
-            businessDate = new DateTime(businessDate.Year, businessDate.Month, businessDate.Day, 0, 0, 0);
-     
             foreach (var entity in vegaDbContext.BusinessDates)
                 vegaDbContext.BusinessDates.Remove(entity);     
      
@@ -42,8 +40,9 @@ namespace vega.Persistence
             currBusinessDate.NextBusDate = businessDate;
             this.vegaDbContext.Add(currBusinessDate);
 
-            Console.WriteLine("Business Date set to :" + currBusinessDate.CurrBusDate);
+            //Console.WriteLine("Business Date set to :" + currBusinessDate.CurrBusDate);
             this.vegaDbContext.SaveChanges();  //Anti Pattern - should use UnitOfWork (one off! :-)
+
         }
     }
 }

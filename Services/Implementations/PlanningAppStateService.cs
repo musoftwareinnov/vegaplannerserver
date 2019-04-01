@@ -73,9 +73,56 @@ namespace vega.Services
             return true;
         }
 
+        public void UpdateCustomDueByDate(PlanningAppState planningAppState, DateTime dueByDate)
+        {
+            int daysDiff;
+            if (dueByDate > planningAppState.DueByDate)
+                daysDiff = planningAppState.DueByDate.GetBusinessDays(dueByDate, new List<DateTime>());//Move dates forward
+            else
+                daysDiff = dueByDate.GetBusinessDays(planningAppState.DueByDate, new List<DateTime>()) * -1; //Move dates back
+
+            if (daysDiff != 0)
+            {   //Date are different so customise
+                if (planningAppState.CustomDurationSet == true)
+                {
+                    planningAppState.CustomDuration += daysDiff;
+                }
+                else
+                {
+                    planningAppState.CustomDurationSet = true;
+                    planningAppState.CustomDuration = (planningAppState.state.CompletionTime + daysDiff);
+                }
+            }
+        }
+
         public PlanningAppStateCustomField getPlanningAppStateCustomField(PlanningAppState planningAppState,int resourceId) { 
             return planningAppState.customFields
                                     .Where(r => r.StateInitialiserStateCustomFieldId == resourceId).SingleOrDefault();
         }
+
+        // public PlanningApp InsertNewPlanningState(StateInitialiserState newStateInitialiserState, IEnumerable<StateStatus> stateStatus) 
+        // {
+
+        //     if(!Completed()) {
+        //         var currentState = Current();
+
+        //         if(newStateInitialiserState.OrderId > currentState.state.OrderId) {
+
+        //             //Remove states after current state
+        //             var states = this.PlanningAppStates.ToList();
+
+        //             PlanningAppState newState = new PlanningAppState();
+        //             newState.state = newStateInitialiserState;
+        //             newState.CurrentState = false;
+        //             newState.StateStatus = stateStatus.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();
+        //             newState.CompletionDate = null;
+        //             newState.DueByDate = DateTime.Now;
+        //             PlanningAppStates.Add(newState);
+
+        //             updateDueByDates();
+        //         }
+        //     }
+        //     return this;
+        //}
     }
 }

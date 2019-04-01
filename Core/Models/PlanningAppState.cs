@@ -76,6 +76,7 @@ namespace vega.Core.Models
         //     return DateTime.Compare(CompletionDate.Value, DueByDate); 
         // }
    
+        //Object Method Used For Mapping To Resource
         public string DynamicStateStatus() {
             var alertDate = DueByDate.AddBusinessDays(state.AlertToCompletionTime * -1);
         
@@ -121,27 +122,27 @@ namespace vega.Core.Models
             this.DueByDate = SystemDate.Instance.date.AddBusinessDays(this.CompletionTime());
         }
 
-        public void UpdateCustomDueByDate(DateTime dueByDate)
-        {
-            int daysDiff;
-            if (dueByDate > this.DueByDate)
-                daysDiff = this.DueByDate.GetBusinessDays(dueByDate, new List<DateTime>());//Move dates forward
-            else
-                daysDiff = dueByDate.GetBusinessDays(this.DueByDate, new List<DateTime>()) * -1; //Move dates back
+        // public void UpdateCustomDueByDate(DateTime dueByDate)
+        // {
+        //     int daysDiff;
+        //     if (dueByDate > this.DueByDate)
+        //         daysDiff = this.DueByDate.GetBusinessDays(dueByDate, new List<DateTime>());//Move dates forward
+        //     else
+        //         daysDiff = dueByDate.GetBusinessDays(this.DueByDate, new List<DateTime>()) * -1; //Move dates back
 
-            if (daysDiff != 0)
-            {   //Date are different so customise
-                if (this.CustomDurationSet == true)
-                {
-                    this.CustomDuration += daysDiff;
-                }
-                else
-                {
-                    this.CustomDurationSet = true;
-                    this.CustomDuration = (this.state.CompletionTime + daysDiff);
-                }
-            }
-        }
+        //     if (daysDiff != 0)
+        //     {   //Date are different so customise
+        //         if (this.CustomDurationSet == true)
+        //         {
+        //             this.CustomDuration += daysDiff;
+        //         }
+        //         else
+        //         {
+        //             this.CustomDurationSet = true;
+        //             this.CustomDuration = (this.state.CompletionTime + daysDiff);
+        //         }
+        //     }
+        // }
         
         public int CompletionTime() {
             if(this.CustomDurationSet)

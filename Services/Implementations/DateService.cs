@@ -1,18 +1,31 @@
 using System;
+using System.Threading.Tasks;
+using vega.Core.Utils;
 using vega.Services.Interfaces;
+using vegaplannerserver.Core;
 
 namespace vega.Services.Implementations
 {
     public class DateService : IDateService
     {
-        public DateTime GetCurrentDate() {
-
-            var d = DateTime.Now.Date;
-            return DateTime.Now.Date;
+        public DateService(IBusinessDateRepository IBusinessDateRepository)
+        {
+            this.IBusinessDateRepository = IBusinessDateRepository;
         }
 
-        public void SetCurrentDate(DateTime testDate) {
-            //Test Date - only used for testing (override)
+        public IBusinessDateRepository IBusinessDateRepository { get; }
+
+        public DateTime GetCurrentDate() {
+            if(SystemDate.Instance.date==null)
+                SystemDate.Instance.date = IBusinessDateRepository.GetBusinessDate().Result.CurrBusDate;
+
+            return SystemDate.Instance.date;
+        }
+
+        public void SetCurrentDate(DateTime businessDate) {
+            IBusinessDateRepository.SetBusinessDate(businessDate);
+            SystemDate.Instance.date = IBusinessDateRepository.GetBusinessDate().Result.CurrBusDate;  //Cache the date and use
+            Console.WriteLine("Current Business Date (From Cache) : " + SystemDate.Instance.date);
         }
     }
 }

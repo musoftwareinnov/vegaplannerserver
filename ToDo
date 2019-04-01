@@ -1,6 +1,7 @@
 
+InsertNewPlanningState (move out of Object to Service)
+genCustomerReferenceId - put in customer repository
 Mandatory Field Set Boolean is the wrong way around
-Min Due By Date Test
 Refactor Survey/Drawers.Admin
 Refactor UpdatePLanningApp (states) - Developer and Address (messy)
 Test Why Allocation Fails on Resource when createing planning app

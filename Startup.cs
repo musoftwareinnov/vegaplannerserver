@@ -76,7 +76,7 @@ namespace vega
         public void ConfigureServices(IServiceCollection services)
         {
             //Core Repositories
-            services.AddSingleton<IDateService, DateService>();
+            services.AddScoped<IDateService, DateService>();
             services.Configure<PhotoSettings>(Configuration.GetSection("PhotoSettings"));
             services.Configure<StateStatusSettings>(Configuration.GetSection("StateStatusSettings"));
             services.Configure<DateFormatSetting>(Configuration.GetSection("DateFormatSetting"));
@@ -385,16 +385,10 @@ namespace vega
         
         public void setApplicationDate(string currentDateOverride, IDateService dateService, IBusinessDateRepository businessDateRepository)
         {
-            //Console.WriteLine("IDATE Business Date : " + dateService.GetCurrentDate());
-            SystemDate.Instance.date = dateService.GetCurrentDate();
-            // var currentDate = DateTime.Now;
-            // if(!string.IsNullOrEmpty(currentDateOverride)) { 
-            //     SystemDate.Instance.date = currentDateOverride.ParseInputDate();      
-            // }
-            // else {
-            //     SystemDate.Instance.date = dateService.GetCurrentDate();
-            // }
-            businessDateRepository.SetBusinessDate(SystemDate.Instance.date);
+            var businessDate = !string.IsNullOrEmpty(currentDateOverride) ? currentDateOverride.ParseInputDate() : DateTime.Now.Date;
+
+            dateService.SetCurrentDate(businessDate);          
+
         }
     }
     

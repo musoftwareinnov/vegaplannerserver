@@ -66,6 +66,7 @@ namespace vega.Controllers
             planningAppStateResource.MinDueByDate = minDueDate.SettingDateFormat();
             planningAppStateResource.DueByDateEditable = minDueDate > SystemDate.Instance.date;
             
+            //var planningAppStateResource = mapper.Map<PlanningAppState, PlanningAppStateFullResource>(planningAppState);
             return planningAppStateResource;
         }
 
@@ -78,7 +79,7 @@ namespace vega.Controllers
             var dueByDate = planningAppStateResource.DueByDate.ParseInputDate();
             
             if(dueByDate != planningAppState.DueByDate) {
-                planningAppState.UpdateCustomDueByDate(dueByDate);
+                PlanningAppStateService.UpdateCustomDueByDate(planningAppState, dueByDate);
                 PlanningAppService.UpdateDueByDates(planningApp); //Updates all forward dueby dates from current position 
             }
 

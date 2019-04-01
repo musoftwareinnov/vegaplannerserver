@@ -199,7 +199,11 @@ namespace vega.Services
 
         public Task<PlanningApp> GetPlanningApp(int id)
         {
-            return PlanningAppRepository.GetPlanningApp(id);                     
+            var planningApp = PlanningAppRepository.GetPlanningApp(id); 
+
+            //Set dynamic status
+            //PlanningAppStateService.GetDynamicStateStatus(planningApp.Current());
+            return planningApp;                  
         }
         public void SavePlanningApp(PlanningApp planningApp)
         {

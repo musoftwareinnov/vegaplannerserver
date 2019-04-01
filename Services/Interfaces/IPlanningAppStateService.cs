@@ -8,6 +8,7 @@ namespace vega.Services.Interfaces
          int CompleteState(PlanningAppState planningAppState);
 
          DateTime SetMinDueByDate(PlanningApp planningApp, PlanningAppState planningAppState);
-         bool IsValid(PlanningAppState planningAppState);
+        void UpdateCustomDueByDate(PlanningAppState planningAppState, DateTime dueByDate);
+        bool IsValid(PlanningAppState planningAppState);
     }
 }

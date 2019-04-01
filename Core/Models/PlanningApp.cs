@@ -199,30 +199,30 @@ namespace vega.Core.Models
             }  
         }   
 
-        public void generateDueByDates()
-        {
-            if(!Completed()) {
+        // public void generateDueByDates()
+        // {
+        //     if(!Completed()) {
 
-                //Important - put states in order before processing!!
-                PlanningAppStates = PlanningAppStates.OrderBy(s => s.state.OrderId).ToList();
-                var prevState = new PlanningAppState();
-                var currState = Current();
-                var resetCurrent = Current();
+        //         //Important - put states in order before processing!!
+        //         PlanningAppStates = PlanningAppStates.OrderBy(s => s.state.OrderId).ToList();
+        //         var prevState = new PlanningAppState();
+        //         var currState = Current();
+        //         var resetCurrent = Current();
 
-                while(currState != null) {
-                    if(!isFirstState(currState)) {
-                        prevState = SeekPrev();
-                        currState.AggregateDueByDate(prevState);
-                    }
-                    else 
-                        currState.SetDueByDate();
+        //         while(currState != null) {
+        //             if(!isFirstState(currState)) {
+        //                 prevState = SeekPrev();
+        //                 currState.AggregateDueByDate(prevState);
+        //             }
+        //             else 
+        //                 currState.SetDueByDate();
                     
-                    currState = Next(currState);
-                }               
-                //Set original state 
-                SetCurrent(resetCurrent);
-            }
-        }
+        //             currState = Next(currState);
+        //         }               
+        //         //Set original state 
+        //         SetCurrent(resetCurrent);
+        //     }
+        // }
   
         public void updateDueByDates()  //Called when inserting a new state to an existing planning app
         {
@@ -271,24 +271,24 @@ namespace vega.Core.Models
         //     }
         // }
 
-        public void PrevState(List<StateStatus> statusList)
-        {   
-            var current = Current();
-            if(current != null)   //Cannot Role back a completed application
-            {
-                if(!isFirstState(current))
-                {
-                    var prevState = SeekPrev();
-                    //daysDiff is used to subtract the future DueByStates by days overrun, basically resetting
-                    var daysDiff = prevState.DueByDate.GetBusinessDays(prevState.CompletionDate.Value, new List<DateTime>());
-                    rewindState();
+        // public void PrevState(List<StateStatus> statusList)
+        // {   
+        //     var current = Current();
+        //     if(current != null)   //Cannot Role back a completed application
+        //     {
+        //         if(!isFirstState(current))
+        //         {
+        //             var prevState = SeekPrev();
+        //             //daysDiff is used to subtract the future DueByStates by days overrun, basically resetting
+        //             var daysDiff = prevState.DueByDate.GetBusinessDays(prevState.CompletionDate.Value, new List<DateTime>());
+        //             rewindState();
 
-                    if(daysDiff > 0)  {
-                        var statesToUpdate = RollbackDueByDates(daysDiff, current);   
-                    }   
-                }
-            }
-        }
+        //             if(daysDiff > 0)  {
+        //                 var statesToUpdate = RollbackDueByDates(daysDiff, current);   
+        //             }   
+        //         }
+        //     }
+        // }
 
         public void Terminate(List<StateStatus> statusList)
         {   
@@ -310,33 +310,33 @@ namespace vega.Core.Models
 
         //Private Functions
      
-        private void rewindState()
-        {
-            var current = Current(); //Make a copy
+        // private void rewindState()
+        // {
+        //     var current = Current(); //Make a copy
  
-            //Make previous state active
-            SeekPrev().CompletionDate = null;
-            SeekPrev().CurrentState = true;
+        //     //Make previous state active
+        //     SeekPrev().CompletionDate = null;
+        //     SeekPrev().CurrentState = true;
   
-            //set current non active
-            current.CurrentState = false;
-        }   
-        private void RollForwardDueByDates(int daysDiff, PlanningAppState prevState)
-        {
-            if(!Completed()) {
-                PlanningAppStates
-                        .Where(s => s.DueByDate > prevState.DueByDate)
-                        .Select(c => {c.DueByDate = c.DueByDate.AddBusinessDays(daysDiff); return c;})
-                        .ToList();  
-            }
-        }
-        private List<PlanningAppState> RollbackDueByDates(int daysDiff, PlanningAppState current)
-        {
-            return PlanningAppStates
-                    .Where(s => s.DueByDate > current.DueByDate)
-                    .Select(c => {c.DueByDate = c.DueByDate.AddBusinessDays(-daysDiff); return c;})
-                    .ToList();  
-        }
+        //     //set current non active
+        //     current.CurrentState = false;
+        // }   
+        // private void RollForwardDueByDates(int daysDiff, PlanningAppState prevState)
+        // {
+        //     if(!Completed()) {
+        //         PlanningAppStates
+        //                 .Where(s => s.DueByDate > prevState.DueByDate)
+        //                 .Select(c => {c.DueByDate = c.DueByDate.AddBusinessDays(daysDiff); return c;})
+        //                 .ToList();  
+        //     }
+        // }
+        // private List<PlanningAppState> RollbackDueByDates(int daysDiff, PlanningAppState current)
+        // {
+        //     return PlanningAppStates
+        //             .Where(s => s.DueByDate > current.DueByDate)
+        //             .Select(c => {c.DueByDate = c.DueByDate.AddBusinessDays(-daysDiff); return c;})
+        //             .ToList();  
+        // }
 
 
 
@@ -427,13 +427,13 @@ namespace vega.Core.Models
                 return OrderedPlanningAppStates.Where(s => s.CurrentState == true).SingleOrDefault();
         }
 
-        public DateTime MinDueByDate() {
-            if(SeekPrev() != null)
-                return SeekPrev().DueByDate;
-            else   
-                return SystemDate.Instance.date;
+        // public DateTime MinDueByDate() {
+        //     if(SeekPrev() != null)
+        //         return SeekPrev().DueByDate;
+        //     else   
+        //         return SystemDate.Instance.date;
 
-        }
+        // }
         public DateTime CompletionDate() {
             if(!Completed())
                 return SeekLastState().DueByDate;
