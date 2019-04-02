@@ -60,6 +60,7 @@ namespace vega.Services
             planningApp.ProjectGenerator = ProjectGeneratorRepository.GetProjectGenerator(planningResource.ProjectGeneratorId).Result;
             Console.WriteLine("Creating New Planning App, Project Generator -> " + planningApp.ProjectGenerator.Name);
 
+            planningApp.StartDate = SystemDate.Instance.date;
             //Create Customer
             planningApp.Customer = CustomerRepository.GetCustomer(planningResource.CustomerId).Result;
 
@@ -160,24 +161,24 @@ namespace vega.Services
             startState.DueByDate = DateService.GetCurrentDate().AddBusinessDays(startState.state.CompletionTime);
 
             if(planningApp.PlanningAppStates.Count>1) 
-                noOfDatesUpdated = UpdateDuebyDates(planningApp);
+                noOfDatesUpdated = UpdateDueByDates(planningApp);
             
             return noOfDatesUpdated;
         }
-        private int UpdateDuebyDates(PlanningApp planningApp)
-        {
-            int statesUpdated = 0;
-            var ops = planningApp.OrderedPlanningAppStates.GetEnumerator();
-            if(ops.MoveNext()) { //First State
-                var prevCompletionTime = ops.Current.DueByDate;
-                while(ops.MoveNext()) { //Second state
-                        ops.Current.DueByDate = prevCompletionTime.AddBusinessDays(ops.Current.CompletionTime());
-                        prevCompletionTime = ops.Current.DueByDate;
-                        statesUpdated++;
-                    }
-                }
-            return statesUpdated;
-        }
+        // public int UpdateDueByDates(PlanningApp planningApp)
+        // {
+        //     int statesUpdated = 0;
+        //     var ops = planningApp.OrderedPlanningAppStates.GetEnumerator();
+        //     if(ops.MoveNext()) { //First State
+        //         var prevCompletionTime = ops.Current.DueByDate;
+        //         while(ops.MoveNext()) { //Second state
+        //                 ops.Current.DueByDate = prevCompletionTime.AddBusinessDays(ops.Current.CompletionTime());
+        //                 prevCompletionTime = ops.Current.DueByDate;
+        //                 statesUpdated++;
+        //             }
+        //         }
+        //     return statesUpdated;
+        // }
  
         private PlanningApp InsertPlanningState(PlanningApp planningApp, int GeneratorOrder, StateInitialiserState stateInitialiserState) 
         {
@@ -235,8 +236,9 @@ namespace vega.Services
             return GetPlanningApp(planningApp.Id);
         }
 
-        public void UpdateDueByDates(PlanningApp planningApp)  //Called when inserting a new state to an existing planning app
+        public int UpdateDueByDates(PlanningApp planningApp)  //Called when inserting a new state to an existing planning app
         {
+            int statesUpdated = 0;
             if(!planningApp.Completed()) {
                 var prevState = new PlanningAppState();
                 var currState = planningApp.Current();
@@ -246,20 +248,17 @@ namespace vega.Services
                     if(!planningApp.isFirstState(currState)) {
                         prevState = planningApp.SeekPrev();
                         currState.AggregateDueByDate(prevState);
-                    }               
+                    }
+                    else 
+                        currState.SetDueByDateFrom(planningApp.StartDate); //First State In Project
+
+                    statesUpdated++;                           
                     currState = planningApp.Next(currState);
                 }               
                 //Set original state 
                 planningApp.SetCurrent(resetCurrent);
             }
+            return statesUpdated;
         }
     }
 }
-                        // OLD UPDATE To DUBY DATE
-                        // var stateToUpdateIdx = planningApp.PlanningAppStates.IndexOf(ops.Current);
-                        // var stateToUpdate = planningApp.PlanningAppStates[stateToUpdateIdx];
-                        // stateToUpdate.DueByDate = prevCompletionTime.AddBusinessDays(stateToUpdate.CompletionTime());
-                        // prevCompletionTime = stateToUpdate.DueByDate;
-                        // statesUpdated++;
-                        // var stateToUpdateIdx = planningApp.PlanningAppStates.IndexOf(ops.Current);
-                        // var stateToUpdate = planningApp.PlanningAppStates[stateToUpdateIdx];

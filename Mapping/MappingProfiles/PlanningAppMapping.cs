@@ -34,6 +34,8 @@ namespace vega.Mapping.MappingProfiles
                     opt => opt.MapFrom(ps => ps.ProjectGenerator.Name))
                 .ForMember(psr => psr.CompletionDate, 
                     opt => opt.MapFrom(ps => ps.CompletionDate().SettingDateFormat())) 
+                .ForMember(psr => psr.StartDate, 
+                    opt => opt.MapFrom(ps => ps.StartDate.SettingDateFormat())) 
                 .ForMember(psr => psr.CustomerName,
                     opt => opt.MapFrom(ps => ps.Customer.CustomerContact.CustomerTitle
                                             + ' ' + ps.Customer.CustomerContact.FirstName 

@@ -29,6 +29,8 @@ namespace vega.Mapping.MappingProfiles
                     opt => opt.MapFrom(ps => ps.DynamicStateStatus()))
                 .ForMember(sis => sis.mandatoryFieldsSet,
                     opt => opt.MapFrom(s => s.mandatoryFieldsSet()))
+                .ForMember(sis => sis.isCustomDuraton,
+                    opt => opt.MapFrom(s => s.isCustomDuration()))
                 .ForMember(psr => psr.isLastGeneratorState,
                     opt => opt.MapFrom(ps => ps.isLastGeneratorState()));
 

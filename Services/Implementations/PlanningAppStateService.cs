@@ -46,7 +46,7 @@ namespace vega.Services
             if(!planningApp.Completed()) {
                 var current = planningApp.Current();
                 var currentDate = SystemDate.Instance.date;
-                if(planningAppState.state.OrderId >= current.state.OrderId) {
+                //if(planningAppState.state.OrderId >= current.state.OrderId || planningAppState.GeneratorOrder > current.GeneratorOrder) {
                     if(planningApp.isFirstState(planningAppState))
                         minDueByDate = currentDate.AddBusinessDays(1); //Add one day
                     else if (planningAppState.CurrentState == true)
@@ -55,7 +55,7 @@ namespace vega.Services
                         minDueByDate = currentDate.AddBusinessDays(1); 
                     else 
                         minDueByDate = planningApp.SeekPrev(planningAppState).DueByDate.AddBusinessDays(1);
-                }
+                //}
             }
 
             return minDueByDate;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using vega.Core.Models;
 
 namespace vega.Controllers.Resources
@@ -11,5 +12,10 @@ namespace vega.Controllers.Resources
         public string DueByDate { get; set; }
         public ICollection<PlanningAppStateCustomFieldResource> PlanningAppStateCustomFieldsResource { get; set; }
         public string Notes { get; set; }
+
+        public UpdatePlanningAppStateResource()
+        {
+            PlanningAppStateCustomFieldsResource = new Collection<PlanningAppStateCustomFieldResource>();
+        }
     }
 }

@@ -31,6 +31,7 @@ namespace vega.Core.Models
         // public StateInitialiser StateInitialiser { get; set; }
         public int CurrentPlanningStatusId { get; set; }
         public StateStatus CurrentPlanningStatus { get; set; }
+        public DateTime StartDate  { get; set; }
         public string ApplicationNo { get; set; }
         public Contact Developer { get; set; }
         public Address DevelopmentAddress { get; set; }

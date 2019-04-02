@@ -50,9 +50,7 @@ namespace vega.Controllers
         public async Task<PlanningAppStateFullResource> GetPlanningAppState(int id)
         {
             var planningAppState = await repository.GetPlanningAppState(id);
-
             var planningApp = await planningAppRepository.GetPlanningApp(planningAppState.PlanningAppId);
-
             var planningAppStateResource = mapper.Map<PlanningAppState, PlanningAppStateFullResource>(planningAppState);
 
             //populate the custom fields with values set in 'customStateValue'
@@ -62,17 +60,20 @@ namespace vega.Controllers
                     customFieldResource.Value = planningAppState.getPlanningAppStateCustomField(customFieldResource.Id).StrValue;
             }
 
-            DateTime minDueDate = PlanningAppStateService.SetMinDueByDate(planningApp, planningAppState);
-            planningAppStateResource.MinDueByDate = minDueDate.SettingDateFormat();
-            planningAppStateResource.DueByDateEditable = minDueDate > SystemDate.Instance.date;
-            
-            //var planningAppStateResource = mapper.Map<PlanningAppState, PlanningAppStateFullResource>(planningAppState);
+            //If a live state set the min due by date
+            planningAppStateResource.DueByDateEditable = false;
+            planningAppStateResource.MinDueByDate = DateTime.Now.Date.ToString();  //TODO: Remove when fix front end
+            if(!planningAppState.Completed()) {
+                DateTime minDueDate = PlanningAppStateService.SetMinDueByDate(planningApp, planningAppState);
+                planningAppStateResource.MinDueByDate = minDueDate.SettingDateFormat();
+                planningAppStateResource.DueByDateEditable = minDueDate > SystemDate.Instance.date;
+            }
             return planningAppStateResource;
         }
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePlanningAppState(int id, [FromBody] UpdatePlanningAppStateResource planningAppStateResource)
+        public async Task<PlanningAppStateFullResource> UpdatePlanningAppState(int id, [FromBody] UpdatePlanningAppStateResource planningAppStateResource)
         {
             var planningAppState = await repository.GetPlanningAppState(id);
             var planningApp = await planningAppRepository.GetPlanningApp(planningAppState.PlanningAppId);
@@ -84,17 +85,18 @@ namespace vega.Controllers
             }
 
             //Set any fields in the PlanningApp table that have been set in the Rule List
-            foreach (var customStateValueResource in planningAppStateResource.PlanningAppStateCustomFieldsResource) 
-                planningAppState.getPlanningAppStateCustomField(customStateValueResource.Id).StrValue = customStateValueResource.Value;
+            if(planningAppStateResource.PlanningAppStateCustomFieldsResource.Count() > 0) {
+                foreach (var customStateValueResource in planningAppStateResource.PlanningAppStateCustomFieldsResource) 
+                    planningAppState.getPlanningAppStateCustomField(customStateValueResource.Id).StrValue = customStateValueResource.Value;
 
-            //Store custom fields in planning state
-            planningApp.UpdateKeyFields(planningAppStateResource.PlanningAppStateCustomFieldsResource);
-
+                //Store custom fields in planning state
+                planningApp.UpdateKeyFields(planningAppStateResource.PlanningAppStateCustomFieldsResource);
+            }
             planningAppState.Notes = planningAppStateResource.Notes;
             repository.Update(planningAppState);
             await unitOfWork.CompleteAsync();
 
-            return Ok();
+            return await GetPlanningAppState(id);
         }
     }
 }

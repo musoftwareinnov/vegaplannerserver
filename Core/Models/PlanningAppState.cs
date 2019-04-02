@@ -46,6 +46,10 @@ namespace vega.Core.Models
                                     .Where(r => r.StateInitialiserStateCustomFieldId == resourceId).SingleOrDefault();
         }
 
+        public bool Completed() {
+            return this.StateStatus.Name == StatusList.Complete || this.StateStatus.Name == StatusList.Overran;
+        }
+
         /* Helper Methods  */
         public override string ToString() {
             return $"{Id} GenOrder:{GeneratorOrder} StateOrder:{state.OrderId} StateName:{state.Name}  DueBy:{DueByDate}".ToString();
@@ -118,8 +122,8 @@ namespace vega.Core.Models
         public void AggregateDueByDate(PlanningAppState planningAppState) {
             this.DueByDate = planningAppState.DueByDate.AddBusinessDays(this.CompletionTime());
         }
-        public void SetDueByDate() {
-            this.DueByDate = SystemDate.Instance.date.AddBusinessDays(this.CompletionTime());
+        public void SetDueByDateFrom(DateTime startDate) {
+            this.DueByDate = startDate.AddBusinessDays(this.CompletionTime());
         }
 
         // public void UpdateCustomDueByDate(DateTime dueByDate)
