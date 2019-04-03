@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using vega.Controllers.Resources;
 using vega.Core;
 using vega.Core.Models;
@@ -10,6 +11,7 @@ using vega.Core.Models.States;
 using vega.Core.Utils;
 using vega.Extensions.DateTime;
 using vega.Services.Interfaces;
+using vegaplanner.Core.Models.Security;
 using vegaplannerserver.Core.Models;
 
 namespace vega.Services
@@ -26,6 +28,8 @@ namespace vega.Services
                                     ICustomerRepository CustomerRepository,
                                     IPlanningAppStateService planningAppStateService,
                                     IDateService dateService,
+                                    IFeeRepository feeRepository,
+                                    UserManager<AppUser> userManager,
                                     IUnitOfWork unitOfWork)
         {
             this.Mapper = mapper;
@@ -37,6 +41,8 @@ namespace vega.Services
             this.CustomerRepository = CustomerRepository;
             this.PlanningAppStateService = planningAppStateService;
             this.DateService = dateService;
+            this.FeeRepository = feeRepository;
+            this.UserManager = userManager;
             this.UnitOfWork = unitOfWork;
             this.statusList = StateStatusRepository.GetStateStatusList().Result;
         }
@@ -48,6 +54,8 @@ namespace vega.Services
         public ICustomerRepository CustomerRepository { get; }
         public IPlanningAppStateService PlanningAppStateService { get; }
         public IDateService DateService { get; }
+        public IFeeRepository FeeRepository { get; }
+        public UserManager<AppUser> UserManager { get; }
         public IUnitOfWork UnitOfWork { get; }
         public IPlanningAppRepository PlanningAppRepository  { get; }
         public IPlanningAppStateRepository PlanningAppStateRepository  { get; }
@@ -64,24 +72,49 @@ namespace vega.Services
             //Create Customer
             planningApp.Customer = CustomerRepository.GetCustomer(planningResource.CustomerId).Result;
 
-            //Persist new PlanningApp
+            //Set Status
             planningApp.CurrentPlanningStatus = statusList.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault();
-            // PlanningAppRepository.Add(planningApp); 
-            // await UnitOfWork.CompleteAsync();
-
-            //var ps  = await PlanningAppRepository.GetPlanningApp(planningApp.Id, includeRelated:false);
 
             //Create States
             planningApp = await AddGeneratorStates(planningApp);
             Console.WriteLine("Generated " + planningApp.PlanningAppStates.Count + " Planning States");
 
+            //Refactor!!!!!!!
+            if(planningResource.Surveyors !=null) {
+                foreach(string surveyorId in planningResource.Surveyors) {
+                    PlanningAppSurveyors planningAppSurveyors = new PlanningAppSurveyors();
+                    planningAppSurveyors.PlanningApp = planningApp;                
+                    planningAppSurveyors.AppUser = await UserManager.FindByIdAsync(surveyorId);
+                    planningApp.Surveyors.Add(planningAppSurveyors);
+                }
+            }
+            if(planningResource.Drawers !=null)
+                foreach(string surveyorId in planningResource.Drawers) {
+                    PlanningAppDrawers planningAppDrawers = new PlanningAppDrawers();
+                    planningAppDrawers.PlanningApp = planningApp;                
+                    planningAppDrawers.AppUser = await UserManager.FindByIdAsync(surveyorId);
+                    planningApp.Drawers.Add(planningAppDrawers);
+                }
+            if(planningResource.Admins !=null)
+                foreach(string adminId in planningResource.Admins) {
+                    PlanningAppAdmins planningAppAdmins = new PlanningAppAdmins();
+                    planningAppAdmins.PlanningApp = planningApp;                
+                    planningAppAdmins.AppUser = await UserManager.FindByIdAsync(adminId);
+                    planningApp.Admins.Add(planningAppAdmins);
+                } 
             //Create Fees
-            // foreach(var fee in vegaDbContext.Fees) {
-            //     PlanningAppFees planningAppFees = new PlanningAppFees { Amount = fee.DefaultAmount, Fee = fee};
-            //     planningApp.Fees.Add(planningAppFees);
-            // }
+            foreach(var fee in FeeRepository.GetFeesDefault()) {
+                PlanningAppFees planningAppFees = new PlanningAppFees { Amount = fee.DefaultAmount, Fee = fee};
+                planningApp.Fees.Add(planningAppFees);
+            }
 
+            //Persist planning app
             PlanningAppRepository.Add(planningApp); 
+            await UnitOfWork.CompleteAsync();
+
+            //Create Reference using planning id
+            planningApp.PlanningReferenceId = genCustomerReferenceId(planningApp);
+            PlanningAppRepository.UpdatePlanningApp(planningApp); 
             await UnitOfWork.CompleteAsync();
 
             //Retrieve planning app from database and return results to controller
@@ -165,23 +198,41 @@ namespace vega.Services
             
             return noOfDatesUpdated;
         }
-        // public int UpdateDueByDates(PlanningApp planningApp)
-        // {
-        //     int statesUpdated = 0;
-        //     var ops = planningApp.OrderedPlanningAppStates.GetEnumerator();
-        //     if(ops.MoveNext()) { //First State
-        //         var prevCompletionTime = ops.Current.DueByDate;
-        //         while(ops.MoveNext()) { //Second state
-        //                 ops.Current.DueByDate = prevCompletionTime.AddBusinessDays(ops.Current.CompletionTime());
-        //                 prevCompletionTime = ops.Current.DueByDate;
-        //                 statesUpdated++;
-        //             }
-        //         }
-        //     return statesUpdated;
-        // }
- 
-        private PlanningApp InsertPlanningState(PlanningApp planningApp, int GeneratorOrder, StateInitialiserState stateInitialiserState) 
+
+        private string genCustomerReferenceId(PlanningApp planningApp) {
+
+            //Get List of Designers and Surveyors and tag to reference number
+            //TODO NOTE: Refactor!!!!!!
+            var drawersInitialsList = planningApp.Drawers.Select(d => d.AppUser.FirstName.Substring(0,1) + 
+                                                    d.AppUser.LastName.Substring(0,1)).ToList();
+
+            var drawersInitials = string.Join(StringConstants.IDil, drawersInitialsList).ToString().TrimEnd(StringConstants.IDil);
+  
+            var surveyorsInitialsList = planningApp.Surveyors.Select(d => d.AppUser.FirstName.Substring(0,1) + 
+                                                    d.AppUser.LastName.Substring(0,1)).ToList();
+
+            var surveyorsInitials = string.Join(StringConstants.IDil, surveyorsInitialsList).ToString().TrimEnd(StringConstants.IDil);
+
+            var adminsInitialsList = planningApp.Admins.Select(d => d.AppUser.FirstName.Substring(0,1) + 
+                                                    d.AppUser.LastName.Substring(0,1)).ToList();
+
+            var adminsInitials = string.Join(StringConstants.IDil, adminsInitialsList).ToString().TrimEnd(StringConstants.IDil);
+          
+            //TODO CDS -> take from settings file or database
+            string reference = "CDS/"   + surveyorsInitials + '/'
+                                        + drawersInitials + '/'
+                                        + adminsInitials + '/' 
+                                        + planningApp.Id.ToString("D6");
+
+            return reference;
+
+        }
+
+        public PlanningApp InsertPlanningState(PlanningApp planningApp, int GeneratorOrder, StateInitialiserState stateInitialiserState) 
         {
+            if(!CanInsertState(planningApp, GeneratorOrder,stateInitialiserState))
+                return planningApp;
+
             PlanningAppState newPlanningAppState = new PlanningAppState();
             newPlanningAppState.state = stateInitialiserState;
 
@@ -197,7 +248,22 @@ namespace vega.Services
             return planningApp;
         }
 
+        private bool CanInsertState(PlanningApp planningApp, int GeneratorOrder, StateInitialiserState stateInitialiserState) 
+        {
+            if(planningApp.CurrentPlanningStatus != statusList.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault()) {
+                return false;
+            }
 
+            var currentState = planningApp.Current();
+            if(currentState == null)
+                return true;  //New Application Being Created
+            else {
+                if(GeneratorOrder >= currentState.GeneratorOrder && stateInitialiserState.OrderId > currentState.state.OrderId)
+                    return true;
+            }
+
+            return false;
+        } 
         public Task<PlanningApp> GetPlanningApp(int id)
         {
             var planningApp = PlanningAppRepository.GetPlanningApp(id); 
@@ -225,10 +291,8 @@ namespace vega.Services
                     planningApp.CurrentPlanningStatus = statusList.Where(s => s.Name == StatusList.Complete).SingleOrDefault();
                 else {
                     //If Overran then roll all future completion dates by business days overdue
-                    if(daysDiff > 0) { 
-                        //ToDo!!!          
-                        //RollForwardDueByDates(daysDiff, prevState);  
-                    } 
+                    if(daysDiff > 0)          
+                        RollForwardDueByDates(planningApp, daysDiff);  
                 }
             }
             PlanningAppRepository.UpdatePlanningApp(planningApp);
@@ -236,6 +300,17 @@ namespace vega.Services
             return GetPlanningApp(planningApp.Id);
         }
 
+        private void RollForwardDueByDates(PlanningApp planningApp, int daysDiff)
+        {
+            
+            if(!planningApp.Completed()) {
+                var prevState = planningApp.SeekPrev();
+                planningApp.OrderedPlanningAppStates
+                        .Where(s => s.DueByDate > prevState.DueByDate)
+                        .Select(c => {c.DueByDate = c.DueByDate.AddBusinessDays(daysDiff); return c;})
+                        .ToList();  
+            }
+        }
         public int UpdateDueByDates(PlanningApp planningApp)  //Called when inserting a new state to an existing planning app
         {
             int statesUpdated = 0;
@@ -262,3 +337,5 @@ namespace vega.Services
         }
     }
 }
+
+

@@ -217,18 +217,51 @@ namespace vega.Persistence
 
         public List<PlanningApp> GetPlanningAppsUsingGenerator(int generatorId, bool inProgress = true)
         {
+            List<PlanningApp> planningApps = new List<PlanningApp>();
+            //Get all planning apps where geenrator id exists
+            var qpa = vegaDbContext.PlanningApps
+                                .Include(b => b.CurrentPlanningStatus) 
+                                .Include(t => t.PlanningAppStates)
+                                    .ThenInclude(a => a.StateStatus)
+                                .Include(t => t.PlanningAppStates)
+                                    .ThenInclude(s => s.state)
+                                .AsQueryable();
+    
+            if(inProgress) {
+                qpa = qpa.Where(p => p.CurrentPlanningStatus.Name == "InProgress");
+                foreach(var pa in qpa) {
+                    var curr = pa.Current();
+                    if(pa.OrderedPlanningAppStates.Any(p => p.state.StateInitialiserId == generatorId
+                                                                    && p.GeneratorOrder >= curr.GeneratorOrder)){
+                        planningApps.Add(pa);
+                    }
 
-            //TODO!!!!!! Change To PRoject Generator!!!!!!
-            // return  vegaDbContext.PlanningApps
-            //                     .Where(p => p.StateInitialiserId == generatorId && p.CurrentPlanningStatus.Name == "InProgress")
-            //                     .Include(b => b.CurrentPlanningStatus) 
-            //                     .Include(t => t.PlanningAppStates)
-            //                         .ThenInclude(a => a.StateStatus)
-            //                     .Include(t => t.PlanningAppStates)
-            //                         .ThenInclude(s => s.state)
-            //                     .ToList();
+                }
+            } 
+            return planningApps;
+        }
 
-            return vegaDbContext.PlanningApps.ToList();
+        public HashSet<int> GetGeneratorOrdersInPlanningApp(PlanningApp planningApp, int generatorId)
+        {
+            //Returns a list of generator orders in the planning app that match generatorId 
+            //(Its possible to have the same generator more than once in a planning app)
+            HashSet<int> uniqueGenOrders = new HashSet<int>();
+
+            var pa = vegaDbContext.PlanningApps
+                                .Where(p => p.Id == planningApp.Id)
+                                .Include(b => b.CurrentPlanningStatus) 
+                                .Include(t => t.PlanningAppStates)
+                                    .ThenInclude(a => a.StateStatus)
+                                .Include(t => t.PlanningAppStates)
+                                    .ThenInclude(s => s.state)
+                                .SingleOrDefault();
+    
+            var genOrders = pa.OrderedPlanningAppStates.Where(p => p.state.StateInitialiserId == generatorId);
+
+            foreach(var genOrder in genOrders)
+                uniqueGenOrders.Add(genOrder.GeneratorOrder);
+
+            return uniqueGenOrders;
         }
 
         public PlanningApp UpdatePlanningApp(PlanningApp planningApp)

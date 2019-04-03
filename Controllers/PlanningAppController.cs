@@ -78,65 +78,7 @@ namespace vega.Controllers
 
             var planningApp = await planningAppService.Create(planningResource);
 
-            //Debug
-            // foreach(var ps in planningApp.OrderedPlanningAppStates) {
-            //     Console.WriteLine(ps);
-            // }
-
             return await GetPlanningApp(planningApp.Id);
-
-            // var result = mapper.Map<PlanningApp, PlanningAppResource>(pa);
-            // result.BusinessDate = CurrentDate.SettingDateFormat();
-
-            //var planningApp = mapper.Map<CreatePlanningAppResource, PlanningApp>(planningResource);
-
-            //var stateInitialiser = await stateInitialiserRepository.GetStateInitialiser(pa.StateInitialiserId, includeDeleted: false);
-            
-            // PlanningAppResource result = null;
-
-            // if(stateInitialiser.States.Count > 0)
-            // {
-            //     //REFACTOR SORT NULL PROBLEM, SHOULD BE ALLOCATED IN RESOURCE!!!!!
-            //     if(planningResource.Surveyors !=null) {
-            //         foreach(string surveyorId in planningResource.Surveyors) {
-            //             PlanningAppSurveyors planningAppSurveyors = new PlanningAppSurveyors();
-            //             planningAppSurveyors.PlanningApp = planningApp;                
-            //             planningAppSurveyors.AppUser = await userManager.FindByIdAsync(surveyorId);
-            //             planningApp.Surveyors.Add(planningAppSurveyors);
-            //         }
-            //     }
-
-            //     if(planningResource.Drawers !=null)
-            //     foreach(string surveyorId in planningResource.Drawers) {
-            //         PlanningAppDrawers planningAppDrawers = new PlanningAppDrawers();
-            //         planningAppDrawers.PlanningApp = planningApp;                
-            //         planningAppDrawers.AppUser = await userManager.FindByIdAsync(surveyorId);
-            //         planningApp.Drawers.Add(planningAppDrawers);
-            //     }
-            //     if(planningResource.Admins !=null)
-            //     foreach(string adminId in planningResource.Admins) {
-            //         PlanningAppAdmins planningAppAdmins = new PlanningAppAdmins();
-            //         planningAppAdmins.PlanningApp = planningApp;                
-            //         planningAppAdmins.AppUser = await userManager.FindByIdAsync(adminId);
-            //         planningApp.Admins.Add(planningAppAdmins);
-            //     } 
-
-            //     repository.Add(planningApp, stateInitialiser);
-            //     await unitOfWork.CompleteAsync();
-
-            //     planningApp = await repository.GetPlanningApp(planningApp.Id, includeRelated: true);
-
-            //     //Generate Customer Reference
-            //     var customer = await customerRepository.GetCustomer(planningApp.CustomerId,includeRelated:false);
-            //     planningApp.genCustomerReferenceId(customer);
-            //     await unitOfWork.CompleteAsync();  //Save reference number
-                
-            //     result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
-            //     result.BusinessDate = CurrentDate.SettingDateFormat();
-            // }
-
-
-            //return Ok(result);
         }
 
         [HttpPut("insertgenerator/{id}")]

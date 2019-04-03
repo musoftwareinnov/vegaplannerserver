@@ -345,32 +345,32 @@ namespace vega.Core.Models
         //Helper functions
 
         //Planning id for customer usage
-        public void genCustomerReferenceId(Customer customer) {
+        // public void genCustomerReferenceId(Customer customer) {
 
-            //Get List of Designers and Surveyors and tag to reference number
-            //TODO NOTE: Refactor!!!!!!
-            var drawersInitialsList = Drawers.Select(d => d.AppUser.FirstName.Substring(0,1) + 
-                                                    d.AppUser.LastName.Substring(0,1)).ToList();
+        //     //Get List of Designers and Surveyors and tag to reference number
+        //     //TODO NOTE: Refactor!!!!!!
+        //     var drawersInitialsList = Drawers.Select(d => d.AppUser.FirstName.Substring(0,1) + 
+        //                                             d.AppUser.LastName.Substring(0,1)).ToList();
 
-            var drawersInitials = string.Join(StringConstants.IDil, drawersInitialsList).ToString().TrimEnd(StringConstants.IDil);
+        //     var drawersInitials = string.Join(StringConstants.IDil, drawersInitialsList).ToString().TrimEnd(StringConstants.IDil);
   
-            var surveyorsInitialsList = Surveyors.Select(d => d.AppUser.FirstName.Substring(0,1) + 
-                                                    d.AppUser.LastName.Substring(0,1)).ToList();
+        //     var surveyorsInitialsList = Surveyors.Select(d => d.AppUser.FirstName.Substring(0,1) + 
+        //                                             d.AppUser.LastName.Substring(0,1)).ToList();
 
-            var surveyorsInitials = string.Join(StringConstants.IDil, surveyorsInitialsList).ToString().TrimEnd(StringConstants.IDil);
+        //     var surveyorsInitials = string.Join(StringConstants.IDil, surveyorsInitialsList).ToString().TrimEnd(StringConstants.IDil);
 
-            var adminsInitialsList = Admins.Select(d => d.AppUser.FirstName.Substring(0,1) + 
-                                                    d.AppUser.LastName.Substring(0,1)).ToList();
+        //     var adminsInitialsList = Admins.Select(d => d.AppUser.FirstName.Substring(0,1) + 
+        //                                             d.AppUser.LastName.Substring(0,1)).ToList();
 
-            var adminsInitials = string.Join(StringConstants.IDil, adminsInitialsList).ToString().TrimEnd(StringConstants.IDil);
+        //     var adminsInitials = string.Join(StringConstants.IDil, adminsInitialsList).ToString().TrimEnd(StringConstants.IDil);
           
-            //TODO CDS -> take from settings file or database
-            PlanningReferenceId = "CDS/" + this.Id.ToString("D6") + "/"                                      
-                                        + adminsInitials + '/'
-                                        + surveyorsInitials + '/'
-                                        + drawersInitials ;
+        //     //TODO CDS -> take from settings file or database
+        //     PlanningReferenceId = "CDS/" + this.Id.ToString("D6") + "/"                                      
+        //                                 + adminsInitials + '/'
+        //                                 + surveyorsInitials + '/'
+        //                                 + drawersInitials ;
 
-        }
+        // }
 
 
 

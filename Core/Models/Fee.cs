@@ -1,4 +1,4 @@
-namespace vegaplannerserver.Core.Models
+namespace vega.Core.Models
 {
     public class Fee
     {

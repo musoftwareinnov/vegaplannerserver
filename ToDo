@@ -1,11 +1,16 @@
-OVerran RollFOrward DueByDates
-InsertNewPlanningState (move out of Object to Service)
-Project Reference genCustomerReferenceId - put in customer repository
-Mandatory Field Set Boolean is the wrong way around
-Refactor Survey/Drawers.Admin
+
+Notes not working on creation
+Insert Generator to Application 
+PLanning Application Ref - Update search!!!
 Refactor UpdatePLanningApp (states) - Developer and Address (messy)
-Test Why Allocation Fails on Resource when createing planning app
 Azure Key Vault
 Add Logger
+
+TESTING
+
+1. Test updates of state duration reflects in 
+2. Insert new state
+3. deelete state
+4. Overrun rolldate Test
 
 

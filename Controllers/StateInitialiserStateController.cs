@@ -11,6 +11,7 @@ using vega.Core.Models.States;
 using vega.Persistence;
 using vega.Controllers.Resources.StateInitialser;
 using Microsoft.AspNetCore.Authorization;
+using vega.Services.Interfaces;
 
 namespace vega.Controllers
 {
@@ -22,10 +23,12 @@ namespace vega.Controllers
         public StateInitialiserStateController(IMapper mapper,
                                                 IStateInitialiserStateRepository repository, 
                                                 IPlanningAppRepository planningAppRepository, 
+                                                IPlanningAppService planningAppService,
                                                 IStateStatusRepository stateStatusRepository,
                                                 IUnitOfWork unitOfWork)
         {
             this.planningAppRepository = planningAppRepository;
+            this.PlanningAppService = planningAppService;
             this.stateStatusRepository = stateStatusRepository;
             this.mapper = mapper;
             this.repository = repository;
@@ -34,6 +37,7 @@ namespace vega.Controllers
 
         public IMapper mapper { get; }
         public IStateInitialiserStateRepository repository { get; }
+        public IPlanningAppService PlanningAppService { get; }
         public IStateStatusRepository stateStatusRepository { get; }
         public IUnitOfWork UnitOfWork { get; }
 
@@ -59,16 +63,28 @@ namespace vega.Controllers
             else
                 repository.AddAfter(stateInitialiserState, stateInitialiserResource.OrderId);
 
+            await UnitOfWork.CompleteAsync();
+
+            var newStateInitialiserState = await repository.GetStateInitialiserState(stateInitialiserState.Id);
+
             //Get all planning apps that use this state initialiser
             var apps =  planningAppRepository.GetPlanningAppsUsingGenerator(stateInitialiserState.StateInitialiserId, inProgress:true);
+ 
 
-            var statusLists = await stateStatusRepository.GetStateStatusList();
-            apps.ForEach(p => p.InsertNewPlanningState(stateInitialiserState, statusLists));
+            foreach(var pa in apps) {
+                var genOrderList = planningAppRepository.GetGeneratorOrdersInPlanningApp(pa, stateInitialiserState.StateInitialiserId);
+                var current = pa.Current();
+                foreach(var genOrder in genOrderList) 
+                    PlanningAppService.InsertPlanningState(pa, genOrder, newStateInitialiserState);
+
+                PlanningAppService.UpdateDueByDates(pa);
+            }
+
 
             await UnitOfWork.CompleteAsync();
 
-            stateInitialiserState = await repository.GetStateInitialiserState(stateInitialiserState.Id);
-            var result = mapper.Map<StateInitialiserState, StateInitialiserStateResource>(stateInitialiserState);
+            var result = mapper.Map<StateInitialiserState, StateInitialiserStateResource>(newStateInitialiserState);
+
 
             return Ok(result);
         }
@@ -98,7 +114,11 @@ namespace vega.Controllers
 
             //update states from all current planning applications
             var apps =  planningAppRepository.GetPlanningAppsUsingGenerator(stateInitialiserState.StateInitialiserId, inProgress:true);
-            apps.ForEach(p => p.updateDueByDates());
+
+            foreach(var pa in apps) {
+                PlanningAppService.UpdateDueByDates(pa);
+            }
+            //apps.ForEach(p => p.updateDueByDates());
 
             await UnitOfWork.CompleteAsync();
 

@@ -93,6 +93,7 @@ namespace vega
             services.AddScoped<IDrawingRepository, DrawingRepository>(); 
             services.AddScoped<IPlanningStatisticsRepository, PlanningStatisticsRepository>(); 
             services.AddScoped<IBusinessDateRepository, BusinessDateRepository>(); 
+            services.AddScoped<IFeeRepository, FeeRepository>(); 
             services.AddScoped<IStaticDataRepository, StaticDataRepository>(); 
             services.AddScoped<IProjectGeneratorRepository, ProjectGeneratorRepository>(); 
 
