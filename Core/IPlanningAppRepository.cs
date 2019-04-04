@@ -13,7 +13,6 @@ namespace vega.Core
         QueryResult<PlanningApp> GetPlanningAppsSearchCriteria(PlanningAppQuery queryObj);
         PlanningApp UpdatePlanningApp(PlanningApp planningApp);
         List<PlanningApp> GetPlanningAppsUsingGenerator(int generatorId, bool inProgress = true);
-        void AppendGenerator(PlanningApp planningApp, StateInitialiser stateInitialiser);
         HashSet<int> GetGeneratorOrdersInPlanningApp(PlanningApp planningApp, int generatorId);
 
     }

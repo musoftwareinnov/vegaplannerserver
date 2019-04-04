@@ -159,9 +159,32 @@ namespace vega.Services
             }
     
             foreach(var state in generator.OrderedStates) {
-                 InsertPlanningState(planningApp, SequenceId, state);
+                 InsertPlanningState(planningApp, SequenceId, generator, state );
             }
             InitialiseDuebyDates(planningApp);
+            return planningApp;
+        }
+
+        public async Task<PlanningApp> AppendGenerator(PlanningApp planningApp, int SequenceId, int NewGeneratorId) 
+        {
+            var currentDate = DateService.GetCurrentDate();
+            PlanningAppState newPlanningAppState = new PlanningAppState();
+
+            var generator = await StateInitialiserRepository.GetStateInitialiser(NewGeneratorId);
+
+            var generatorExists = planningApp.OrderedPlanningAppStates.Any(ps => ps.GeneratorOrder == SequenceId);
+            //increase SequenceId of all future generators ad insert new one
+            if(generatorExists) {
+                planningApp.PlanningAppStates
+                .Where(g => g.GeneratorOrder >= SequenceId)
+                .Select(g => {g.GeneratorOrder++ ; return g;})
+                .ToList();               
+            }
+    
+            foreach(var state in generator.OrderedStates) {
+                 InsertPlanningState(planningApp, SequenceId, generator, state );
+            }
+            UpdateDueByDates(planningApp);
             return planningApp;
         }
 
@@ -228,7 +251,7 @@ namespace vega.Services
 
         }
 
-        public PlanningApp InsertPlanningState(PlanningApp planningApp, int GeneratorOrder, StateInitialiserState stateInitialiserState) 
+        public PlanningApp InsertPlanningState(PlanningApp planningApp, int GeneratorOrder, StateInitialiser generator, StateInitialiserState stateInitialiserState) 
         {
             if(!CanInsertState(planningApp, GeneratorOrder,stateInitialiserState))
                 return planningApp;
@@ -243,6 +266,7 @@ namespace vega.Services
 
             //Console.WriteLine("Adding States " + stateInitialiserState.Name + " To Planning App"); 
             newPlanningAppState.GeneratorOrder = GeneratorOrder;
+            newPlanningAppState.GeneratorName = generator.Name;
             newPlanningAppState.StateStatus = statusList.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();
             planningApp.PlanningAppStates.Add(newPlanningAppState);
             return planningApp;
@@ -258,7 +282,9 @@ namespace vega.Services
             if(currentState == null)
                 return true;  //New Application Being Created
             else {
-                if(GeneratorOrder >= currentState.GeneratorOrder && stateInitialiserState.OrderId > currentState.state.OrderId)
+                if(GeneratorOrder == currentState.GeneratorOrder && stateInitialiserState.OrderId > currentState.state.OrderId)
+                    return true;
+                else if(GeneratorOrder > currentState.GeneratorOrder)
                     return true;
             }
 
@@ -267,9 +293,6 @@ namespace vega.Services
         public Task<PlanningApp> GetPlanningApp(int id)
         {
             var planningApp = PlanningAppRepository.GetPlanningApp(id); 
-
-            //Set dynamic status
-            //PlanningAppStateService.GetDynamicStateStatus(planningApp.Current());
             return planningApp;                  
         }
         public void SavePlanningApp(PlanningApp planningApp)
@@ -311,6 +334,30 @@ namespace vega.Services
                         .ToList();  
             }
         }
+
+        public void RemovePlanningState(PlanningApp planningApp, StateInitialiserState stateInitialiserState) 
+        {
+            if(!planningApp.Completed()) {
+                var currentState = planningApp.Current();
+
+                //If state is in current generator and is after the current state then remove
+                var statesToRemove = planningApp.PlanningAppStates.Where(s => s.state.Id == stateInitialiserState.Id
+                                                                            && s.GeneratorOrder == currentState.GeneratorOrder
+                                                                            && s.state.OrderId > currentState.state.OrderId).ToList();
+                
+                //state in future generators
+                statesToRemove.AddRange(planningApp.PlanningAppStates.Where(s => s.state.Id == stateInitialiserState.Id
+                                                                            && s.GeneratorOrder > currentState.GeneratorOrder
+                                                                            ).ToList());
+
+                                                                        
+                foreach(var state in statesToRemove) {
+                    planningApp.PlanningAppStates.Remove(state);                
+                }
+                UpdateDueByDates(planningApp);   
+            }  
+        } 
+
         public int UpdateDueByDates(PlanningApp planningApp)  //Called when inserting a new state to an existing planning app
         {
             int statesUpdated = 0;

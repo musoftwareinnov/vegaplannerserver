@@ -9,7 +9,9 @@ namespace vega.Services.Interfaces
     {
         Task<PlanningApp> Create(CreatePlanningAppResource planningAppResource);
         Task<PlanningApp> InsertGenerator(PlanningApp planningApp, int OrderId, int NewGeneratorId);
-        PlanningApp InsertPlanningState(PlanningApp planningApp, int GeneratorOrder, StateInitialiserState stateInitialiserState);
+        Task<PlanningApp> AppendGenerator(PlanningApp planningApp, int OrderId, int NewGeneratorId);
+        PlanningApp InsertPlanningState(PlanningApp planningApp, int GeneratorOrder, StateInitialiser generator, StateInitialiserState stateInitialiserState);
+        void RemovePlanningState(PlanningApp planningApp, StateInitialiserState stateInitialiserState);
         PlanningApp RemoveGenerator(PlanningApp planningApp, int OrderId, int NewGeneratorId);
         Task<PlanningApp> GetPlanningApp(int id);
         Task<PlanningApp> NextState(PlanningApp planningApp);

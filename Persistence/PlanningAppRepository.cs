@@ -45,18 +45,6 @@ namespace vega.Persistence
         {
             vegaDbContext.Add(planningApp);   
         }
-        
-        public void AppendGenerator(PlanningApp planningApp, StateInitialiser stateInitialiser)
-        {
-
-            var initialStatus = vegaDbContext.StateStatus.Where(s => s.Name == stateStatusSettings.STATE_ON_TIME).SingleOrDefault();
-            var initialStatusList  = vegaDbContext.StateStatus.ToList();
-
-            foreach(var state in stateInitialiser.States) {
-                planningApp = planningApp.InsertNewPlanningState(state, initialStatusList);
-            }
-            //vegaDbContext.Update(planningApp);  
-        }
 
         public async Task<PlanningApp> GetPlanningApp(int id, bool includeRelated = true)
         {
@@ -67,6 +55,7 @@ namespace vega.Persistence
             return vegaDbContext.PlanningApps
                     .Where(s => s.Id == id)
                         .Include(b => b.CurrentPlanningStatus)
+                        .Include(p => p.ProjectGenerator)
                         .Include(t => t.PlanningAppStates)
                             .ThenInclude(s => s.state) 
                                 .ThenInclude(cs => cs.StateInitialiserStateCustomFields)
@@ -77,7 +66,6 @@ namespace vega.Persistence
                             .ThenInclude(cf => cf.customFields)
                         .Include(c => c.Customer.CustomerContact)
                         .Include(c => c.Customer.CustomerAddress)
-                        //.Include(g => g.StateInitialiser)
                         .Include(s => s.Surveyors)
                             .ThenInclude(u => u.AppUser)
                         .Include(s => s.Drawers)

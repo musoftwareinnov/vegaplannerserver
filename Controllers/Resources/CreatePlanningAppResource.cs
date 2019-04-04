@@ -14,7 +14,7 @@ namespace vega.Controllers.Resources
         public string Name { get; set; }
         public ContactResource Developer { get; set; }
         public Address DevelopmentAddress { get; set; }
-
+        public string Notes { get; set; }
         public ICollection<string> Surveyors { get; set; }
         public ICollection<string> Drawers { get; set; }
         public ICollection<string> Admins { get; set; }

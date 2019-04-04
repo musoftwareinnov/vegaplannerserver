@@ -22,6 +22,7 @@ namespace vega.Controllers
         private readonly IPlanningAppRepository planningAppRepository;
         public StateInitialiserStateController(IMapper mapper,
                                                 IStateInitialiserStateRepository repository, 
+                                                IStateInitialiserRepository generatorRepository, 
                                                 IPlanningAppRepository planningAppRepository, 
                                                 IPlanningAppService planningAppService,
                                                 IStateStatusRepository stateStatusRepository,
@@ -32,17 +33,19 @@ namespace vega.Controllers
             this.stateStatusRepository = stateStatusRepository;
             this.mapper = mapper;
             this.repository = repository;
+            this.GeneratorRepository = generatorRepository;
             UnitOfWork = unitOfWork;
         }
 
         public IMapper mapper { get; }
         public IStateInitialiserStateRepository repository { get; }
+        public IStateInitialiserRepository GeneratorRepository { get; }
         public IPlanningAppService PlanningAppService { get; }
         public IStateStatusRepository stateStatusRepository { get; }
         public IUnitOfWork UnitOfWork { get; }
 
         [HttpPost]
-        public async Task<IActionResult> SaveStateInitialiserState([FromBody] SaveStateInitialiserStateResource stateInitialiserResource)
+        public async Task<IActionResult> InsertGeneratorState([FromBody] SaveStateInitialiserStateResource stateInitialiserResource)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -55,6 +58,7 @@ namespace vega.Controllers
                 ModelState.AddModelError("InitialiserId", "InitialiserId not valid");
                 return BadRequest(ModelState);
             }
+            var generator = await GeneratorRepository.GetStateInitialiser(stateInitialiserResource.StateInitialiserId );
      
             var stateInitialiserState = mapper.Map<SaveStateInitialiserStateResource, StateInitialiserState>(stateInitialiserResource);
 
@@ -75,7 +79,7 @@ namespace vega.Controllers
                 var genOrderList = planningAppRepository.GetGeneratorOrdersInPlanningApp(pa, stateInitialiserState.StateInitialiserId);
                 var current = pa.Current();
                 foreach(var genOrder in genOrderList) 
-                    PlanningAppService.InsertPlanningState(pa, genOrder, newStateInitialiserState);
+                    PlanningAppService.InsertPlanningState(pa, genOrder, generator, newStateInitialiserState);
 
                 PlanningAppService.UpdateDueByDates(pa);
             }
@@ -91,7 +95,7 @@ namespace vega.Controllers
 
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetStateInitialiserState(int id)
+        public async Task<IActionResult> GetGeneratorState(int id)
         {
             var stateInitialiserState = await repository.GetStateInitialiserState(id);
 
@@ -104,7 +108,7 @@ namespace vega.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStateInitialiserState([FromBody] StateInitialiserStateResource stateInitialiserStateResource)
+        public async Task<IActionResult> UpdateGeneratorState([FromBody] StateInitialiserStateResource stateInitialiserStateResource)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -118,7 +122,6 @@ namespace vega.Controllers
             foreach(var pa in apps) {
                 PlanningAppService.UpdateDueByDates(pa);
             }
-            //apps.ForEach(p => p.updateDueByDates());
 
             await UnitOfWork.CompleteAsync();
 
@@ -144,7 +147,9 @@ namespace vega.Controllers
             //remove state from all current planning applications
             var apps =  planningAppRepository.GetPlanningAppsUsingGenerator(stateInitialiserState.StateInitialiserId, inProgress:true);
 
-            apps.ForEach(p => p.RemovePlanningState(stateInitialiserState));
+            foreach(var pa in apps) {
+                PlanningAppService.RemovePlanningState(pa, stateInitialiserState);;
+            }
 
             await UnitOfWork.CompleteAsync();
 

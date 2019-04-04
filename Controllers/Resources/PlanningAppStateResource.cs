@@ -9,6 +9,7 @@ namespace vega.Controllers.Resources
     {
         public int Id { get; set; }
         public int GeneratorId { get; set; }
+        public string GeneratorName { get; set; }
         public int GeneratorOrder { get; set; } 
         public string StateName { get; set; }
         public string DueByDate { get; set; }

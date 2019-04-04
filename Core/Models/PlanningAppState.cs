@@ -18,6 +18,7 @@ namespace vega.Core.Models
         public int PlanningAppId { get; set; }
         public PlanningApp PlanningApp { get; set; }
         public int GeneratorOrder { get; set; }  //States must be kept in order  GeneratorOrder/StateOrder
+        public string GeneratorName { get; set; } 
         public int StateInitialiserStateId { get; set; }
         public StateInitialiserState state { get; set; }
         public DateTime DueByDate { get; set; }
@@ -54,31 +55,6 @@ namespace vega.Core.Models
         public override string ToString() {
             return $"{Id} GenOrder:{GeneratorOrder} StateOrder:{state.OrderId} StateName:{state.Name}  DueBy:{DueByDate}".ToString();
         }
-
-        //ONLY CALLED IN TERMINATE - MAY REMOVE!!!!
-        // public bool isValid() {
-            
-        //     foreach(var template in this.state.StateInitialiserStateCustomFields) {
-        //         var value = getPlanningAppStateCustomField(template.StateInitialiserCustomFieldId);
-
-        //         if(string.IsNullOrWhiteSpace(value.StrValue) && template.StateInitialiserCustomField.isMandatory)
-        //             return false;
-        //     }
-        //     return true;
-        // }
-
-        // public int CompleteState(DateTime completionDate, List<StateStatus> stateStatusList) 
-        // {
-        //     CurrentState = false;
-        //     CompletionDate = completionDate;
-
-        //     if(CompletionDate > DueByDate)
-        //         StateStatus = stateStatusList.Where(s => s.Name == StatusList.Overran).SingleOrDefault();
-        //     else 
-        //         StateStatus = stateStatusList.Where(s => s.Name == StatusList.Complete).SingleOrDefault();
-
-        //     return DateTime.Compare(CompletionDate.Value, DueByDate); 
-        // }
    
         //Object Method Used For Mapping To Resource
         public string DynamicStateStatus() {
@@ -96,57 +72,12 @@ namespace vega.Core.Models
             }
             return StateStatus.Name;
         }
-
-        // public DateTime SetMinDueByDate(PlanningApp planningApp) {
-            
-        //     DateTime minDueByDate = new DateTime();
-
-        //     if(!planningApp.Completed()) {
-        //         var current = planningApp.Current();
-        //         var currentDate = SystemDate.Instance.date;
-        //         if(this.state.OrderId >= current.state.OrderId) {
-        //             if(planningApp.isFirstState(this))
-        //                 minDueByDate = currentDate.AddBusinessDays(1); //Add one day
-        //             else if (this.CurrentState == true)
-        //                 minDueByDate = currentDate.AddBusinessDays(1); 
-        //             else if (planningApp.SeekPrev(this).DueByDate <= currentDate)
-        //                 minDueByDate = currentDate.AddBusinessDays(1); 
-        //             else 
-        //                 minDueByDate = planningApp.SeekPrev(this).DueByDate.AddBusinessDays(1);
-        //         }
-        //     }
-
-        //     return minDueByDate;
-        // }
-
         public void AggregateDueByDate(PlanningAppState planningAppState) {
             this.DueByDate = planningAppState.DueByDate.AddBusinessDays(this.CompletionTime());
         }
         public void SetDueByDateFrom(DateTime startDate) {
             this.DueByDate = startDate.AddBusinessDays(this.CompletionTime());
         }
-
-        // public void UpdateCustomDueByDate(DateTime dueByDate)
-        // {
-        //     int daysDiff;
-        //     if (dueByDate > this.DueByDate)
-        //         daysDiff = this.DueByDate.GetBusinessDays(dueByDate, new List<DateTime>());//Move dates forward
-        //     else
-        //         daysDiff = dueByDate.GetBusinessDays(this.DueByDate, new List<DateTime>()) * -1; //Move dates back
-
-        //     if (daysDiff != 0)
-        //     {   //Date are different so customise
-        //         if (this.CustomDurationSet == true)
-        //         {
-        //             this.CustomDuration += daysDiff;
-        //         }
-        //         else
-        //         {
-        //             this.CustomDurationSet = true;
-        //             this.CustomDuration = (this.state.CompletionTime + daysDiff);
-        //         }
-        //     }
-        // }
         
         public int CompletionTime() {
             if(this.CustomDurationSet)
@@ -155,7 +86,7 @@ namespace vega.Core.Models
                 return state.CompletionTime;    
         }
         public bool isLastGeneratorState() { 
-            return this.PlanningApp.isLastGeneratorState(this.StateInitialiserStateId);   
+            return this.PlanningApp.isLastGeneratorState(this.Id);   
         }
 
         public bool isCustomDuration() {

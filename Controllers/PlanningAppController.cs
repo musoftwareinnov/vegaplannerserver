@@ -96,6 +96,21 @@ namespace vega.Controllers
 
         }
 
+        [HttpPut("appendgenerator/{id}")]
+        public async Task<IActionResult> AppendGenerator(int id, [FromBody] AppGeneratorResource appGenResource)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var planningApp  = await planningAppService.GetPlanningApp(id);
+            await planningAppService.AppendGenerator(planningApp, appGenResource.OrderId, appGenResource.GeneratorId);
+
+            await unitOfWork.CompleteAsync();
+
+            return await GetPlanningApp(id);
+
+        }
+
         [HttpPut("removegenerator/{id}")]
         public async Task<IActionResult> RemoveGenerator(int id, [FromBody] AppGeneratorResource appGenResource)
         {
@@ -140,8 +155,6 @@ namespace vega.Controllers
             return mapper.Map<QueryResult<PlanningApp>, QueryResultResource<PlanningAppSummaryResource>>(queryResult);
         }
 
-        //TODO: REFACTOR state transition
-
         [HttpPut("nextstate/{id}")]
         public async Task<IActionResult> NextPlanningAppState(int id)
         {
@@ -161,34 +174,11 @@ namespace vega.Controllers
             return await GetPlanningApp(planningApp.Id);
         }
 
-        // [HttpPut("prevstate/{id}")]
-        // public async Task<IActionResult> PrevPlanningAppState(int id)
-        // {
-        //     DateTime currentDate = DateTime.Now;
-        //     var stateStatusList = await statusListRepository.GetStateStatusList(); //List of possible statuses
-
-        //     var planningApp = await repository.GetPlanningApp(id, includeRelated: true);
-
-        //     if (planningApp == null)
-        //         return NotFound();
-
-        //     //TODO!!!!!!!Inject Logger to say what changed state by which user
-        //     var currentStateId = planningApp.Current().Id;
-
-        //     //get full entities, including custom state rules
-        //     var currentState = await planningAppStateRepository.GetPlanningAppState(currentStateId);
-        //     if(currentState.isValid())
-        //         planningApp.PrevState(stateStatusList);
-        //     else
-        //         return BadRequest(new { message = "bad request for next state"});
-      
-        //     repository.UpdatePlanningApp(planningApp);
-        //     await unitOfWork.CompleteAsync();
-
-        //     var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
-        //     result.BusinessDate = CurrentDate.SettingDateFormat();
-        //     return Ok(result);
-        // }
+        [HttpPut("prevstate/{id}")]
+        public IActionResult PrevPlanningAppState(int id)
+        {
+            return Ok("Not Implemented");
+        }
 
 
         // [HttpPut("terminate/{id}")]
@@ -237,12 +227,6 @@ namespace vega.Controllers
             result.BusinessDate = CurrentDate.SettingDateFormat();
 
             return Ok(result);
-        }
-
-
-
-        private void contravar(List<string> planningAppUser) {
-
-        }   
+        } 
     }
 }

@@ -1,16 +1,14 @@
 
-Notes not working on creation
 Insert Generator to Application 
-PLanning Application Ref - Update search!!!
 Refactor UpdatePLanningApp (states) - Developer and Address (messy)
 Azure Key Vault
 Add Logger
-
+Refactor AppendGenerator and InsertGenerator
 TESTING
 
 1. Test updates of state duration reflects in 
 2. Insert new state
-3. deelete state
+3. Delete state
 4. Overrun rolldate Test
 
 

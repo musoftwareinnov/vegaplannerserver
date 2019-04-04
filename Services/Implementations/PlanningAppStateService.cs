@@ -98,30 +98,5 @@ namespace vega.Services
             return planningAppState.customFields
                                     .Where(r => r.StateInitialiserStateCustomFieldId == resourceId).SingleOrDefault();
         }
-
-        // public PlanningApp InsertNewPlanningState(StateInitialiserState newStateInitialiserState, IEnumerable<StateStatus> stateStatus) 
-        // {
-
-        //     if(!Completed()) {
-        //         var currentState = Current();
-
-        //         if(newStateInitialiserState.OrderId > currentState.state.OrderId) {
-
-        //             //Remove states after current state
-        //             var states = this.PlanningAppStates.ToList();
-
-        //             PlanningAppState newState = new PlanningAppState();
-        //             newState.state = newStateInitialiserState;
-        //             newState.CurrentState = false;
-        //             newState.StateStatus = stateStatus.Where(s => s.Name == StatusList.OnTime).SingleOrDefault();
-        //             newState.CompletionDate = null;
-        //             newState.DueByDate = DateTime.Now;
-        //             PlanningAppStates.Add(newState);
-
-        //             updateDueByDates();
-        //         }
-        //     }
-        //     return this;
-        //}
     }
 }
