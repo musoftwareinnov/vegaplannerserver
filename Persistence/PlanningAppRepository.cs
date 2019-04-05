@@ -55,7 +55,7 @@ namespace vega.Persistence
             return vegaDbContext.PlanningApps
                     .Where(s => s.Id == id)
                         .Include(b => b.CurrentPlanningStatus)
-                        .Include(p => p.ProjectGenerator)
+                        // .Include(p => p.ProjectGenerator)
                         .Include(t => t.PlanningAppStates)
                             .ThenInclude(s => s.state) 
                                 .ThenInclude(cs => cs.StateInitialiserStateCustomFields)

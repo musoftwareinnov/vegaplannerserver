@@ -34,7 +34,9 @@ namespace vega.Mapping.MappingProfiles
                 .ForMember(sis => sis.isCustomDuraton,
                     opt => opt.MapFrom(s => s.isCustomDuration()))
                 .ForMember(psr => psr.isLastGeneratorState,
-                    opt => opt.MapFrom(ps => ps.isLastGeneratorState()));
+                    opt => opt.MapFrom(ps => ps.isLastGeneratorState()))
+                .ForMember(psr => psr.canRemoveGenerator,
+                    opt => opt.MapFrom(ps => ps.canRemoveGenerator()));
 
             CreateMap<PlanningAppState, PlanningAppStateFullResource>()
                 .ForMember(psr => psr.StateName,

@@ -24,7 +24,7 @@ namespace vega.Core.Models
         public Customer Customer { get; set; }
         public String PlanningReferenceId { get; set; }
         public int ProjectGeneratorId { get; set; }
-        public ProjectGenerator ProjectGenerator { get; set; }
+        //public ProjectGenerator ProjectGenerator { get; set; }
 
         // Deprecate Single Generator Use
         // public int StateInitialiserId { get; set; }
@@ -88,7 +88,6 @@ namespace vega.Core.Models
         }
 
         //Private Functions
-    
         public void SetCurrent(PlanningAppState planningAppState) {
 
             foreach ( var state  in OrderedPlanningAppStates) {   
@@ -187,6 +186,17 @@ namespace vega.Core.Models
                             return false;
                     }
                     else 
+                        return true;
+                }
+            }
+            return false;
+        }
+        public bool canRemoveGenerator(PlanningAppState planningAppState)
+        {
+            if(!this.Completed()) {
+                if(isLastGeneratorState(planningAppState.Id)) {
+                    var curr = this.Current();
+                    if(planningAppState.GeneratorOrder > curr.GeneratorOrder)
                         return true;
                 }
             }

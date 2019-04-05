@@ -12,8 +12,8 @@ namespace vega.Mapping.MappingProfiles
         public PlanningAppMapping()
         { 
             CreateMap<PlanningApp, PlanningAppResource>()
-                .ForMember(psr => psr.ProjectGeneratorName, 
-                    opt => opt.MapFrom(ps => ps.ProjectGenerator.Name))
+                // .ForMember(psr => psr.ProjectGeneratorName, 
+                //     opt => opt.MapFrom(ps => ps.ProjectGenerator.Name))
                 .ForMember(psr => psr.PlanningAppStates, 
                     opt => opt.MapFrom(ps => ps.OrderedPlanningAppStates))
                 .ForMember(psr => psr.CurrentStateStatus,
@@ -30,8 +30,8 @@ namespace vega.Mapping.MappingProfiles
                     opt => opt.MapFrom(ps => ps.CurrentPlanningStatus.Name))
                 .ForMember(psr => psr.Name, 
                     opt => opt.MapFrom(ps => ps.Name))
-                .ForMember(psr => psr.Generator, 
-                    opt => opt.MapFrom(ps => ps.ProjectGenerator.Name))
+                // .ForMember(psr => psr.Generator, 
+                //     opt => opt.MapFrom(ps => ps.ProjectGenerator.Name))
                 .ForMember(psr => psr.CompletionDate, 
                     opt => opt.MapFrom(ps => ps.CompletionDate().SettingDateFormat())) 
                 .ForMember(psr => psr.StartDate, 

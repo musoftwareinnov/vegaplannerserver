@@ -65,8 +65,12 @@ namespace vega.Services
             
             var planningApp = Mapper.Map<CreatePlanningAppResource, PlanningApp>(planningResource);
 
-            planningApp.ProjectGenerator = ProjectGeneratorRepository.GetProjectGenerator(planningResource.ProjectGeneratorId).Result;
-            Console.WriteLine("Creating New Planning App, Project Generator -> " + planningApp.ProjectGenerator.Name);
+            //Use when gui setup to create multiple generators
+            //planningApp.ProjectGenerator = ProjectGeneratorRepository.GetProjectGenerator(planningResource.ProjectGeneratorId).Result;
+            //Console.WriteLine("Creating New Planning App, Project Generator -> " + planningApp.ProjectGenerator.Name);
+
+            //Dummy project multi generator for now
+            planningApp.ProjectGeneratorId = planningResource.ProjectGeneratorId;
 
             planningApp.StartDate = SystemDate.Instance.date;
             //Create Customer
@@ -76,7 +80,7 @@ namespace vega.Services
             planningApp.CurrentPlanningStatus = statusList.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault();
 
             //Create States
-            planningApp = await AddGeneratorStates(planningApp);
+            planningApp = await AddSingleGeneratorStates(planningApp);
             Console.WriteLine("Generated " + planningApp.PlanningAppStates.Count + " Planning States");
 
             //Refactor!!!!!!!
@@ -121,12 +125,34 @@ namespace vega.Services
             return await PlanningAppRepository.GetPlanningApp(planningApp.Id, includeRelated:false);
         }
         
-        private async Task<PlanningApp> AddGeneratorStates(PlanningApp planningApp) 
+        //Single Generator Creator
+        private async Task<PlanningApp> AddSingleGeneratorStates(PlanningApp planningApp) 
         {
-            foreach(var gen in planningApp.ProjectGenerator.OrderedGenerators) {
-                //Console.WriteLine("Adding Generator " + gen.Generator.Name + " To Planning App");
-                await InsertGenerator(planningApp, gen.SeqId, gen.Generator.Id) ;
+
+            await InsertGenerator(planningApp, 1, planningApp.ProjectGeneratorId) ;
+
+            //set first state to current state
+            if(planningApp.PlanningAppStates.Count > 0) {
+                var startState = planningApp.PlanningAppStates.FirstOrDefault();
+                var currentDate = DateService.GetCurrentDate();
+                startState.CurrentState = true;
+
+                InitialiseDuebyDates(planningApp);
             }
+            //Set overall Status to InProgress
+            planningApp.CurrentPlanningStatus = statusList.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault();
+
+            return planningApp;
+        }
+
+        //NOT USED !!! Multi Generator creator (next version when dine front end)
+        private async Task<PlanningApp> AddProjectGeneratorStates(PlanningApp planningApp) 
+        {
+            // foreach(var gen in planningApp.ProjectGenerator.OrderedGenerators) {
+            //     //Console.WriteLine("Adding Generator " + gen.Generator.Name + " To Planning App");
+                 //await InsertGenerator(planningApp, gen.SeqId, gen.Generator.Id) ;
+                 await InsertGenerator(planningApp,-1,-1) ;
+            // }
 
             //set first state to current state
             if(planningApp.PlanningAppStates.Count > 0) {
@@ -190,11 +216,11 @@ namespace vega.Services
 
         public PlanningApp RemoveGenerator(PlanningApp planningApp, int SequenceId, int GeneratorId) 
         {
+
             var currentDate = DateService.GetCurrentDate();
             PlanningAppState newPlanningAppState = new PlanningAppState();
 
             //var generator = await StateInitialiserRepository.GetStateInitialiser(GeneratorId);
-
             var statesToDelete = planningApp.PlanningAppStates.Where(s => s.GeneratorOrder == SequenceId).ToList();
 
             foreach(var planningAppState in statesToDelete) {
@@ -206,7 +232,7 @@ namespace vega.Services
             .Select(g => {g.GeneratorOrder-- ; return g;})
             .ToList();               
             
-            InitialiseDuebyDates(planningApp);
+            UpdateDueByDates(planningApp);
             return planningApp;
         }
         private int InitialiseDuebyDates(PlanningApp planningApp)
@@ -287,6 +313,17 @@ namespace vega.Services
                 else if(GeneratorOrder > currentState.GeneratorOrder)
                     return true;
             }
+
+            return false;
+        } 
+        private bool CanRemoveState(PlanningApp planningApp, int GeneratorOrder, StateInitialiserState stateInitialiserState) 
+        {
+            if(planningApp.CurrentPlanningStatus != statusList.Where(s => s.Name == StatusList.AppInProgress).SingleOrDefault()) {
+                return false;
+            }
+            var currentState = planningApp.Current();
+            if(GeneratorOrder > currentState.GeneratorOrder)
+                    return true;
 
             return false;
         } 

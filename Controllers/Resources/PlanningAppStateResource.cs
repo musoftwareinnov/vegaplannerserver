@@ -18,6 +18,7 @@ namespace vega.Controllers.Resources
         public bool CurrentState { get; set; }
         public bool isCustomDuraton  { get; set; }
         public bool isLastGeneratorState  { get; set; }
+        public bool canRemoveGenerator  { get; set; }
         public bool mandatoryFieldsSet { get; set; }
     }
 }

@@ -88,6 +88,9 @@ namespace vega.Core.Models
         public bool isLastGeneratorState() { 
             return this.PlanningApp.isLastGeneratorState(this.Id);   
         }
+        public bool canRemoveGenerator() { 
+            return this.PlanningApp.canRemoveGenerator(this);   
+        }
 
         public bool isCustomDuration() {
             return this.CustomDurationSet;
