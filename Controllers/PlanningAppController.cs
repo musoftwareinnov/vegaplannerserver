@@ -181,34 +181,16 @@ namespace vega.Controllers
         }
 
 
-        // [HttpPut("terminate/{id}")]
-        // public async Task<IActionResult> TerminatePlanningApp(int id)
-        // {
-        //     DateTime currentDate = DateTime.Now;
-        //     var stateStatusList = await statusListRepository.GetStateStatusList(); //List of possible statuses
+        [HttpPut("terminate/{id}")]
+        public async Task<IActionResult> TerminatePlanningApp(int id)
+        {
+            var planningApp = await repository.GetPlanningApp(id, includeRelated: true);
+            planningAppService.Terminate(planningApp);
+            await unitOfWork.CompleteAsync();
+            var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
 
-        //     var planningApp = await repository.GetPlanningApp(id, includeRelated: true);
-
-        //     if (planningApp == null)
-        //         return NotFound();
-
-        //     //TODO!!!!!!!Inject Logger to say what changed state by which user
-        //     var currentStateId = planningApp.Current().Id;
-
-        //     //get full entities, including custom state rules
-        //     var currentState = await planningAppStateRepository.GetPlanningAppState(currentStateId);
-        //     if(currentState.isValid())
-        //         planningApp.Terminate(stateStatusList);
-        //     else
-        //         return BadRequest(new { message = "bad request for next state"});
-      
-        //     repository.UpdatePlanningApp(planningApp);
-        //     await unitOfWork.CompleteAsync();
-
-        //     var result = mapper.Map<PlanningApp, PlanningAppResource>(planningApp);
-        //     result.BusinessDate = CurrentDate.SettingDateFormat();
-        //     return Ok(result);
-        // }
+            return Ok(result);
+        }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePlanningApp(int id, [FromBody] UpdatePlanningAppResource planningResource)

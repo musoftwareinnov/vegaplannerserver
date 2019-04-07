@@ -365,8 +365,6 @@ namespace vega.Migrations
                         .IsRequired()
                         .HasMaxLength(255);
 
-                    b.Property<int>("OrderId");
-
                     b.HasKey("Id");
 
                     b.ToTable("StateInitialisers");

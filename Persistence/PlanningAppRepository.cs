@@ -182,9 +182,21 @@ namespace vega.Persistence
 
             var appsInProgress = query.Where(pa => pa.CurrentPlanningStatus.Name == StatusList.AppInProgress).ToList();
 
+            //DEBUGGING CHECKS
             foreach(var app in appsInProgress) {
+                if(app.Current() == null) {
+                    app.Current();
+                }
                 app.PlanningAppStates = app.OrderedPlanningAppStates.ToList();
             }
+
+            // var ontime = appsInProgress.Where(pa => pa.Current().DynamicStateStatus() == "OnTime")
+            //                             .OrderBy(o => o.Current().DueByDate);
+            // var due = appsInProgress.Where(pa => pa.Current().DynamicStateStatus() == "Due")
+            //                             .OrderBy(o => o.Current().DueByDate);
+            // var overdue = appsInProgress.Where(pa => pa.Current().DynamicStateStatus() == "Overdue")
+            //                             .OrderBy(o => o.Current().DueByDate);
+
             foreach(var status in statusListInProgress) { 
                 planningAppSelectList.AddRange(appsInProgress.Where(pa => pa.Current().DynamicStateStatus() == status.Name)
                                         .OrderBy(o => o.Current().DueByDate));

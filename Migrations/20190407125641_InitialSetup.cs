@@ -1,11 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using System;
-using System.Collections.Generic;
 
 namespace vega.Migrations
 {
-    public partial class InitialModel : Migration
+    public partial class InitialSetup : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,9 +13,9 @@ namespace vega.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    ConcurrencyStamp = table.Column<string>(nullable: true),
                     Name = table.Column<string>(maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(maxLength: 256, nullable: true)
+                    NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -28,28 +27,43 @@ namespace vega.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false),
-                    ConcurrencyStamp = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(nullable: false),
-                    FacebookId = table.Column<long>(nullable: true),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    LockoutEnabled = table.Column<bool>(nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
-                    NormalizedEmail = table.Column<string>(maxLength: 256, nullable: true),
+                    UserName = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(maxLength: 256, nullable: true),
+                    Email = table.Column<string>(maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(nullable: false),
                     PasswordHash = table.Column<string>(nullable: true),
+                    SecurityStamp = table.Column<string>(nullable: true),
+                    ConcurrencyStamp = table.Column<string>(nullable: true),
                     PhoneNumber = table.Column<string>(nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(nullable: false),
-                    PictureUrl = table.Column<string>(nullable: true),
-                    SecurityStamp = table.Column<string>(nullable: true),
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
-                    UserName = table.Column<string>(maxLength: 256, nullable: true)
+                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
+                    LockoutEnabled = table.Column<bool>(nullable: false),
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    FacebookId = table.Column<long>(nullable: true),
+                    PictureUrl = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BusinessDates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    PrevBusDate = table.Column<DateTime>(nullable: false),
+                    CurrBusDate = table.Column<DateTime>(nullable: false),
+                    NextBusDate = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BusinessDates", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -58,23 +72,40 @@ namespace vega.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Notes = table.Column<string>(maxLength: 1024, nullable: true),
-                    SearchCriteria = table.Column<string>(nullable: true),
-                    CustomerAddress_AddressLine1 = table.Column<string>(maxLength: 255, nullable: true),
-                    CustomerAddress_AddressLine2 = table.Column<string>(nullable: true),
-                    CustomerAddress_CompanyName = table.Column<string>(maxLength: 255, nullable: true),
-                    CustomerAddress_GeoLocation = table.Column<string>(maxLength: 20, nullable: true),
-                    CustomerAddress_Postcode = table.Column<string>(maxLength: 10, nullable: true),
-                    CustomerContact_EmailAddress = table.Column<string>(maxLength: 30, nullable: true),
+                    CustomerContact_CustomerTitleId = table.Column<int>(nullable: false),
+                    CustomerContact_CustomerTitle = table.Column<string>(nullable: true),
                     CustomerContact_FirstName = table.Column<string>(maxLength: 30, nullable: true),
                     CustomerContact_LastName = table.Column<string>(maxLength: 30, nullable: true),
-                    CustomerContact_TelephoneHome = table.Column<string>(maxLength: 30, nullable: true),
+                    CustomerContact_TelephoneWork = table.Column<string>(maxLength: 30, nullable: true),
                     CustomerContact_TelephoneMobile = table.Column<string>(maxLength: 30, nullable: true),
-                    CustomerContact_TelephoneWork = table.Column<string>(maxLength: 30, nullable: true)
+                    CustomerContact_TelephoneHome = table.Column<string>(maxLength: 30, nullable: true),
+                    CustomerContact_EmailAddress = table.Column<string>(maxLength: 30, nullable: true),
+                    CustomerAddress_CompanyName = table.Column<string>(maxLength: 255, nullable: true),
+                    CustomerAddress_AddressLine1 = table.Column<string>(maxLength: 255, nullable: true),
+                    CustomerAddress_City = table.Column<string>(nullable: true),
+                    CustomerAddress_County = table.Column<string>(nullable: true),
+                    CustomerAddress_Postcode = table.Column<string>(maxLength: 10, nullable: true),
+                    CustomerAddress_GeoLocation = table.Column<string>(maxLength: 20, nullable: true),
+                    SearchCriteria = table.Column<string>(nullable: true),
+                    Notes = table.Column<string>(maxLength: 1024, nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DescriptionOfWork",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(maxLength: 255, nullable: false),
+                    LastUpdate = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DescriptionOfWork", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -83,8 +114,8 @@ namespace vega.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    LastUpdate = table.Column<DateTime>(nullable: false),
-                    Name = table.Column<string>(maxLength: 255, nullable: false)
+                    Name = table.Column<string>(maxLength: 255, nullable: false),
+                    LastUpdate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -105,6 +136,20 @@ namespace vega.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Fees",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true),
+                    DefaultAmount = table.Column<decimal>(type: "decimal(10, 2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Fees", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Makes",
                 columns: table => new
                 {
@@ -118,6 +163,19 @@ namespace vega.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProjectGenerators",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectGenerators", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StateInitialiserCustomFields",
                 columns: table => new
                 {
@@ -125,8 +183,8 @@ namespace vega.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
                     Type = table.Column<string>(nullable: true),
-                    isMandatory = table.Column<bool>(nullable: false),
-                    isPlanningAppField = table.Column<bool>(nullable: false)
+                    isPlanningAppField = table.Column<bool>(nullable: false),
+                    isMandatory = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,9 +197,9 @@ namespace vega.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(maxLength: 255, nullable: false),
                     LastUpdate = table.Column<DateTime>(nullable: false),
-                    Name = table.Column<string>(maxLength: 255, nullable: false)
+                    Description = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -154,9 +212,9 @@ namespace vega.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    GroupType = table.Column<string>(nullable: true),
-                    LastUpdate = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(maxLength: 255, nullable: false),
+                    LastUpdate = table.Column<DateTime>(nullable: false),
+                    GroupType = table.Column<string>(nullable: true),
                     OrderId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -165,14 +223,28 @@ namespace vega.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Title",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(maxLength: 255, nullable: false),
+                    LastUpdate = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Title", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    RoleId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
-                    ClaimValue = table.Column<string>(nullable: true),
-                    RoleId = table.Column<string>(nullable: false)
+                    ClaimValue = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -186,36 +258,14 @@ namespace vega.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AppUsers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Gender = table.Column<string>(nullable: true),
-                    IdentityId = table.Column<string>(nullable: true),
-                    Locale = table.Column<string>(nullable: true),
-                    Location = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AppUsers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AppUsers_AspNetUsers_IdentityId",
-                        column: x => x.IdentityId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
-                    ClaimValue = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: false)
+                    ClaimValue = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -298,8 +348,8 @@ namespace vega.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    MakeId = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(maxLength: 255, nullable: false)
+                    Name = table.Column<string>(maxLength: 255, nullable: false),
+                    MakeId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -313,19 +363,46 @@ namespace vega.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProjectGeneratorSequence",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    SeqId = table.Column<int>(nullable: false),
+                    GeneratorId = table.Column<int>(nullable: true),
+                    ProjectGeneratorId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectGeneratorSequence", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProjectGeneratorSequence_StateInitialisers_GeneratorId",
+                        column: x => x.GeneratorId,
+                        principalTable: "StateInitialisers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProjectGeneratorSequence_ProjectGenerators_ProjectGeneratorId",
+                        column: x => x.ProjectGeneratorId,
+                        principalTable: "ProjectGenerators",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StateInitialiserState",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AlertToCompletionTime = table.Column<int>(nullable: false),
-                    CompletionTime = table.Column<int>(nullable: false),
-                    LastUpdate = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(maxLength: 255, nullable: false),
+                    LastUpdate = table.Column<DateTime>(nullable: false),
                     OrderId = table.Column<int>(nullable: false),
+                    CompletionTime = table.Column<int>(nullable: false),
+                    AlertToCompletionTime = table.Column<int>(nullable: false),
                     StateInitialiserId = table.Column<int>(nullable: false),
-                    canDelete = table.Column<bool>(nullable: false),
-                    isDeleted = table.Column<bool>(nullable: false)
+                    isDeleted = table.Column<bool>(nullable: false),
+                    canDelete = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -344,26 +421,31 @@ namespace vega.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ApplicationNo = table.Column<string>(nullable: true),
-                    CurrentPlanningStatusId = table.Column<int>(nullable: false),
-                    CustomerId = table.Column<int>(nullable: false),
-                    LastUpdate = table.Column<DateTime>(nullable: false),
                     Name = table.Column<string>(maxLength: 255, nullable: false),
-                    Notes = table.Column<string>(nullable: true),
+                    LastUpdate = table.Column<DateTime>(nullable: false),
+                    CustomerId = table.Column<int>(nullable: false),
                     PlanningReferenceId = table.Column<string>(nullable: true),
-                    SearchCriteria = table.Column<string>(nullable: true),
-                    StateInitialiserId = table.Column<int>(nullable: false),
-                    DevelopmentAddress_AddressLine1 = table.Column<string>(maxLength: 255, nullable: true),
-                    DevelopmentAddress_AddressLine2 = table.Column<string>(nullable: true),
-                    DevelopmentAddress_CompanyName = table.Column<string>(maxLength: 255, nullable: true),
-                    DevelopmentAddress_GeoLocation = table.Column<string>(maxLength: 20, nullable: true),
-                    DevelopmentAddress_Postcode = table.Column<string>(maxLength: 10, nullable: true),
-                    Developer_EmailAddress = table.Column<string>(maxLength: 30, nullable: true),
+                    ProjectGeneratorId = table.Column<int>(nullable: false),
+                    CurrentPlanningStatusId = table.Column<int>(nullable: false),
+                    StartDate = table.Column<DateTime>(nullable: false),
+                    ApplicationNo = table.Column<string>(nullable: true),
+                    Developer_CustomerTitleId = table.Column<int>(nullable: false),
+                    Developer_CustomerTitle = table.Column<string>(nullable: true),
                     Developer_FirstName = table.Column<string>(maxLength: 30, nullable: true),
                     Developer_LastName = table.Column<string>(maxLength: 30, nullable: true),
-                    Developer_TelephoneHome = table.Column<string>(maxLength: 30, nullable: true),
+                    Developer_TelephoneWork = table.Column<string>(maxLength: 30, nullable: true),
                     Developer_TelephoneMobile = table.Column<string>(maxLength: 30, nullable: true),
-                    Developer_TelephoneWork = table.Column<string>(maxLength: 30, nullable: true)
+                    Developer_TelephoneHome = table.Column<string>(maxLength: 30, nullable: true),
+                    Developer_EmailAddress = table.Column<string>(maxLength: 30, nullable: true),
+                    DevelopmentAddress_CompanyName = table.Column<string>(maxLength: 255, nullable: true),
+                    DevelopmentAddress_AddressLine1 = table.Column<string>(maxLength: 255, nullable: true),
+                    DevelopmentAddress_City = table.Column<string>(nullable: true),
+                    DevelopmentAddress_County = table.Column<string>(nullable: true),
+                    DevelopmentAddress_Postcode = table.Column<string>(maxLength: 10, nullable: true),
+                    DevelopmentAddress_GeoLocation = table.Column<string>(maxLength: 20, nullable: true),
+                    SearchCriteria = table.Column<string>(nullable: true),
+                    DescriptionOfWork = table.Column<string>(nullable: true),
+                    Notes = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -380,12 +462,6 @@ namespace vega.Migrations
                         principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PlanningApps_StateInitialisers_StateInitialiserId",
-                        column: x => x.StateInitialiserId,
-                        principalTable: "StateInitialisers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -394,15 +470,17 @@ namespace vega.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    IsRegistered = table.Column<bool>(nullable: false),
-                    LastUpdate = table.Column<DateTime>(nullable: false),
                     ModelId = table.Column<int>(nullable: false),
-                    Contact_EmailAddress = table.Column<string>(maxLength: 30, nullable: true),
+                    IsRegistered = table.Column<bool>(nullable: false),
+                    Contact_CustomerTitleId = table.Column<int>(nullable: false),
+                    Contact_CustomerTitle = table.Column<string>(nullable: true),
                     Contact_FirstName = table.Column<string>(maxLength: 30, nullable: true),
                     Contact_LastName = table.Column<string>(maxLength: 30, nullable: true),
-                    Contact_TelephoneHome = table.Column<string>(maxLength: 30, nullable: true),
+                    Contact_TelephoneWork = table.Column<string>(maxLength: 30, nullable: true),
                     Contact_TelephoneMobile = table.Column<string>(maxLength: 30, nullable: true),
-                    Contact_TelephoneWork = table.Column<string>(maxLength: 30, nullable: true)
+                    Contact_TelephoneHome = table.Column<string>(maxLength: 30, nullable: true),
+                    Contact_EmailAddress = table.Column<string>(maxLength: 30, nullable: true),
+                    LastUpdate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -460,21 +538,96 @@ namespace vega.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PlanningAppAdmins",
+                columns: table => new
+                {
+                    PlanningAppId = table.Column<int>(nullable: false),
+                    AppUserId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlanningAppAdmins", x => new { x.PlanningAppId, x.AppUserId });
+                    table.ForeignKey(
+                        name: "FK_PlanningAppAdmins_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PlanningAppAdmins_PlanningApps_PlanningAppId",
+                        column: x => x.PlanningAppId,
+                        principalTable: "PlanningApps",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PlanningAppDrawers",
+                columns: table => new
+                {
+                    PlanningAppId = table.Column<int>(nullable: false),
+                    AppUserId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlanningAppDrawers", x => new { x.PlanningAppId, x.AppUserId });
+                    table.ForeignKey(
+                        name: "FK_PlanningAppDrawers_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PlanningAppDrawers_PlanningApps_PlanningAppId",
+                        column: x => x.PlanningAppId,
+                        principalTable: "PlanningApps",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PlanningAppFees",
+                columns: table => new
+                {
+                    PlanningAppId = table.Column<int>(nullable: false),
+                    FeeId = table.Column<int>(nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(10, 2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlanningAppFees", x => new { x.PlanningAppId, x.FeeId });
+                    table.ForeignKey(
+                        name: "FK_PlanningAppFees_Fees_FeeId",
+                        column: x => x.FeeId,
+                        principalTable: "Fees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PlanningAppFees_PlanningApps_PlanningAppId",
+                        column: x => x.PlanningAppId,
+                        principalTable: "PlanningApps",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PlanningAppState",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CompletionDate = table.Column<DateTime>(nullable: true),
-                    CurrentState = table.Column<bool>(nullable: false),
-                    CustomDuration = table.Column<int>(nullable: false),
-                    CustomDurationSet = table.Column<bool>(nullable: false),
-                    DueByDate = table.Column<DateTime>(nullable: false),
-                    Notes = table.Column<string>(nullable: true),
                     PlanningAppId = table.Column<int>(nullable: false),
+                    GeneratorOrder = table.Column<int>(nullable: false),
+                    GeneratorName = table.Column<string>(nullable: true),
                     StateInitialiserStateId = table.Column<int>(nullable: false),
+                    DueByDate = table.Column<DateTime>(nullable: false),
+                    userModifiedDate = table.Column<bool>(nullable: false),
+                    CompletionDate = table.Column<DateTime>(nullable: true),
                     StateStatusId = table.Column<int>(nullable: false),
-                    userModifiedDate = table.Column<bool>(nullable: false)
+                    CurrentState = table.Column<bool>(nullable: false),
+                    CustomDurationSet = table.Column<bool>(nullable: false),
+                    CustomDuration = table.Column<int>(nullable: false),
+                    Notes = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -495,6 +648,30 @@ namespace vega.Migrations
                         name: "FK_PlanningAppState_StateStatus_StateStatusId",
                         column: x => x.StateStatusId,
                         principalTable: "StateStatus",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PlanningAppSurveyors",
+                columns: table => new
+                {
+                    PlanningAppId = table.Column<int>(nullable: false),
+                    AppUserId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlanningAppSurveyors", x => new { x.PlanningAppId, x.AppUserId });
+                    table.ForeignKey(
+                        name: "FK_PlanningAppSurveyors_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PlanningAppSurveyors_PlanningApps_PlanningAppId",
+                        column: x => x.PlanningAppId,
+                        principalTable: "PlanningApps",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -549,11 +726,11 @@ namespace vega.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    DateValue = table.Column<DateTime>(nullable: false),
-                    IntValue = table.Column<int>(nullable: false),
-                    PlanningAppStateId = table.Column<int>(nullable: true),
                     StateInitialiserStateCustomFieldId = table.Column<int>(nullable: false),
-                    StrValue = table.Column<string>(nullable: true)
+                    StrValue = table.Column<string>(nullable: true),
+                    IntValue = table.Column<int>(nullable: false),
+                    DateValue = table.Column<DateTime>(nullable: false),
+                    PlanningAppStateId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -565,11 +742,6 @@ namespace vega.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AppUsers_IdentityId",
-                table: "AppUsers",
-                column: "IdentityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -626,6 +798,21 @@ namespace vega.Migrations
                 column: "VehicleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PlanningAppAdmins_AppUserId",
+                table: "PlanningAppAdmins",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanningAppDrawers_AppUserId",
+                table: "PlanningAppDrawers",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanningAppFees_FeeId",
+                table: "PlanningAppFees",
+                column: "FeeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PlanningApps_CurrentPlanningStatusId",
                 table: "PlanningApps",
                 column: "CurrentPlanningStatusId");
@@ -634,11 +821,6 @@ namespace vega.Migrations
                 name: "IX_PlanningApps_CustomerId",
                 table: "PlanningApps",
                 column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlanningApps_StateInitialiserId",
-                table: "PlanningApps",
-                column: "StateInitialiserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PlanningAppState_PlanningAppId",
@@ -659,6 +841,21 @@ namespace vega.Migrations
                 name: "IX_PlanningAppStateCustomFields_PlanningAppStateId",
                 table: "PlanningAppStateCustomFields",
                 column: "PlanningAppStateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanningAppSurveyors_AppUserId",
+                table: "PlanningAppSurveyors",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectGeneratorSequence_GeneratorId",
+                table: "ProjectGeneratorSequence",
+                column: "GeneratorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectGeneratorSequence_ProjectGeneratorId",
+                table: "ProjectGeneratorSequence",
+                column: "ProjectGeneratorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StateInitialiserState_StateInitialiserId",
@@ -684,9 +881,6 @@ namespace vega.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AppUsers");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -702,6 +896,12 @@ namespace vega.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "BusinessDates");
+
+            migrationBuilder.DropTable(
+                name: "DescriptionOfWork");
+
+            migrationBuilder.DropTable(
                 name: "DevelopmentType");
 
             migrationBuilder.DropTable(
@@ -711,10 +911,28 @@ namespace vega.Migrations
                 name: "Photos");
 
             migrationBuilder.DropTable(
+                name: "PlanningAppAdmins");
+
+            migrationBuilder.DropTable(
+                name: "PlanningAppDrawers");
+
+            migrationBuilder.DropTable(
+                name: "PlanningAppFees");
+
+            migrationBuilder.DropTable(
                 name: "PlanningAppStateCustomFields");
 
             migrationBuilder.DropTable(
+                name: "PlanningAppSurveyors");
+
+            migrationBuilder.DropTable(
+                name: "ProjectGeneratorSequence");
+
+            migrationBuilder.DropTable(
                 name: "StateInitialiserStateCustomFields");
+
+            migrationBuilder.DropTable(
+                name: "Title");
 
             migrationBuilder.DropTable(
                 name: "VehicleFeatures");
@@ -723,10 +941,16 @@ namespace vega.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Fees");
 
             migrationBuilder.DropTable(
                 name: "PlanningAppState");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "ProjectGenerators");
 
             migrationBuilder.DropTable(
                 name: "StateInitialiserCustomFields");

@@ -33,6 +33,8 @@ namespace vega.Controllers.Resources
         public ICollection<string> Admins { get; set; }
         public string DescriptionOfWork { get; set; }
         public string Notes { get; set; }
+        public bool canArchive { get; set; }
+        public bool canTerminate { get; set; }
 
         public ICollection<PlanningAppStateResource> PlanningAppStates { get; set; }
         public ICollection<PlanningAppFeesResource> PlanningAppFees { get; set; }

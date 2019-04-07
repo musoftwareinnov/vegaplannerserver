@@ -125,6 +125,16 @@ namespace vega.Services
             return await PlanningAppRepository.GetPlanningApp(planningApp.Id, includeRelated:false);
         }
         
+        public void Terminate(PlanningApp planningApp) {
+
+            
+            planningApp.CurrentPlanningStatus = statusList.Where(s => s.Name == StatusList.AppTerminated).SingleOrDefault();
+            //planningApp.Current().StateStatus = planningApp.CurrentPlanningStatus;
+            PlanningAppRepository.UpdatePlanningApp(planningApp);
+
+        }
+
+
         //Single Generator Creator
         private async Task<PlanningApp> AddSingleGeneratorStates(PlanningApp planningApp) 
         {

@@ -69,13 +69,6 @@ namespace vega.Core.Models
             Fees = new Collection<PlanningAppFees>();
         }  
 
-        public void Terminate(List<StateStatus> statusList)
-        {   
-            CurrentPlanningStatus = statusList.Where(p => p.Name == StatusList.AppTerminated).SingleOrDefault();
-            //this.Current().CompletionDate = SystemDate.Instance.date;
-            
-        }
-
         public void UpdateKeyFields(IEnumerable<PlanningAppStateCustomFieldResource> fieldsToUpdate)
         {   
             foreach(var rule in fieldsToUpdate) {
@@ -174,6 +167,9 @@ namespace vega.Core.Models
         }
         public bool isLastGeneratorState(int planningAppStateId)
         {
+            if(this.CurrentPlanningStatus.Name != StatusList.AppInProgress)
+                return false; //Only interested in live applications when adding generators
+
             var r = OrderedPlanningAppStates.GetEnumerator();
             while(r.MoveNext()) {
                 PlanningAppState prev = r.Current;
@@ -201,6 +197,16 @@ namespace vega.Core.Models
                 }
             }
             return false;
+        }
+
+        public bool canArchive()
+        {
+            return (this.CurrentPlanningStatus.Name == StatusList.Complete || this.CurrentPlanningStatus.Name == StatusList.AppTerminated);
+        }
+
+        public bool canTerminate()
+        {
+            return (this.CurrentPlanningStatus.Name == StatusList.AppInProgress);
         }
     }
 }

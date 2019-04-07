@@ -21,6 +21,11 @@
  dotnet ef database update CustomerTitleLookup
  dotnet ef database update ProjectGenerator
  dotnet ef database update ProjectGeneratorSequence
+ dotnet ef database update ProjectFinal
+ dotnet ef database update RemoveSingleUseGenerator
+ dotnet ef database update AddStartDateToProject
+ dotnet ef database update AddGenNametoPlanState
+ dotnet ef database update TempRemoveMutlipleProjectGenerators
 
 #Clear down database
 #truncate table PlanningAppFees
@@ -30,4 +35,13 @@
 #truncate table PlanningAppAdmins
 #delete PlanningAppState
 #delete PlanningApps
+#
+#NoACtion
+#                    table.PrimaryKey("PK_PlanningAppState", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PlanningAppState_PlanningApps_PlanningAppId",
+                        column: x => x.PlanningAppId,
+                        principalTable: "PlanningApps",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
 

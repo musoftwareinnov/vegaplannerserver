@@ -15,5 +15,7 @@ namespace vega.Controllers.Resources
         public string NextState { get; set; }
         public string ApplicationNo{ get; set; }
         public string CompletionDate { get; set; }
+        public bool canArchive { get; set; }
+        public bool canTerminate { get; set; }
     }
 }

@@ -1,13 +1,12 @@
 
-Insert Generator to Application 
 Archiving
-Terminate
+WHen terminating go back to previous state - InProgress/Clients or Search Ref (specify in queryparam path)
 
 Error testing On new application
 Add Case Officer
 Refactor UpdatePLanningApp (states) - Developer and Address (messy)
-Azure Key Vault
-Add Logger
+Azure Key Vault!!!!!
+Add Logger!!!!
 
 Refactor AppendGenerator and InsertGenerator
 TESTING

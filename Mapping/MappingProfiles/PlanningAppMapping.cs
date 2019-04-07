@@ -20,6 +20,10 @@ namespace vega.Mapping.MappingProfiles
                     opt => opt.MapFrom(ps => ps.Current().DynamicStateStatus()))
                 .ForMember(psr => psr.CurrentState,
                     opt => opt.MapFrom(ps => ps.Current().state.Name))
+                .ForMember(psr => psr.canArchive,
+                    opt => opt.MapFrom(ps => ps.canArchive()))
+                .ForMember(psr => psr.canTerminate,
+                    opt => opt.MapFrom(ps => ps.canTerminate()))
                 .ForMember(psr => psr.NextState,
                     opt => opt.MapFrom(ps => ps.SeekNext().state.Name))
                 .ForMember(psr => psr.ExpectedStateCompletionDate,
@@ -61,8 +65,7 @@ namespace vega.Mapping.MappingProfiles
             CreateMap<UpdatePlanningAppResource, PlanningApp>()                
                     .AfterMap((vr, v) => {
                     //Update Fees
-                    var updatedFees = v.Fees.ToList();
-                    foreach (var f in updatedFees) {
+                    foreach (var f in v.Fees.ToList()) {
                         f.Amount = vr.planningAppFees.Where(rf => rf.Id == f.FeeId).SingleOrDefault().Amount;
                     }
                 });

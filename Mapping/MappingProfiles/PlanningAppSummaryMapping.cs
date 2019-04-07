@@ -18,6 +18,10 @@ namespace vega.Mapping.MappingProfiles
                     opt => opt.MapFrom(ps => ps.Current().DueByDate.SettingDateFormat()))
                 .ForMember(psr => psr.NextState,
                     opt => opt.MapFrom(ps => ps.SeekNext().state.Name))
+                .ForMember(psr => psr.canArchive,
+                    opt => opt.MapFrom(ps => ps.canArchive()))
+                .ForMember(psr => psr.canTerminate,
+                    opt => opt.MapFrom(ps => ps.canTerminate()))
                 .ForMember(psr => psr.PlanningStatus, 
                     opt => opt.MapFrom(ps => ps.CurrentPlanningStatus.Name))
                 .ForMember(psr => psr.Name, 

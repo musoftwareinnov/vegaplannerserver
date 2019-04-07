@@ -41,6 +41,8 @@ namespace vega.Mapping.MappingProfiles
             CreateMap<PlanningAppState, PlanningAppStateFullResource>()
                 .ForMember(psr => psr.StateName,
                     opt => opt.MapFrom(ps => ps.state.Name))
+            .ForMember(psr => psr.GeneratorName,
+                    opt => opt.MapFrom(ps => ps.GeneratorName))
                 .ForMember(psr => psr.DueByDate,
                     opt => opt.MapFrom(ps => ps.DueByDate.SettingDateFormat())) 
                 .ForMember(psr => psr.DateCompleted,

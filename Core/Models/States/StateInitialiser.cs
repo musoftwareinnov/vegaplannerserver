@@ -12,7 +12,6 @@ namespace vega.Core.Models
 {  
     public class StateInitialiser : IdNameProperty
     {  
-        public int OrderId { get; set; }
         public string Description { get; set; }
 
         [JsonIgnore]

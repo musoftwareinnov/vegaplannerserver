@@ -10,8 +10,8 @@ using vega.Persistence;
 namespace vega.Migrations
 {
     [DbContext(typeof(VegaDbContext))]
-    [Migration("20190404184604_TempRemoveMutlipleProjectGenerators")]
-    partial class TempRemoveMutlipleProjectGenerators
+    [Migration("20190407125901_SeedInitial")]
+    partial class SeedInitial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -366,8 +366,6 @@ namespace vega.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255);
-
-                    b.Property<int>("OrderId");
 
                     b.HasKey("Id");
 

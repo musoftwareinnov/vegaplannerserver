@@ -15,6 +15,7 @@ namespace vega.Services.Interfaces
         PlanningApp RemoveGenerator(PlanningApp planningApp, int OrderId, int NewGeneratorId);
         Task<PlanningApp> GetPlanningApp(int id);
         Task<PlanningApp> NextState(PlanningApp planningApp);
+        void Terminate(PlanningApp planningApp);
         int UpdateDueByDates(PlanningApp planningApp);
     }
 }

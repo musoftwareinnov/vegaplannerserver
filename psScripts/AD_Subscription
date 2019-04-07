@@ -1,0 +1,36 @@
+
+Account          : paulscollay@yahoo.co.uk
+SubscriptionName : vegaplanner_payg
+SubscriptionId   : e69f7c40-76f1-464d-babc-0c47f2963668
+TenantId         : b22a1039-f55e-46d8-973f-60d92cad894d
+Environment      : AzureCloud
+
+Creating a new Application in AAD (App URI - http://VSO.root.360fd0fe-b3ed-41d1-a76e-a248815833cf)
+VERBOSE: Performing the operation "Adding a new application with display name 'VSO.root.360fd0fe-b3ed-41d1-a76e-a248815833cf'" on target "VSO.root.360fd0fe-b3ed-41d1-a76e-a248815833cf".
+Azure AAD Application creation completed successfully (Application Id: 0b5cf302-3f75-45d2-a514-616f770c9156)
+Creating a new SPN
+SPN creation completed successfully (SPN Name: )
+Waiting for SPN creation to reflect in Directory before Role assignment
+Assigning role (owner) to SPN App (0b5cf302-3f75-45d2-a514-616f770c9156)
+
+RoleAssignmentId   : /subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668/providers/Microsoft.Authorization/roleAssignments/f0ceceec-4744-416e-ad57-f29445d85864
+Scope              : /subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668
+DisplayName        : VSO.root.360fd0fe-b3ed-41d1-a76e-a248815833cf
+SignInName         : 
+RoleDefinitionName : Owner
+RoleDefinitionId   : 8e3af657-a8ff-443c-a75c-2fe8c4bcb635
+ObjectId           : f3bc15f2-e587-45e0-8646-b8210eb17470
+ObjectType         : ServicePrincipal
+CanDelegate        : False
+
+SPN role assignment completed successfully
+
+Copy and Paste below values for Service Connection
+***************************************************************************
+Connection Name: (SPN)
+Subscription Id: e69f7c40-76f1-464d-babc-0c47f2963668
+Subscription Name: 
+Service Principal Id: 0b5cf302-3f75-45d2-a514-616f770c9156
+Service Principal key: <Password that you typed in>
+Tenant Id: b22a1039-f55e-46d8-973f-60d92cad894d
+
