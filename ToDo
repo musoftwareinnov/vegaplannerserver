@@ -1,12 +1,12 @@
 
-Archiving
-WHen terminating go back to previous state - InProgress/Clients or Search Ref (specify in queryparam path)
-
+Archiving: WHen terminating go back to previous state - InProgress/Clients or Search Ref (specify in queryparam path)
 Error testing On new application
 Add Case Officer
-Refactor UpdatePLanningApp (states) - Developer and Address (messy)
 Azure Key Vault!!!!!
-Add Logger!!!!
+Add Logger!!!! Elastic Search
+Search - exclude Archived!!!!
+
+Version Control
 
 Refactor AppendGenerator and InsertGenerator
 TESTING
