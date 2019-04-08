@@ -57,6 +57,7 @@ namespace vega
         private string[] allowCors = {
             "http://localhost:4200",
             "https://vegaplannerclient.azurewebsites.net"
+            "https://croftondesignservices.azurewebsites.net"
         };
 
         public Startup(IHostingEnvironment env)

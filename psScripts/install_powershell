@@ -1,0 +1,5 @@
+
+#Install Powershell from site
+#Get-Command *AzureRM*   //should be empty
+#Install-Module -Name AzureRM
+#Get-Command *AzureRM*   //list of commands
