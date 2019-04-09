@@ -180,7 +180,7 @@ namespace vega.Persistence
             List<PlanningApp> planningAppSelectList = new List<PlanningApp>();
             var statusListInProgress = stateStatusRepository.GetStateStatusListGroup(StatusList.AppInProgress);
 
-            var appsInProgress = query.Where(pa => pa.CurrentPlanningStatus.Name == StatusList.AppInProgress).ToList();
+            var appsInProgress = query.Where(pa => pa.CurrentPlanningStatus.Name == StatusList.AppInProgress);//.ToList();
 
             //DEBUGGING CHECKS
             // foreach(var app in appsInProgress) {

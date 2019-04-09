@@ -1,5 +1,4 @@
 {
-    "appService.defaultWebAppToDeploy": "/subscriptions/e69f7c40-76f1-464d-babc-0c47f2963668/resourceGroups/vegaPlannerProdGroup/providers/Microsoft.Web/sites/vegaPlannerServer",
     "appService.deploySubpath": "",
     "git.ignoreLimitWarning": true
 }

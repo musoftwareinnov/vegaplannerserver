@@ -39,6 +39,9 @@ using vega.Services;
 using System.Collections.Generic;
 using vega.Core.Models.States;
 using vega.Services.Implementations;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.KeyVault.Models;
+using Microsoft.Azure.Services.AppAuthentication;
 
 namespace vega
 {
@@ -60,14 +63,18 @@ namespace vega
             "https://vegaplannerclientcds.azurewebsites.net"
         };
 
-        public Startup(IHostingEnvironment env)
+
+        public Startup(IHostingEnvironment env, IConfiguration azureConfiguration)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
-            Configuration = builder.Build();
+
+            //Add azure secret configuration that contain local keyvault values
+            builder.AddConfiguration(azureConfiguration);    
+            Configuration = builder.Build(); 
         }
 
 
@@ -130,8 +137,10 @@ namespace vega
             //AutoMapper
             services.AddAutoMapper(typeof(Startup));
 
-            //Database Connection
-            services.AddDbContext<VegaDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+            //Database Connection. Get Password From KeyVault
+            var connectionString =  Configuration.GetConnectionString("Default") + Configuration["VegaPlannerDbPwdCDS"];
+            Console.WriteLine(connectionString); //REMOVE WHEN HAPPY!!
+            services.AddDbContext<VegaDbContext>(options => options.UseSqlServer(connectionString));
   
             // SECURITY && JWT Wire up
             // Get options from app settings
@@ -223,7 +232,6 @@ namespace vega
             {
                 Console.WriteLine("In Development mode");
                 Console.WriteLine("Database Connection String: " + Configuration.GetConnectionString("Default"));              
-                // Note: HotModuleRelacement removed, client separate application
             }
             else
             {
@@ -265,6 +273,8 @@ namespace vega
             });
             app.UseAuthentication();
 
+
+        
             //Create Roles if not exist
             //CORE DUMP ONCE SET!!!!!!!! TODO!!!!!!
             CreateUserRoles(serviceProvider).Wait();
@@ -279,6 +289,14 @@ namespace vega
             var options = new DateSettings();
             Configuration.GetSection("DateSettings").Bind(options);
             setApplicationDate(options.CurrentDateOverride, dateService, businessDateRepository);
+        }
+
+        // This method fetches a token from Azure Active Directory, which can then be provided to Azure Key Vault to authenticate
+        public async Task<string> GetAccessTokenAsync()
+        {
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            string accessToken = await azureServiceTokenProvider.GetAccessTokenAsync("https://vault.azure.net");
+            return accessToken;
         }
         private async Task CreatePlanningAppStatuses(IServiceProvider serviceProvider)  
         { 

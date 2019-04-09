@@ -1,5 +1,5 @@
 #Create New Server
-# sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=MyComplexPassword!1234' -p 1433:1433 -d microsoft/mssql-server-linux
+# sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=vegaplannerdev1970[]' -p 1433:1433 -d microsoft/mssql-server-linux
 
 #Comment out the following in startup :-
 # CreateUserRoles(serviceProvider).Wait();
@@ -7,25 +7,8 @@
 # setApplicationDate(options.CurrentDateOverride, businessDateRepository)
 
 #Run Migrations Scripts
- dotnet ef database update InitialModel
- dotnet ef database update SeedDatabase
- dotnet ef database update AddCityCountyAddress
- dotnet ef database update BusinessDates
- dotnet ef database update DescriptionOfWorkModel
- dotnet ef database update SeedDescriptionOfWorkModel
- dotnet ef database update AddSurveyors
- dotnet ef database update AddDrawers
- dotnet ef database update ChangAppUserType
- dotnet ef database update Fees
- dotnet ef database update SeedFees
- dotnet ef database update CustomerTitleLookup
- dotnet ef database update ProjectGenerator
- dotnet ef database update ProjectGeneratorSequence
- dotnet ef database update ProjectFinal
- dotnet ef database update RemoveSingleUseGenerator
- dotnet ef database update AddStartDateToProject
- dotnet ef database update AddGenNametoPlanState
- dotnet ef database update TempRemoveMutlipleProjectGenerators
+ dotnet ef database update InitialSetup
+ dotnet ef database update SeedInitial
 
 #Clear down database
 #truncate table PlanningAppFees
@@ -38,10 +21,10 @@
 #
 #NoACtion
 #                    table.PrimaryKey("PK_PlanningAppState", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PlanningAppState_PlanningApps_PlanningAppId",
-                        column: x => x.PlanningAppId,
-                        principalTable: "PlanningApps",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+#                    table.ForeignKey(
+#                        name: "FK_PlanningAppState_PlanningApps_PlanningAppId",
+#                        column: x => x.PlanningAppId,
+#                        principalTable: "PlanningApps",
+#                        principalColumn: "Id",
+#                        onDelete: ReferentialAction.NoAction);
 

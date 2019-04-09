@@ -2,7 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <!-- <Version>2.0</Version> 
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <UserSecretsId>06466f76-4a2b-4d64-94d9-72d76e179948</UserSecretsId>
+    <!-- <Version>2.2</Version> 
     <Authors>Paul Scollay</Authors>
     <Company>MU Software Innovations</Company>
     <Product>Vega Planner</Product>
@@ -23,10 +25,14 @@
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <IsPackable>false</IsPackable> -->
   </PropertyGroup>
+  
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.0.100" />
+    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.3" />
+    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="2.2.0" />
     <PackageReference Include="Moq" Version="4.9.0" />
   </ItemGroup>
 
