@@ -274,8 +274,6 @@ namespace vega
             });
             app.UseAuthentication();
 
-
-        
             //Create Roles if not exist
             //CORE DUMP ONCE SET!!!!!!!! TODO!!!!!!
             CreateUserRoles(serviceProvider).Wait();
