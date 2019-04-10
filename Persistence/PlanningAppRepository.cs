@@ -82,22 +82,7 @@ namespace vega.Persistence
         public QueryResult<PlanningApp> GetPlanningApps(PlanningAppQuery queryObj)
         {
             var result = new QueryResult<PlanningApp>();
-            var resList = new List<PlanningApp>();
-
-            var query1 =  vegaDbContext.PlanningApps
-             .Include(b => b.CurrentPlanningStatus) 
-                                             .Include(t => t.PlanningAppStates)
-                                    .ThenInclude(a => a.StateStatus)
-                                .ToList();
-
-            var query2 =  vegaDbContext.PlanningApps
-                                .Include(b => b.CurrentPlanningStatus) 
-                                .Include(t => t.PlanningAppStates)
-                                    .ThenInclude(a => a.StateStatus)
-                                .Include(t => t.PlanningAppStates)
-                                    .ThenInclude(s => s.state)
-                                .Include(c => c.Customer.CustomerContact)
-                                .ToList();    
+            var resList = new List<PlanningApp>(); 
 
             var query =  vegaDbContext.PlanningApps
                                 .Include(b => b.CurrentPlanningStatus) 
