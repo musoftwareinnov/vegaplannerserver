@@ -195,7 +195,7 @@ namespace vega.Persistence
             List<PlanningApp> planningAppSelectList = new List<PlanningApp>();
             var statusListInProgress = stateStatusRepository.GetStateStatusListGroup(StatusList.AppInProgress);
 
-
+            //This iw weird - need to convert to list be fore where clause and orderby????
             var queryList = query.ToList();
 
             var appsInProgress = queryList.Where(pa => pa.CurrentPlanningStatus.Name == StatusList.AppInProgress)
