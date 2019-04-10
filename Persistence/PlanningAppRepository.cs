@@ -84,6 +84,21 @@ namespace vega.Persistence
             var result = new QueryResult<PlanningApp>();
             var resList = new List<PlanningApp>();
 
+            var query1 =  vegaDbContext.PlanningApps
+             .Include(b => b.CurrentPlanningStatus) 
+                                             .Include(t => t.PlanningAppStates)
+                                    .ThenInclude(a => a.StateStatus)
+                                .ToList();
+
+            var query2 =  vegaDbContext.PlanningApps
+                                .Include(b => b.CurrentPlanningStatus) 
+                                .Include(t => t.PlanningAppStates)
+                                    .ThenInclude(a => a.StateStatus)
+                                .Include(t => t.PlanningAppStates)
+                                    .ThenInclude(s => s.state)
+                                .Include(c => c.Customer.CustomerContact)
+                                .ToList();    
+
             var query =  vegaDbContext.PlanningApps
                                 .Include(b => b.CurrentPlanningStatus) 
                                 .Include(t => t.PlanningAppStates)
@@ -91,7 +106,7 @@ namespace vega.Persistence
                                 .Include(t => t.PlanningAppStates)
                                     .ThenInclude(s => s.state)
                                 .Include(c => c.Customer.CustomerContact)
-                                .AsQueryable();
+                                .AsQueryable();                  
 
             if(queryObj.CustomerId > 0)
                 query = query.Where(c => c.Customer.Id == queryObj.CustomerId);
@@ -180,15 +195,19 @@ namespace vega.Persistence
             List<PlanningApp> planningAppSelectList = new List<PlanningApp>();
             var statusListInProgress = stateStatusRepository.GetStateStatusListGroup(StatusList.AppInProgress);
 
-            var appsInProgress = query.Where(pa => pa.CurrentPlanningStatus.Name == StatusList.AppInProgress);//.ToList();
+
+            var queryList = query.ToList();
+
+            var appsInProgress = queryList.Where(pa => pa.CurrentPlanningStatus.Name == StatusList.AppInProgress)
+                                    .OrderBy(d => d.Current().DueByDate).ToList();
 
             //DEBUGGING CHECKS
-            foreach(var app in appsInProgress) {
-                if(app.Current() == null) {
-                    app.Current();
-                }
-                app.PlanningAppStates = app.OrderedPlanningAppStates.ToList();
-            }
+            // foreach(var app in appsInProgress) {
+            //     if(app.Current() == null) {
+            //         app.Current();
+            //     }
+            //     app.PlanningAppStates = app.OrderedPlanningAppStates.ToList();
+            // }
 
             // var ontime = appsInProgress.Where(pa => pa.Current().DynamicStateStatus() == "OnTime")
             //                             .OrderBy(o => o.Current().DueByDate);
@@ -197,12 +216,12 @@ namespace vega.Persistence
             // var overdue = appsInProgress.Where(pa => pa.Current().DynamicStateStatus() == "Overdue")
             //                             .OrderBy(o => o.Current().DueByDate);
 
-            foreach(var status in statusListInProgress) { 
-                planningAppSelectList.AddRange(appsInProgress.Where(pa => pa.Current().DynamicStateStatus() == status.Name)
-                                        .OrderBy(o => o.Current().DueByDate));
-            }  
+            // foreach(var status in statusListInProgress) { 
+            //     planningAppSelectList.AddRange(appsInProgress.Where(pa => pa.Current().DynamicStateStatus() == status.Name)
+            //                             .OrderBy(o => o.Current().DueByDate));
+            // }  
 
-            return planningAppSelectList;
+            return appsInProgress;
         }
 
         public List<PlanningApp> getAppsNotInProgress(IQueryable<PlanningApp> query) {
