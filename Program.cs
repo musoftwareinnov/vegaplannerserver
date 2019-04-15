@@ -30,11 +30,11 @@ namespace vega
                 {
                     if (context.HostingEnvironment.IsProduction())
                     {
-                //         var builtConfig = config.Build();
-                //             var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                //             var keyVaultClient = new KeyVaultClient(
-                //                 new KeyVaultClient.AuthenticationCallback(
-                //                     azureServiceTokenProvider.KeyVaultTokenCallback));
+                        var builtConfig = config.Build();
+                            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                            var keyVaultClient = new KeyVaultClient(
+                                new KeyVaultClient.AuthenticationCallback(
+                                    azureServiceTokenProvider.KeyVaultTokenCallback));
                 //             //Console.WriteLine("config=" + builtConfig["KeyVaultName"]);
                 //             config.AddAzureKeyVault(
                 //                 $"https://{builtConfig["KeyVaultName"]}.vault.azure.net/",
