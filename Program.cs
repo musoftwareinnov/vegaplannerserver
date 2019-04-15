@@ -26,10 +26,10 @@ namespace vega
                 .UseKestrel(options => { options.Limits.MaxRequestBodySize = 1000000000; } ) //For large images uploads 100MB
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
-                // .ConfigureAppConfiguration((context, config) =>
-                // {
-                //     if (context.HostingEnvironment.IsProduction())
-                //     {
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    if (context.HostingEnvironment.IsProduction())
+                    {
                 //         var builtConfig = config.Build();
                 //             var azureServiceTokenProvider = new AzureServiceTokenProvider();
                 //             var keyVaultClient = new KeyVaultClient(
@@ -40,8 +40,8 @@ namespace vega
                 //                 $"https://{builtConfig["KeyVaultName"]}.vault.azure.net/",
                 //                 keyVaultClient,
                 //                 new DefaultKeyVaultSecretManager());
-                //     }
-                // })
+                    }
+                })
                 .UseStartup<Startup>();
 
         private static string GetKeyVaultEndpoint() => "https://vegaplannerscds.vault.azure.net";
