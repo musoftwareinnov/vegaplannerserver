@@ -139,10 +139,8 @@ namespace vega
 
             //Database Connection. Get Password From KeyVault
             var connectionString =  Configuration.GetConnectionString("Default") + Configuration["VegaPlannerDbPwdCDS"];
-            Console.WriteLine(connectionString); //REMOVE WHEN HAPPY!!
             services.AddDbContext<VegaDbContext>(options => options.UseSqlServer(connectionString));
-            //services.AddDbContext<VegaDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default") ));
-  
+ 
             // SECURITY && JWT Wire up
             // Get options from app settings
             var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
@@ -345,10 +343,9 @@ namespace vega
                 userIdentity.LastName = Constants.Strings.AdminUser.LastName;
                 userIdentity.Email = Constants.Strings.AdminUser.Email;
         
-                var result = await UserManager.CreateAsync(userIdentity, "admpassword"); //CHANGE To ENCRYPT!!!!!!
+                var result = await UserManager.CreateAsync(userIdentity, Configuration["adminpwd"]);
 
                 if (result.Succeeded) {
-                    //IAU Deprecated -> UserRepository.Add(new InternalAppUser { IdentityId = userIdentity.Id, Location = "Nowhere" });    
                     var adminClaims = RoleClaimSetup.RoleClaimSetupAdmin();
                     await UserManager.AddToRoleAsync(userIdentity, adminClaims.Role.Name); 
                     await UnitOfWork.CompleteAsync();
