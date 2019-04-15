@@ -1,0 +1,6 @@
+
+  535  az login
+  536  az keyvault secret show --name vegapladmin --vault-name vegaplannerscds
+  537  az keyvault secret set --vault-name vegaplannerscds --name "AppSecret" --value "MySecret"
+  538  az keyvault secret set --vault-name "vegaplannerscds" --name "SecretName" --value "secret_value_1_prod"
+  539   az keyvault secret set --vault-name "vegaplannerscds" --name "Section--SecretName" --value "secret_value_2_prod"

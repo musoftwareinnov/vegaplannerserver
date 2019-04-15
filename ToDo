@@ -6,6 +6,16 @@ Azure Key Vault!!!!!
 Add Logger!!!! Elastic Search
 Search - exclude Archived!!!!
 
+
+New Features
+1. Setup State - specify email/text on alert or completion or overdue
+                    Customer email  - put alerts in list to process by admin
+                    Drawers
+                    Surveyors
+                    Admins
+
+
+
 Version Control
 
 Refactor AppendGenerator and InsertGenerator
