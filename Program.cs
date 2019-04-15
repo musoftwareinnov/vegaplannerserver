@@ -37,7 +37,8 @@ namespace vega
                                     azureServiceTokenProvider.KeyVaultTokenCallback));
                             Console.WriteLine("config=" + builtConfig["KeyVaultName"]);
                             config.AddAzureKeyVault(
-                                $"https://{builtConfig["KeyVaultName"]}.vault.azure.net/",
+                                // $"https://{builtConfig["KeyVaultName"]}.vault.azure.net/",
+                                "https://vegaplannerscds.vault.azure.net/",
                                 keyVaultClient,
                                 new DefaultKeyVaultSecretManager());
                     }
