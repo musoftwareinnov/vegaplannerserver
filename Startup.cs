@@ -140,8 +140,8 @@ namespace vega
             //Database Connection. Get Password From KeyVault
             var connectionString =  Configuration.GetConnectionString("Default") + Configuration["VegaPlannerDbPwdCDS"];
             Console.WriteLine(connectionString); //REMOVE WHEN HAPPY!!
-            //services.AddDbContext<VegaDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<VegaDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default") ));
+            services.AddDbContext<VegaDbContext>(options => options.UseSqlServer(connectionString));
+            //services.AddDbContext<VegaDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default") ));
   
             // SECURITY && JWT Wire up
             // Get options from app settings
